@@ -44,7 +44,16 @@
     ],
     "from": "10-20",
     "to": "01-31",
-    "label": "福袋"
+    "label": "福袋",
+    "seo": {
+      "workTitle": "{work}の福袋{year}一覧｜ハッピーバッグ・予約受付中のものも",
+      "workTitleNoResv": "{work}の福袋{year}一覧｜楽天市場で買えるハッピーバッグ",
+      "workH1": "{work}の福袋{year}",
+      "workDesc": "{work}の福袋（ハッピーバッグ）を新しい順に並べた一覧です",
+      "hubTitle": "福袋{year}一覧｜{works}などのキャラクターの福袋・ハッピーバッグ",
+      "hubH1": "福袋{year}",
+      "kaikataLink": "公式の福袋の予定は{work}の買い方メモに"
+    }
   },
   {
     "slug": "oshougatsu",

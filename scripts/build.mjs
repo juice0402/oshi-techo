@@ -14,7 +14,7 @@ import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
 import { buildIcs } from './lib/ics.mjs';
 import { decoCss, DECO_STYLES } from '../src/deco/deco.mjs';
 
-const OUT = 'dist';
+const OUT = process.env.OUT_DIR || 'dist'; // 見本データのテストで、別の日付のページを作るときだけ OUT_DIR を使う
 const production = process.env.SITE_MODE === 'production';
 
 const { works: allWorks, corners } = loadWorks();
@@ -1237,31 +1237,60 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
   });
 }
 
+// 一覧のページの構造化データ（ご当地・季節の特集。商品の Product・Offer は入れない）
+const collectionLd = ({ name, description, url, parts = [] }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name,
+  description,
+  url,
+  inLanguage: 'ja',
+  ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
+});
 // ---- 季節の特集（/作品/季節/ と /季節/） ----
 // 作品ごとの特集のページ（期間中）。others：ほかの作品の特集（いちばん下のリンク）
+// seasons.json の seo があれば、名前・説明文・見出しをそれで作る（福袋：「{作品}の福袋{年}一覧」。検索の「福袋 2027」「ハッピーバッグ」に合わせた）
+const seoFill = (t, v) => t.replace(/\{(work|year|works)\}/g, (_, k) => v[k] ?? '');
+// その作品の買い方メモに、まだ終わっていないこの季節の予定（events の tag）があるか
+const kaikataHas = (slug, tag) => hasKaikata(slug) && (readJson(`src/kaikata/${slug}.json`).events ?? []).some((e) => e.tag === tag && e.until >= today);
 function seasonWorkPage(s, w, others) {
   const label = s.label;
   {
     const path = `/${w.c.slug}/${s.slug}/`;
+    const seo = s.seo;
+    const v = { work: w.c.name, year: s.win.year };
+    const hasResv = w.items.some((i) => i.resv);
+    const seoTitle = seo && seoFill(hasResv ? seo.workTitle : seo.workTitleNoResv, v);
+    const seoDesc =
+      seo &&
+      sentence(
+        seoFill(seo.workDesc, v),
+        hasResv ? '予約受付中のものもあります' : '',
+        priceMid(w.items) ? `値段は${priceMid(w.items)}です` : '',
+        `特集は${mdOfYmd(s.win.end)}まで、楽天市場から1日2回集めています`,
+      );
+    const seoH1 = seo && seoFill(seo.workH1, v);
     page({
       path,
       tab: w.c.slug,
       count: w.items.length,
       deco: s.slug,
       crumbs: [{ name: 'トップ', path: '/' }, { name: w.c.name, path: `/${w.c.slug}/` }, { name: s.name, path }],
-      title: `${w.c.name}の${label}${s.win.year}｜${settings.siteName}`,
-      description: sentence(
+      title: seo ? `${seoTitle}｜${settings.siteName}` : `${w.c.name}の${label}${s.win.year}｜${settings.siteName}`,
+      ...(seo ? { extraLd: [collectionLd({ name: seoH1, description: seoDesc, url: `${SITE}${path}` })] } : {}),
+      description: seo ? seoDesc : sentence(
         `${w.c.name}の${label}を、楽天市場から1日2回集めています`,
         `見つけたのは${w.items.length}件です`,
         mixLine(w.items),
         s.gift && w.items.some((i) => i.gift === 1) ? `ラッピング対応は${w.items.filter((i) => i.gift === 1).length}件、特集は${mdOfYmd(s.win.end)}までです` : `特集は${mdOfYmd(s.win.end)}までです`,
       ),
-      h1: `${w.c.name}の${label}`,
+      h1: seo ? seoH1 : `${w.c.name}の${label}`,
       // プレゼントの季節（gift）は、送料込み・ラッピング対応でしぼりこめる
       body:
         (s.gift
           ? filterBar(w.items.slice(0, settings.listItems), ['s', 'g']) + sortBar(w.items.slice(0, settings.listItems)) + filterGrid(w.items, { show: settings.listItems, eager: true, sort: true }) + FILTER_END + SORT_END
           : sortGrid(w.items.slice(0, settings.listItems))) +
+        (seo?.kaikataLink && kaikataHas(w.c.slug, s.slug) ? `<p class="more"><a href="/${w.c.slug}/kaikata/#yotei">${esc(seoFill(seo.kaikataLink, v))}</a></p>` : '') +
         priceAt() +
         (others.length ? `<p class="more">${others.map((x) => `<a href="/${x.c.slug}/${s.slug}/">${esc(x.c.name)}の${esc(label)}</a>`).join('／')}</p>` : ''),
       lastmod: newest(w.items),
@@ -1272,22 +1301,24 @@ for (const { s, works } of seasonPages) {
   const label = s.label;
   for (const w of works) seasonWorkPage(s, w, works.filter((x) => x !== w));
   const names = works.length > 3 ? `${works.slice(0, 3).map((w) => w.c.name).join('・')}など` : works.map((w) => w.c.name).join('・');
+  const hubDesc = (() => {
+    const big = [...works].sort((a, b) => b.items.length - a.items.length);
+    const all = works.flatMap((w) => w.items);
+    return sentence(
+      `${big.slice(0, 2).map((w) => `${w.c.name}${w.items.length}件`).join('、')}${works.length > 2 ? 'など' : ''}、${works.length}作品の${label}を作品ごとに並べています`,
+      priceMid(all) ? `値段は${priceMid(all)}です` : '',
+      s.gift && all.some((i) => i.gift === 1) ? `ラッピング対応は${all.filter((i) => i.gift === 1).length}件、特集は${mdOfYmd(s.win.end)}までです` : `特集は${mdOfYmd(s.win.end)}まで、1日2回集めています`,
+    );
+  })();
   page({
     path: `/${s.slug}/`,
     count: works.reduce((n, w) => n + w.items.length, 0),
     deco: s.slug,
     crumbs: [{ name: 'トップ', path: '/' }, { name: label, path: `/${s.slug}/` }],
-    title: `${label}${s.win.year}（${names}）｜${settings.siteName}`,
-    description: (() => {
-      const big = [...works].sort((a, b) => b.items.length - a.items.length);
-      const all = works.flatMap((w) => w.items);
-      return sentence(
-        `${big.slice(0, 2).map((w) => `${w.c.name}${w.items.length}件`).join('、')}${works.length > 2 ? 'など' : ''}、${works.length}作品の${label}を作品ごとに並べています`,
-        priceMid(all) ? `値段は${priceMid(all)}です` : '',
-        s.gift && all.some((i) => i.gift === 1) ? `ラッピング対応は${all.filter((i) => i.gift === 1).length}件、特集は${mdOfYmd(s.win.end)}までです` : `特集は${mdOfYmd(s.win.end)}まで、1日2回集めています`,
-      );
-    })(),
-    h1: label,
+    title: s.seo ? `${seoFill(s.seo.hubTitle, { year: s.win.year, works: works.slice(0, 3).map((w) => w.c.name).join('・') })}｜${settings.siteName}` : `${label}${s.win.year}（${names}）｜${settings.siteName}`,
+    description: hubDesc,
+    h1: s.seo ? seoFill(s.seo.hubH1, { year: s.win.year }) : label,
+    ...(s.seo ? { extraLd: [collectionLd({ name: seoFill(s.seo.hubH1, { year: s.win.year }), description: hubDesc, url: `${SITE}/${s.slug}/` })] } : {}),
     body:
       (s.gift ? filterBar(works.flatMap((w) => w.items.slice(0, 24)), ['s', 'g']) : '') +
       works
@@ -1387,15 +1418,6 @@ for (const x of seasonLater) {
 // 作品ごとのページは「ご当地{作品}一覧」：地方の見出し（h2）の中に都道府県の見出し（h3）。北から南の順、都道府県の中は新しい順で30件まで
 const MAX_PER_PREF = 30;
 const MAX_TOC_OPEN = 15; // 都道府県がこれより多いと、目次を地方ごとにたたむ（最初は開いた形）
-const collectionLd = ({ name, description, url, parts = [] }) => ({
-  '@context': 'https://schema.org',
-  '@type': 'CollectionPage',
-  name,
-  description,
-  url,
-  inLanguage: 'ja',
-  ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
-});
 // 都道府県ごとの一覧のページ。作品（/作品/gotouchi/）とキャラだけ（/作品/gotouchi/キャラ/）で同じ形
 // who：説明文と節の名前に使う名前（サンリオ・ハローキティ）。part：都道府県の節の名前（「北海道のご当地{part}」）。top：目次の上に置くもの
 function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [] }) {
