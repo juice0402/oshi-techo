@@ -1,0 +1,46 @@
+<div class="fit" id="tcfit">
+<p class="fit-mm"><label>しまう枚数<input type="number" name="tn" inputmode="numeric" min="1" max="20000" value="100">枚</label></p>
+<fieldset class="pick"><legend>リフィル1枚に入る数</legend>
+<label><input type="radio" name="tp" value="9" checked><span>9ポケット</span></label>
+<label><input type="radio" name="tp" value="4"><span>4ポケット</span></label>
+<label><input type="radio" name="tp" value="12"><span>チェキ12ポケット</span></label>
+<label><input type="radio" name="tp" value="mm"><span>ポケットを数えた</span></label>
+</fieldset>
+<p class="fit-mm" data-for="tp" hidden><label>片面のポケット<input type="number" name="tpx" inputmode="numeric" min="1" max="30" value="6">こ</label></p>
+<fieldset class="pick"><legend>入れ方</legend>
+<label><input type="radio" name="ts" value="2" checked><span>表と裏の両方</span></label>
+<label><input type="radio" name="ts" value="1"><span>表だけ</span></label>
+</fieldset>
+<fieldset class="pick"><legend>バインダー1冊のリフィル</legend>
+<label><input type="radio" name="tb" value="25" checked><span>25枚</span></label>
+<label><input type="radio" name="tb" value="50"><span>50枚</span></label>
+<label><input type="radio" name="tb" value="mm"><span>商品の表示</span></label>
+</fieldset>
+<p class="fit-mm" data-for="tb" hidden><label>リフィル<input type="number" name="tbx" inputmode="numeric" min="1" max="200" value="30">枚まで</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 50" role="img" aria-label="いるバインダーを横に並べ、それぞれに入るリフィルの量をぬったところ"></svg><figcaption>四角がバインダー、ぬった所がリフィルの入る量</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('tcfit');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空、整数でないときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=Number(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi&&Math.floor(x)===x)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'の整数を入れてください。';return 0;}
+function pick(n,m,lo,hi,t){var s=v(n);f.querySelector('.fit-mm[data-for="'+n+'"]').hidden=s!=='mm';return s==='mm'?num(m,lo,hi,t):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+// バインダーの絵：1冊を縦長の四角にして、入るリフィルの量を下からぬる。12冊より多いときは12冊まで描く
+function draw(svg,books,cap,last){clear(svg);var m=Math.min(books,12),w=20,g=6,h=60;svg.setAttribute('viewBox','-2 -2 '+(m*(w+g)-g+4)+' '+(h+4));for(var i=0;i<m;i++){var x=i*(w+g),fill=(i===books-1)?last/cap:1;el(svg,'rect',{x:x,y:0,width:w,height:h,rx:2,'class':'fit-w'});el(svg,'rect',{x:x+2,y:h-2-(h-4)*fill,width:w-4,height:(h-4)*fill,rx:1,'class':'fit-c '+C[i%3]});}}
+function run(){bad='';
+var n=num('tn',1,20000,'しまう枚数'),pk=pick('tp','tpx',1,30,'片面のポケット'),cap=pick('tb','tbx',1,200,'1冊のリフィル'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// リフィル1枚に入る数 ＝ 片面のポケット × 入れる面（両方なら2）。リフィルとバインダーは、余りが出たら1つ足す
+var per=pk*(+v('ts')),refills=Math.ceil(n/per),books=Math.ceil(refills/cap),last=refills-(books-1)*cap,room=refills*per-n;
+var ans='リフィルが'+refills+'枚、バインダーが'+books+'冊いります。';
+if(room>0)ans+='最後のリフィルには、あと'+room+'枚入ります。';
+f.querySelector('.fit-ans').textContent=ans;draw(svg,books,cap,last);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
