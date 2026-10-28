@@ -5,13 +5,13 @@ import { esc, yen, jstMonthDay, jstMonthDayTime, rakutenTime } from './text.mjs'
 const HOUR = 3600000;
 const DAY = 24 * HOUR;
 
-// 楽天の情報から出す、本当のことだけの印（レビュー・ポイント倍率・タイムセールや販売期間の終わり・送料込み・ラッピング対応）
+// 楽天の情報から出す、本当のことだけの印（レビューの件数・ポイント倍率・タイムセールや販売期間の終わり・送料込み・ラッピング対応）
 // 予約の商品の endTime は「販売期間の終わり」として出す（予約の締切とは限らないため、締切とは書かない）
 export function marksFor(it, nowIso) {
   const now = Date.parse(nowIso);
   const out = { review: '', extra: '', until: '', perks: perksOf(it) };
   if (it.reviews > 0) {
-    out.review = `レビュー${Number(it.reviews).toLocaleString('ja-JP')}件${it.rating > 0 ? `・平均${(Math.round(it.rating * 10) / 10).toFixed(1)}` : ''}`;
+    out.review = `レビュー${Number(it.reviews).toLocaleString('ja-JP')}件`;
   }
   const ps = rakutenTime(it.pointStart);
   const pe = rakutenTime(it.pointEnd);
