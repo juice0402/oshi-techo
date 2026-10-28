@@ -994,6 +994,11 @@ function yomiList(list) {
 }
 
 // ---- コーナーのトップ（/anime/ など。キャラのコーナーはサイトのトップ）。作品ごとに新着の棚 ----
+// コーナーの読みもの（config/yomimono.json の記事に corner: "game" などを書いたもの）。サイトのトップの「推し活の読みもの」と同じ部品。ないときは出さない
+const cornerYomi = (k) => {
+  const list = yomiArticles.filter((a) => a.corner === k.slug);
+  return list.length ? `<section class="yomi"><h2>${esc(k.name)}の読みもの</h2>${yomiList(list)}<p class="more"><a href="/yomimono/">読みものをすべて見る</a></p></section>` : '';
+};
 for (const k of liveCorners) {
   const ws = worksIn(k.slug);
   const news = cornerNews(k.slug);
@@ -1026,7 +1031,7 @@ for (const k of liveCorners) {
     description: desc,
     h1: `${k.title}の新着`,
     mainClass: 'top shelf',
-    body: shelves + rankSection(`楽天のランキングに入っている${k.title}`, rankedFor('').filter((r) => set.has(r.c)), 8) + oshiFolded(ws),
+    body: shelves + rankSection(`楽天のランキングに入っている${k.title}`, rankedFor('').filter((r) => set.has(r.c)), 8) + cornerYomi(k) + oshiFolded(ws),
     lastmod: newest(news),
     count: news.length,
   });

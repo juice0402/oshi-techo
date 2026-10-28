@@ -1,0 +1,43 @@
+<div class="fit" id="s2fit">
+<fieldset class="pick"><legend>入れる本体</legend>
+<label><input type="radio" name="sb" value="272x116x30.7" checked><span>Switch 2</span></label>
+<label><input type="radio" name="sb" value="242x102x28.4"><span>有機ELモデル</span></label>
+<label><input type="radio" name="sb" value="239x102x28.4"><span>Switch</span></label>
+</fieldset>
+<p class="fit-mm"><label>ケースの内側の横<input type="number" name="sw" inputmode="decimal" min="100" max="400" step="0.5" value="280">mm</label></p>
+<p class="fit-mm"><label>内側の縦<input type="number" name="sh" inputmode="decimal" min="50" max="250" step="0.5" value="125">mm</label></p>
+<p class="fit-mm"><label>内側の厚さ<input type="number" name="sd" inputmode="decimal" min="5" max="100" step="0.5" value="35">mm</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 50" role="img" aria-label="ケースの内側と本体の大きさを同じ縮尺の四角で重ねたところ"></svg><figcaption>外の四角がケースの内側、ぬった四角がコントローラーをつけた本体</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('s2fit');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'mmの数字を入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+function run(){bad='';
+var w=num('sw',100,400,'内側の横'),h=num('sh',50,250,'内側の縦'),d=num('sd',5,100,'内側の厚さ'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 本体の大きさは任天堂の仕様の数字（横×縦×最大の厚さ。最大の厚さはスティックの先からZL・ZRの出っぱりまで）
+var b=v('sb').split('x').map(Number),bw=b[0],bh=b[1],bd=b[2],t;
+var gw=w-bw,gh=h-bh,gd=d-bd,short=[];
+if(gw<0)short.push('横が'+r1(-gw)+'mm');
+if(gh<0)short.push('縦が'+r1(-gh)+'mm');
+if(gd<0)short.push('厚さが'+r1(-gd)+'mm');
+if(short.length)t='本体（'+bw+'×'+bh+'mm、最大の厚さ'+bd+'mm）には、'+short.join('、')+'足りません。';
+else t='本体（'+bw+'×'+bh+'mm、最大の厚さ'+bd+'mm）が入る大きさです。すきまは左右に約'+r1(gw/2)+'mmずつ、上下に約'+r1(gh/2)+'mmずつ、厚さに'+r1(gd)+'mmです。';
+f.querySelector('.fit-ans').textContent=t;
+clear(svg);var W=Math.max(w,bw),H=Math.max(h,bh);svg.setAttribute('viewBox','-2 -2 '+(W+4)+' '+(H+4));
+el(svg,'rect',{x:(W-w)/2,y:(H-h)/2,width:w,height:h,rx:8,'class':'fit-w'});
+el(svg,'rect',{x:(W-bw)/2,y:(H-bh)/2,width:bw,height:bh,rx:10,'class':short.length?'fit-p':'fit-l'});
+// 本体のほうが大きいときは、ケースの内側を点線で上に重ねて、はみ出した所を見せる
+if(short.length)el(svg,'rect',{x:(W-w)/2,y:(H-h)/2,width:w,height:h,rx:8,'class':'fg-dash'});}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

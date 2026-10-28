@@ -201,6 +201,30 @@ const html = files.filter((f) => f.endsWith('.html'));
     if (a.sources) ok(s2.includes(`href="/yomimono/${a.slug}/shiryou/"`) && existsSync(`dist/yomimono/${a.slug}/shiryou/index.html`), `${p}：調べた資料のページがある`);
   }
 }
+// 読みもののコーナー（記事の corner）：そのコーナーのトップの下のほうに「◯◯の読みもの」の棚。読みものがないコーナーには出さない
+// 棚の excludeRe：キャラの名前があってライセンス・公式・任天堂のどれもない商品名は外す（Switch 2 のケースの記事）
+{
+  const arts = readJson('config/yomimono.json', []);
+  for (const k of corners.filter((x) => x.slug !== 'chara')) {
+    const p = `dist/${k.slug}/index.html`;
+    if (!existsSync(p)) continue;
+    const s2 = readFileSync(p, 'utf8');
+    const mine = arts.filter((a) => a.corner === k.slug);
+    if (mine.length) ok(s2.includes(`<section class="yomi"><h2>${k.name}の読みもの</h2>`) && mine.every((a) => s2.includes(`href="/yomimono/${a.slug}/"`)), `${p}：${k.name}の読みものの棚がある`);
+    else ok(!s2.includes('<section class="yomi">'), `${p}：読みものがないコーナーには読みものの棚を出さない`);
+  }
+  ok(arts.every((a) => !a.corner || corners.some((k) => k.slug === a.corner)), '読みものの corner はあるコーナーの名前');
+  const sw = arts.find((a) => a.slug === 'switch2-case');
+  if (sw) {
+    const sh = sw.shelves.find((x) => x.id === 'hard');
+    const rule = { match: sh.match, exclude: sh.exclude, excludeRe: sh.excludeRe ?? [] };
+    const it = (name) => judge({ code: 'x', url: 'u', img: 'i', price: 1000, name }, rule, settings).keep;
+    ok(it('Nintendo Switch 2 ハードケース ゲームカード収納'), 'Switch 2 のケースの棚：Switch 2 用のケースは載せる');
+    ok(!it('Nintendo Switch 2 ハードケース カービィ'), 'Switch 2 のケースの棚：キャラの名前があってライセンスの表示がない物は外す');
+    ok(it('任天堂ライセンス商品 Switch2 ハードケース カービィ'), 'Switch 2 のケースの棚：ライセンス商品のキャラ柄は載せる');
+    ok(!it('Nintendo Switch 有機ELモデル ハードケース'), 'Switch 2 のケースの棚：前の Switch だけの物は外す');
+  }
+}
 // 買い方メモ（/<作品>/kaikata/。src/kaikata/<作品>.json）：楽天の商品と広告を出さない、作品のトップからつなぐ、終わった予定は出さない
 {
   const dir = 'src/kaikata';

@@ -24,7 +24,8 @@ try {
     for (const s of a.shelves ?? []) {
       const id = `${a.slug}/${s.id}`;
       // 棚の言葉を「作品の名前」とみなして、除外のしくみ（filter.mjs の judge）をそのまま使う
-      const rule = { match: s.match, exclude: s.exclude ?? [], excludeRe: [] };
+      // excludeRe：言葉だけでは分けにくいもの（キャラの名前があってライセンスの表示がない物など）を形で外す
+      const rule = { match: s.match, exclude: s.exclude ?? [], excludeRe: s.excludeRe ?? [] };
       const seen = new Set();
       // お店ちがいの同じ商品は1回だけ（商品名のはじめ32文字が同じものは、レビューが多いほうを残す）
       const twins = new Set();
