@@ -103,9 +103,9 @@ h1+section .grid,h1+.grid{margin-top:10px}
 .shelf .grid li{flex:0 0 44%;scroll-snap-align:start}
 @media (min-width:640px){.shelf .grid li{flex-basis:23%}}
 @media (min-width:900px){.shelf .grid li{flex-basis:18.5%}}
-.oshi details{margin:0 0 6px}
-.oshi summary{cursor:pointer;padding:8px 4px;font-weight:700;font-size:14px}
-.oshi details .chips{padding:0 0 8px}
+.oshi details,.gtoc details{margin:0 0 6px}
+.oshi summary,.gtoc summary{cursor:pointer;padding:8px 4px;font-weight:700;font-size:14px}
+.oshi details .chips,.gtoc details .chips{padding:0 0 8px}
 .ytl{display:flex;align-items:center;flex-wrap:wrap;gap:4px 10px}
 .ytl a{display:block;padding:4px 0;line-height:0}
 .ytl img{display:block;width:auto;height:20px}

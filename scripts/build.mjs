@@ -10,7 +10,7 @@ import { esc, yen, mdOf, jstDate, jstMonthDay, jstMonthDayTime, normalize, rakut
 import { CATEGORIES, categoryOf, productKey, reservationInfo, median, oshiMatcher, isAdult, isKids } from './lib/classify.mjs';
 import { cardHtml, marksFor, searchFormHtml, oshiChipsHtml, searchHref } from './lib/view.mjs';
 import { activeSeasons, seasonMatcher, nextBirthday, mdLabel } from './lib/season.mjs';
-import { AREAS, regionOf, isGotouchi } from './lib/region.mjs';
+import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
 import { buildIcs } from './lib/ics.mjs';
 import { decoCss, DECO_STYLES } from '../src/deco/deco.mjs';
 
@@ -1024,7 +1024,7 @@ function chooseNav(c) {
     adultFor(c.slug).length >= MIN_PICK && [`${base}otona/`, '大人向け'],
     kidsFor(c.slug).length >= MIN_PICK && [`${base}kids/`, '子ども向け'],
     hasYosan(c.slug) && [`${base}yosan/`, '予算で選ぶ'],
-    hasGotouchi(c.slug) && [`${base}gotouchi/`, `ご当地${c.name}`],
+    hasGotouchi(c.slug) && [`${base}gotouchi/`, `ご当地${c.name}一覧`],
     ...topicPages.filter((x) => x.c === c).map((x) => [`${base}${x.t.slug}/`, x.t.name]),
     hasCalendar(c) && [`${base}hatsubai/`, '発売日カレンダー'],
     hasKaikata(c.slug) && [`${base}kaikata/`, '買い方メモ'],
@@ -1363,62 +1363,111 @@ for (const x of seasonLater) {
 }
 
 // ---- ご当地グッズ（/作品/gotouchi/ と /gotouchi/） ----
+// 作品ごとのページは「ご当地{作品}一覧」：地方の見出し（h2）の中に都道府県の見出し（h3）。北から南の順、都道府県の中は新しい順で30件まで
+const MAX_PER_PREF = 30;
+const MAX_TOC_OPEN = 15; // 都道府県がこれより多いと、目次を地方ごとにたたむ（最初は開いた形）
+const collectionLd = ({ name, description, url, parts = [] }) => ({
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name,
+  description,
+  url,
+  inLanguage: 'ja',
+  ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
+});
 for (const w of gotouchiWorks) {
   const { c } = w;
   const path = `/${c.slug}/gotouchi/`;
-  const groups = [
-    ...AREAS.map((a) => ({ slug: a.slug, name: a.name, items: w.items.filter((i) => i.region?.area === a) })),
-    { slug: 'sonohoka', name: 'そのほか', items: w.items.filter((i) => !i.region) },
-  ].filter((g) => g.items.length);
+  const areas = AREAS.map((a) => {
+    const prefs = a.prefs
+      .map((pref) => ({ pref, id: prefId(pref), items: w.items.filter((i) => i.region?.pref === pref).sort(byNew) }))
+      .filter((p) => p.items.length);
+    return { slug: a.slug, name: a.name, prefs };
+  }).filter((a) => a.prefs.length);
+  const rest = w.items.filter((i) => !i.region).sort(byNew);
+  const prefList = areas.flatMap((a) => a.prefs);
   const places = topPlaces(w.items);
   const others = gotouchiWorks.filter((x) => x !== w);
+  const h1 = `ご当地${c.name}一覧`;
+  const description = sentence(
+    `${c.name}のご当地グッズを、都道府県ごとに北から南へ並べた一覧です`,
+    places.length ? `商品名に多い地名は${places.join('・')}で、${areas.length}つの地方から見つけました` : '地名が商品名にないものもまとめています',
+    priceMid(w.items) ? `値段は${priceMid(w.items)}です` : '',
+  );
+  const SONOHOKA = '地名が商品名にないもの';
+  // 目次：都道府県が3つ以上なら地方ごとに都道府県を並べる。少ない作品は地方のチップのまま
+  let toc = '';
+  if (prefList.length >= 3) {
+    const fold = prefList.length > MAX_TOC_OPEN;
+    const prefLinks = (a) => `<ul class="chips">${a.prefs.map((p) => `<li><a href="#${p.id}">${esc(p.pref)}</a></li>`).join('')}</ul>`;
+    const restLink = rest.length ? `<div class="gtr"><p class="oc">そのほか</p><ul class="chips"><li><a href="#sonohoka">${SONOHOKA}</a></li></ul></div>` : '';
+    toc = `<nav class="gtoc" aria-label="都道府県">${areas
+      .map((a) => (fold ? `<details open><summary>${esc(a.name)}</summary>${prefLinks(a)}</details>` : `<div class="gtr"><p class="oc">${esc(a.name)}</p>${prefLinks(a)}</div>`))
+      .join('')}${restLink}</nav>`;
+  } else {
+    const chips = [...areas.map((a) => [a.slug, a.name]), ...(rest.length ? [['sonohoka', SONOHOKA]] : [])];
+    if (chips.length > 1) toc = `<ul class="chips">${chips.map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join('')}</ul>`;
+  }
+  let first = true;
+  const gridOnce = (items) => {
+    const html = grid(items, first);
+    first = false;
+    return html;
+  };
   page({
     path,
     tab: c.slug,
     count: w.items.length,
     deco: 'gotouchi',
-    crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: 'ご当地', path }],
-    title: `ご当地${c.name}グッズを地域で選ぶ${places.length ? `（${places.join('・')}など）` : ''}｜${settings.siteName}`,
-    description: sentence(
-      `${c.name}のご当地グッズ${w.items.length}件を、北から南へ地方ごとに並べています`,
-      places.length ? `商品名に多い地名は${places.join('・')}で、${groups.filter((g) => g.slug !== 'sonohoka').length}つの地方から見つけました` : '',
-      priceMid(w.items) ? `値段は${priceMid(w.items)}です` : '',
-    ),
-    h1: `ご当地${c.name}`,
+    crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: h1, path }],
+    title: `${h1}｜都道府県ごとのグッズ${places.length ? `（${places.join('・')}など）` : ''}｜${settings.siteName}`,
+    description,
+    h1,
+    extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${c.name}`, url: `${SITE}${path}#${p.id}` })) })],
     body:
-      (groups.length > 1 ? `<ul class="chips">${groups.map((g) => `<li><a href="#${g.slug}">${esc(g.name)}</a></li>`).join('')}</ul>` : '') +
-      groups.map((g, i) => `<section id="${g.slug}"><h2>${esc(g.name)}</h2>${grid(g.items.slice(0, 30), i === 0)}</section>`).join('') +
+      toc +
+      areas
+        .map(
+          (a) =>
+            `<section id="${a.slug}"><h2>${esc(a.name)}</h2>${a.prefs
+              .map((p) => `<section class="gp" id="${p.id}"><h3>${esc(p.pref)}</h3>${gridOnce(p.items.slice(0, MAX_PER_PREF))}</section>`)
+              .join('')}</section>`,
+        )
+        .join('') +
+      (rest.length ? `<section id="sonohoka"><h2>${SONOHOKA}</h2>${gridOnce(rest.slice(0, MAX_PER_PREF))}</section>` : '') +
       priceAt() +
-      (others.length ? `<p class="more">${others.map((x) => `<a href="/${x.c.slug}/gotouchi/">ご当地${esc(x.c.name)}</a>`).join('／')}</p>` : ''),
+      (others.length ? `<p class="more">${others.map((x) => `<a href="/${x.c.slug}/gotouchi/">ご当地${esc(x.c.name)}一覧</a>`).join('／')}</p>` : ''),
     lastmod: newest(w.items),
   });
 }
 if (gotouchiWorks.length) {
-  const names = gotouchiWorks.length > 3 ? `${gotouchiWorks.slice(0, 3).map((w) => w.c.name).join('・')}など` : gotouchiWorks.map((w) => w.c.name).join('・');
+  const names = gotouchiWorks.length > 3 ? `${gotouchiWorks.slice(0, 3).map((w) => w.c.name).join('・')}など` : `${gotouchiWorks.map((w) => w.c.name).join('・')}の`;
+  const all = gotouchiWorks.flatMap((w) => w.items);
+  const pl = topPlaces(all, 2);
+  const description = sentence(
+    `${gotouchiWorks.slice(0, 2).map((w) => w.c.name).join('・')}${gotouchiWorks.length > 2 ? 'など' : ''}${gotouchiWorks.length}作品のご当地グッズを、作品ごとに集めた一覧です`,
+    pl.length ? `商品名に多い地名は${pl.join('と')}で、作品ごとに都道府県で分けた一覧もあります` : '',
+    priceMid(all) ? `値段は${priceMid(all)}です` : '',
+  );
   page({
     path: '/gotouchi/',
-    count: gotouchiWorks.reduce((n, w) => n + w.items.length, 0),
+    count: all.length,
     deco: 'gotouchi',
-    crumbs: [{ name: 'トップ', path: '/' }, { name: 'ご当地グッズ', path: '/gotouchi/' }],
-    title: `ご当地キャラグッズを地域で選ぶ（${names}）｜${settings.siteName}`,
-    description: (() => {
-      const big = [...gotouchiWorks].sort((a, b) => b.items.length - a.items.length);
-      const pl = topPlaces(gotouchiWorks.flatMap((w) => w.items), 2);
-      return sentence(
-        `${big.slice(0, 2).map((w) => `${w.c.name}${w.items.length}件`).join('、')}${gotouchiWorks.length > 2 ? 'など' : ''}、${gotouchiWorks.length}作品のご当地グッズを並べています`,
-        pl.length ? `商品名に多い地名は${pl.join('と')}で、作品ごとに地方で分けたページもあります` : '',
-        priceMid(gotouchiWorks.flatMap((w) => w.items)) ? `値段は${priceMid(gotouchiWorks.flatMap((w) => w.items))}です` : '',
-      );
-    })(),
-    h1: 'ご当地グッズ',
+    crumbs: [{ name: 'トップ', path: '/' }, { name: 'ご当地グッズ一覧', path: '/gotouchi/' }],
+    title: `ご当地グッズ一覧｜${names}都道府県ごとのキャラグッズ｜${settings.siteName}`,
+    description,
+    h1: 'ご当地グッズ一覧',
+    extraLd: [
+      collectionLd({ name: 'ご当地グッズ一覧', description, url: `${SITE}/gotouchi/` }),
+    ],
     body:
       gotouchiWorks
         .map(
           (w, i) =>
-            `<section><h2>ご当地${esc(w.c.name)}</h2>${grid(w.newest.slice(0, settings.topItems), i === 0)}<p class="more"><a href="/${w.c.slug}/gotouchi/">ご当地${esc(w.c.name)}を地域で選ぶ</a></p></section>`,
+            `<section><h2>ご当地${esc(w.c.name)}</h2>${grid(w.newest.slice(0, settings.topItems), i === 0)}<p class="more"><a href="/${w.c.slug}/gotouchi/">ご当地${esc(w.c.name)}一覧</a></p></section>`,
         )
         .join('') + priceAt(),
-    lastmod: newest(gotouchiWorks.flatMap((w) => w.items)),
+    lastmod: newest(all),
   });
 }
 

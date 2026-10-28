@@ -86,6 +86,7 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   const { regionOf, isGotouchi } = await import('./lib/region.mjs');
   ok(isGotouchi('【飛騨高山限定】ちいかわ ご当地 ぬいぐるみ') && isGotouchi('北海道限定　ちいかわ　メロン') && !isGotouchi('ちいかわ 当店限定 マグ') && !isGotouchi('ちいかわ ぬいぐるみ'), 'ご当地：「ご当地」か「地名＋限定」だけ');
   ok(regionOf('【飛騨高山限定】ちいかわ').pref === '岐阜' && regionOf('東京都限定 ちいかわ').pref === '東京' && regionOf('ちいかわ 京都限定').area.name === '近畿' && regionOf('ご当地キティ 草津温泉').pref === '群馬' && regionOf('ちいかわ マグ') === null, 'ご当地：地名から都道府県と地方（「東京都」は京都にしない）');
+  ok(['富士急ハイランド', '富士吉田', '河口湖', '山中湖'].every((w) => regionOf(`ご当地スヌーピー ${w}`).pref === '山梨') && regionOf('ご当地スヌーピー 富士山').pref === '静岡' && regionOf('お台場限定 スヌーピー').pref === '東京' && regionOf('ご当地 道後 スヌーピー').pref === '愛媛', 'ご当地：名所の地名（富士急ハイランドは山梨・富士山は静岡のまま）');
   const { isAdult, isKids } = await import('./lib/classify.mjs');
   ok(isAdult('ちいかわ 長財布 レディース') && isAdult('ポケモン マグカップ') && !isAdult('ちいかわ キッズ 財布') && !isAdult('ポケモン ぬいぐるみ') && !isAdult('大人気 ちいかわ BIGぬいぐるみ') && !isAdult('ちいかわ インテリア ぬいぐるみ') && isAdult('大人用 ちいかわ ぬいぐるみ') && !isAdult('ちいかわ マグカップ付箋') && !isAdult('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('サンリオ 女の子 Tシャツ') && !isKids('スヌーピー メンズ Tシャツ'), '大人向け・子ども向けの見分け');
   ok(topicsCfg.every((t) => chars.some((c) => c.slug === t.work) && t.title && t.h1 && t.words.length && /^\d{4}-\d\d-\d\d$/.test(t.until ?? '2099-12-31')), '話題：作品・名前・言葉・期限の設定がそろっている');
@@ -414,10 +415,24 @@ if (process.env.DATA_LATEST) {
   ok(tc.includes('<title>ちいかわの手帳・カレンダー2027｜') && tc.includes('<body class="dk s-techo">') && tc.includes('手帳 2027 B6') && !tc.includes('手帳 2026 去年'), '季節の特集：来年の手帳・カレンダーのページ（去年のものは入れない）');
   // ご当地
   const go = readFileSync('dist/chiikawa/gotouchi/index.html', 'utf8');
-  ok(go.includes('<title>ご当地ちいかわグッズを地域で選ぶ（北海道・') && go.includes('<body class="dk s-gotouchi">') && go.includes('<section id="hokkaido-tohoku"><h2>北海道・東北</h2>') && go.includes('<section id="kyushu-okinawa"><h2>九州・沖縄</h2>') && go.includes('<a href="#kinki">近畿</a>'), 'ご当地：地方ごとに分けたページ');
-  ok(go.indexOf('id="hokkaido-tohoku"') < go.indexOf('id="kinki"') && go.indexOf('id="kinki"') < go.indexOf('id="kyushu-okinawa"'), 'ご当地：北から南の順');
+  ok(go.includes('<title>ご当地ちいかわ一覧｜都道府県ごとのグッズ（北海道・') && go.includes('<body class="dk s-gotouchi">') && go.includes('<section id="hokkaido-tohoku"><h2>北海道・東北</h2><section class="gp" id="p-hokkaido"><h3>北海道</h3>') && go.includes('<section id="kyushu-okinawa"><h2>九州・沖縄</h2>') && go.includes('<a href="#p-osaka">大阪</a>') && go.includes('<section id="sonohoka"><h2>地名が商品名にないもの</h2>'), 'ご当地：地方の中を都道府県ごとに分けたページと目次');
+  ok(go.indexOf('id="hokkaido-tohoku"') < go.indexOf('id="kinki"') && go.indexOf('id="p-kyoto"') < go.indexOf('id="p-osaka"') && go.indexOf('id="kinki"') < go.indexOf('id="kyushu-okinawa"'), 'ご当地：北から南の順');
+  {
+    const sn = readFileSync('dist/snoopy/gotouchi/index.html', 'utf8');
+    const ld = JSON.parse(sn.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1]);
+    const col = [ld].flat().find((x) => x['@type'] === 'CollectionPage');
+    const toc = sn.match(/<nav class="gtoc"[^>]*>(.*?)<\/nav>/s)?.[1] ?? '';
+    ok(
+      /<title>ご当地スヌーピー一覧｜都道府県ごとのグッズ（[^<]*など）｜/.test(sn) && sn.includes('<h1 class="tape">ご当地スヌーピー一覧</h1>') && sn.includes('<meta property="og:title" content="ご当地スヌーピー一覧｜') && sn.includes('content="スヌーピーのご当地グッズを、都道府県ごとに北から南へ並べた一覧です。'),
+      'ご当地：title・h1・og:title・説明文が「ご当地スヌーピー一覧」',
+    );
+    ok(toc.indexOf('#p-hokkaido') >= 0 && toc.indexOf('#p-hokkaido') < toc.indexOf('#p-tokyo') && toc.indexOf('#p-tokyo') < toc.indexOf('#p-yamanashi') && toc.indexOf('#p-yamanashi') < toc.indexOf('#p-okinawa') && !toc.includes('#p-kyoto'), 'ご当地：都道府県の目次（見つかった都道府県だけ・北から南）');
+    ok(sn.includes('<section class="gp" id="p-yamanashi"><h3>山梨</h3>') && !sn.includes('id="p-shizuoka"'), 'ご当地：富士急ハイランドは山梨');
+    ok(col?.name === 'ご当地スヌーピー一覧' && col.hasPart?.some((x) => x['@type'] === 'WebPageElement' && x.url.endsWith('/snoopy/gotouchi/#p-tokyo')) && !JSON.stringify(ld).includes('"Product"'), 'ご当地：構造化データ（CollectionPage と都道府県の節。商品は入れない）');
+    ok(readFileSync('dist/gotouchi/index.html', 'utf8').includes('<title>ご当地グッズ一覧｜') && readFileSync('dist/gotouchi/index.html', 'utf8').includes('<a href="/snoopy/gotouchi/">ご当地スヌーピー一覧</a>'), 'ご当地：/gotouchi/ の名前と作品ごとの一覧へのリンク');
+  }
   ok(!readFileSync('dist/chiikawa/new/index.html', 'utf8').includes('gotouchi%2F'), 'ご当地：ご当地で探したものは、作品の新着には出さない');
-  ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
+  ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
   // 誕生日
   ok(topHtml.includes('<h2>もうすぐクロミの誕生日（10月31日）</h2>') && topHtml.includes('<a href="/search/?c=sanrio&amp;q=%E3%82%AF%E3%83%AD%E3%83%9F">クロミのグッズをもっと見る</a>'), '誕生日：近い推しキャラのグッズをトップに');
   const bd = readFileSync('dist/tanjoubi/index.html', 'utf8');
