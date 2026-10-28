@@ -26,6 +26,8 @@ try {
       // 棚の言葉を「作品の名前」とみなして、除外のしくみ（filter.mjs の judge）をそのまま使う
       const rule = { match: s.match, exclude: s.exclude ?? [], excludeRe: [] };
       const seen = new Set();
+      // お店ちがいの同じ商品は1回だけ（商品名のはじめ32文字が同じものは、レビューが多いほうを残す）
+      const twins = new Set();
       for (let page = 1; page <= (s.pages ?? 1) && seen.size < KEEP; page++) {
       calls++;
       const { items: found } = await searchPage({ keyword: s.keyword, page, sort: '-reviewCount', availability: '1', ngKeyword: '中古' });
@@ -34,6 +36,9 @@ try {
         if (!judge(it, rule, settings).keep || seen.has(it.code)) continue;
         // head：棚の言葉が、商品名のはじめ（宣伝の【】＼／を除いて head 文字まで）にあるものだけ。言葉をたくさん並べた別の商品をよけるため
         if (s.head && !s.match.some((w) => cleanHead(it.name, s.head).includes(w))) continue;
+        const twin = cleanHead(it.name, 999).replace(/\s/g, '').slice(0, 32);
+        if (twins.has(twin)) continue;
+        twins.add(twin);
         seen.add(it.code);
         items.push({ shelf: id, code: it.code, name: it.name, price: it.price, url: it.url, img: it.img, shop: it.shop, avail: it.avail, reviews: it.reviews, rating: it.rating, postage: it.postage, gift: it.gift });
       }
