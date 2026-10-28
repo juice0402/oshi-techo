@@ -281,14 +281,19 @@ ok(!html.some((f) => /<p class="more"><a [^>]*>[^<]*（\d+件）/.test(readFileS
     ok(/^楽天市場のちいかわグッズを1日2回集めています。\d+\/\d+までの7日で見つけた新着は\d+件、予約受付中は\d+件です。/.test(d('chiikawa/index.html')), `作品のページの説明文に新着と予約の数（${d('chiikawa/index.html')}）`);
   }
 }
-for (const icon of ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png']) ok(files.includes(join('dist', icon)), `ファビコン ${icon} がある`);
+for (const icon of ['favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) ok(files.includes(join('dist', icon)), `ファビコン ${icon} がある`);
 // ファビコンの目印は、いまの絵の中身から作ったもの（絵を変えたら目印も変わる）
 const iconV = (await import('node:crypto'))
   .createHash('sha1')
-  .update(['favicon.svg', 'favicon.ico', 'icon-192.png', 'apple-touch-icon.png'].map((f) => readFileSync(join('src/icons', f)).toString('base64')).join('|'))
+  .update(['favicon.svg', 'favicon.ico', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'].map((f) => readFileSync(join('src/icons', f)).toString('base64')).join('|'))
   .digest('hex')
   .slice(0, 8);
 ok(files.includes(join('dist', 'og.png')), 'SNSで共有したときの画像（og.png）がある');
+{
+  // ホーム画面に追加：名前とアイコン。ふだんのブラウザで開く（standalone だと iPhone でわたしの推しの保存が分かれる）
+  const mf = JSON.parse(readFileSync('dist/manifest.webmanifest', 'utf8'));
+  ok(mf.name === settings.siteName && mf.short_name === settings.siteShortName && mf.start_url === '/' && mf.display === 'browser' && mf.icons.every((i) => files.includes(join('dist', i.src.replace(/^\/|\?.*$/g, '')))), 'ホーム画面に追加：manifest の名前・開く場所・アイコンがあり、ふだんのブラウザで開く');
+}
 const ogV = (await import('node:crypto')).createHash('sha1').update(readFileSync('src/og.png')).digest('hex').slice(0, 8);
 ok(!files.some((f) => f.startsWith(join('dist', 'og') + '/')) && !readdirSync('src/og').some((f) => f.endsWith('.ttf')), 'SNSの画像の元（src/og/）と字のファイルは公開しない・リポジトリに入れない');
 
@@ -309,6 +314,7 @@ for (const f of html) {
   ok(/<title>[^<]+<\/title>/.test(s), `${f}：タイトルがある`);
   ok(s.includes(`<img src="/logo.svg" width="176" height="34" alt="${settings.siteName}">`) && s.includes('<nav class="fn" aria-label="しくみ">') && s.includes('<nav class="tabs" aria-label="作品">'), `${f}：ロゴの画像と、しくみ・作品に分けたメニューがある`);
   ok(s.includes(`<link rel="icon" href="/favicon.ico?v=${iconV}" sizes="48x48">`) && s.includes(`<link rel="icon" href="/favicon.svg?v=${iconV}" type="image/svg+xml">`) && s.includes(`<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=${iconV}">`) && !s.includes('url(/favicon.svg)'), `${f}：ファビコンの指定がある（絵の中身から作った目印つき）`);
+  ok(s.includes('<link rel="manifest" href="/manifest.webmanifest">'), `${f}：ホーム画面に追加の manifest の指定がある`);
   // 読みものの記事は、その記事の絵（src/yomimono/img/<記事>-og.jpg。中身から作った目印つき）
   const ogArticle = s.match(/<meta property="og:image" content="[^"]*\/yomimono\/img\/([a-z0-9-]+-og\.jpg)\?v=([0-9a-f]{8})">/);
   const ogArticleOk = ogArticle && (await import('node:crypto')).createHash('sha256').update(readFileSync(join('src/yomimono/img', ogArticle[1]))).digest('hex').slice(0, 8) === ogArticle[2];
