@@ -359,7 +359,7 @@ if (process.env.DATA_RANKING) {
   const chi = readFileSync('dist/chiikawa/index.html', 'utf8');
   ok(top.includes('<h2>楽天のランキングに入っているグッズ</h2>') && top.includes('<span class="rk">20代女性ランキング入り</span>'), 'ランキング：トップにランキングに入っているグッズ');
   ok(chi.includes('<span class="rk">楽天ランキング入り</span>'), 'ランキング：新着のカードにも印');
-  ok(chi.includes('<span class="rv">レビュー128件・平均4.6</span>'), 'レビューの件数と平均');
+  ok(chi.includes('<span class="rv">レビュー128件</span>') && !chi.includes('・平均'), 'レビューは件数だけ（平均は出さない）');
   ok(chi.includes('data-until="2026-10-19T16:59:00.000Z">ポイント10倍 10/20 01:59まで</span>'), 'ポイント倍率と終わる日時（過ぎたら消す）');
   ok(chi.includes('<h2>レビューが多いもの</h2>'), 'レビューが多いもの');
   ok(readFileSync('dist/pokemon/index.html', 'utf8').includes('<span class="nx">前に売り切れたことあり</span>'), '前に売り切れたことあり');

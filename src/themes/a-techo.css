@@ -66,6 +66,8 @@ main.sheet .idx+section h2,main.sheet .idx+.my+section h2,main.sheet .idx+.my[hi
 .grid a:active .ph{background:var(--line)}
 .rk,.tg,.nt{font-size:11px;font-weight:700;line-height:1.5;color:var(--berry)}
 .tg,.rk{display:block;margin:2px 0 0}
+/* 太字の印はカード1枚に1つだけ。前にあるものを出す（予約・値下がりは締切や値段の行といっしょ）。過ぎて消えた印のあとは次の印が出る */
+.tg~.rk,:is(.tg,.rk,.nt,.nx)~:is(.nx,.hi){display:none}
 .nm{order:1}.pd{order:2}.tg,.rk{order:3}.nt{order:4}.nx,.hi{order:5}.pk{order:6}.rv{order:7}.sh{order:8}.go{order:9}
 .nm{-webkit-line-clamp:3;min-height:4.35em;font-size:13px;line-height:1.45}
 .pd{margin-top:6px;align-items:baseline}
