@@ -893,6 +893,12 @@ function oshiFolded(list) {
 // ---- 読みもの（/yomimono/）：調べて書いた記事。図と、記事に合う楽天市場の棚（config/yomimono.json・src/yomimono/） ----
 // 本文は src/yomimono/<記事>.html。<!--fig:名前--> は src/yomimono/fig/、<!--tool:名前--> は src/yomimono/tools/、<!--shelf:棚--> は楽天市場の棚に置きかえる
 const yomiArticles = readJson('config/yomimono.json', []);
+// 作品のページから読みものへの1行（記事の linkFrom：work の作品の gotouchi（ご当地の一覧の目次の上）・kaikata（買い方メモ）・top（作品のトップの入荷メモの下））
+const yomiLinksFor = (slug, where) =>
+  yomiArticles
+    .filter((a) => a.linkFrom?.work === slug && a.linkFrom.pages?.includes(where))
+    .map((a) => `<p class="more"><a href="/yomimono/${a.slug}/">${esc(a.linkFrom.text)}</a></p>`)
+    .join('');
 const yomiData = readJson(process.env.DATA_LATEST ? 'test/fixture-yomimono.json' : 'data/yomimono.json', { fetchedAt: '', items: [] });
 const YOMI_SHELF_MAX = 8;
 const yomiDate = (ymd) => `${Number(ymd.slice(0, 4))}年${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
@@ -1093,6 +1099,7 @@ for (const c of chars) {
       tagS(section('再入荷', L.sainyuka, { limit: settings.topItems, more: sub('sainyuka') ? `${base}sainyuka/` : '', moreLabel: '再入荷をすべて見る' }), 'sainyuka') +
       tagS(soonBooks(c), 'soon') +
       memoSection(c, L, Y) +
+      yomiLinksFor(c.slug, 'top') +
       `<p class="more"><a href="/koushiki/#${esc(c.slug)}">${esc(c.name)}の公式の動画とお知らせ</a></p>` +
       tsugiWorks(c),
     lastmod: newest(L.news.length ? L.news : L.all),
@@ -1471,7 +1478,7 @@ for (const w of gotouchiWorks) {
     // キャラだけの一覧があれば、名前にも入れる（「ご当地サンリオ・ご当地キティ一覧」）
     title: (places) => `${subs.length ? `ご当地${c.name}・${subs.map((x) => `ご当地${x.sub.name}`).join('・')}一覧` : h1}｜都道府県ごとのグッズ${placesNote(places)}｜${settings.siteName}`,
     crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: h1, path }],
-    top: subs.map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}だけを見る</a></p>`).join(''),
+    top: yomiLinksFor(c.slug, 'gotouchi') + subs.map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}だけを見る</a></p>`).join(''),
     more: gotouchiWorks.filter((x) => x !== w).map((x) => [`/${x.c.slug}/gotouchi/`, `ご当地${x.c.name}一覧`]),
   });
 }
@@ -1947,7 +1954,8 @@ if (yomiArticles.length) {
         .map((s) => `<section id="${s.id}"><h2>${esc(s.h)}</h2>${para(s)}</section>`)
         .join('') +
       (events.length ? `<section id="yotei"><h2>これからの予定</h2><ul class="kk-days">${events.map((e) => `<li><time>${when(e)}</time><span>${esc(e.text)}。</span></li>`).join('')}</ul></section>` : '') +
-      `</div>`;
+      `</div>` +
+      yomiLinksFor(c.slug, 'kaikata');
     // 説明文に入れるお店の名前。short があればそれを使い、空にしたお店は説明文に出さない（長い名前で説明文が長くなりすぎないように）
     const shopNames = k.shops
       .filter((s) => s.kind === 'お店' || s.kind === '通販')
@@ -2029,6 +2037,7 @@ page({
 <p>このサイトは、会員登録やお問い合わせフォームがなく、名前やメールアドレスなどを集めていません。</p>
 <h2>端末に保存するもの</h2>
 <p>「わたしの推し」に選んだ推しキャラと、前にこのサイトを見た時刻を、見ている端末のブラウザの中だけに保存します。サイトや楽天には送りません。ブラウザのデータを消すと消えます。</p>
+<p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。</p>
 <h2>アクセス解析</h2>
 <p>サイトの改善のため、Cloudflare Web Analytics でアクセス数を数えることがあります。Cookieは使わず、個人を特定する情報は集めません。</p>
 <h2>広告</h2>
