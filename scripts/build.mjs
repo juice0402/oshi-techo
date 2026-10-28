@@ -475,6 +475,16 @@ const gotouchiWorks = chars
   })
   .filter((w) => w.items.length >= MIN_GOTOUCHI);
 const hasGotouchi = (slug) => gotouchiWorks.some((w) => w.c.slug === slug);
+// キャラだけのご当地の一覧（characters.json の gotouchiSub。サンリオのご当地キティ）：作品のご当地の中で、商品名にキャラの名前があるもの
+const gotouchiSubs = gotouchiWorks
+  .flatMap((w) =>
+    (w.c.gotouchiSub ?? []).map((sub) => {
+      const hit = oshiMatcher(sub);
+      return { w, sub, items: w.items.filter((i) => hit(i.name)), newest: w.newest.filter((i) => hit(i.name)) };
+    }),
+  )
+  .filter((x) => x.items.length >= MIN_GOTOUCHI);
+const subPath = (x) => `/${x.w.c.slug}/gotouchi/${x.sub.slug}/`;
 // 多い地名（ページの名前に使う）
 const topPlaces = (items, n = 3) => {
   const count = {};
@@ -1209,6 +1219,10 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
       (adult.length >= 4 ? section(`大人向けの${o.name}グッズ`, adult, { limit: settings.topItems }) : '') +
       section(`${o.name}のグッズ一覧`, list.slice(settings.topItems, settings.listItems), { cat: true }).replace('<section>', '<section class="rest">') +
       oshiSection([c], o.slug) +
+      gotouchiSubs
+        .filter((x) => x.w.c === c && x.sub.oshi === o.slug)
+        .map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}一覧</a></p>`)
+        .join('') +
       (bd ? `<p class="more"><a href="/tanjoubi/">${esc(o.name)}の誕生日は${mdLabel(o.birthday)}</a></p>` : '') +
       `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p>`,
     deco: bd && bd.days <= BIRTHDAY_DECO ? 'birthday' : '',
@@ -1375,9 +1389,10 @@ const collectionLd = ({ name, description, url, parts = [] }) => ({
   inLanguage: 'ja',
   ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
 });
-for (const w of gotouchiWorks) {
-  const { c } = w;
-  const path = `/${c.slug}/gotouchi/`;
+// 都道府県ごとの一覧のページ。作品（/作品/gotouchi/）とキャラだけ（/作品/gotouchi/キャラ/）で同じ形
+// who：説明文と節の名前に使う名前（サンリオ・ハローキティ）。part：都道府県の節の名前（「北海道のご当地{part}」）。top：目次の上に置くもの
+function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [] }) {
+  const w = { items, newest: newestItems };
   const areas = AREAS.map((a) => {
     const prefs = a.prefs
       .map((pref) => ({ pref, id: prefId(pref), items: w.items.filter((i) => i.region?.pref === pref).sort(byNew) }))
@@ -1387,10 +1402,8 @@ for (const w of gotouchiWorks) {
   const rest = w.items.filter((i) => !i.region).sort(byNew);
   const prefList = areas.flatMap((a) => a.prefs);
   const places = topPlaces(w.items);
-  const others = gotouchiWorks.filter((x) => x !== w);
-  const h1 = `ご当地${c.name}一覧`;
   const description = sentence(
-    `${c.name}のご当地グッズを、都道府県ごとに北から南へ並べた一覧です`,
+    `${who}のご当地グッズを、都道府県ごとに北から南へ並べた一覧です`,
     places.length ? `商品名に多い地名は${places.join('・')}で、${areas.length}つの地方から見つけました` : '地名が商品名にないものもまとめています',
     priceMid(w.items) ? `値段は${priceMid(w.items)}です` : '',
   );
@@ -1419,12 +1432,13 @@ for (const w of gotouchiWorks) {
     tab: c.slug,
     count: w.items.length,
     deco: 'gotouchi',
-    crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: h1, path }],
-    title: `${h1}｜都道府県ごとのグッズ${places.length ? `（${places.join('・')}など）` : ''}｜${settings.siteName}`,
+    crumbs,
+    title: title(places),
     description,
     h1,
-    extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${c.name}`, url: `${SITE}${path}#${p.id}` })) })],
+    extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${part}`, url: `${SITE}${path}#${p.id}` })) })],
     body:
+      top +
       toc +
       areas
         .map(
@@ -1436,8 +1450,52 @@ for (const w of gotouchiWorks) {
         .join('') +
       (rest.length ? `<section id="sonohoka"><h2>${SONOHOKA}</h2>${gridOnce(rest.slice(0, MAX_PER_PREF))}</section>` : '') +
       priceAt() +
-      (others.length ? `<p class="more">${others.map((x) => `<a href="/${x.c.slug}/gotouchi/">ご当地${esc(x.c.name)}一覧</a>`).join('／')}</p>` : ''),
+      (more.length ? `<p class="more">${more.map(([href, name]) => `<a href="${href}">${esc(name)}</a>`).join('／')}</p>` : ''),
     lastmod: newest(w.items),
+  });
+}
+const placesNote = (places) => (places.length ? `（${places.join('・')}など）` : '');
+for (const w of gotouchiWorks) {
+  const { c } = w;
+  const path = `/${c.slug}/gotouchi/`;
+  const h1 = `ご当地${c.name}一覧`;
+  const subs = gotouchiSubs.filter((x) => x.w === w);
+  gotouchiListPage({
+    c,
+    items: w.items,
+    newestItems: w.newest,
+    path,
+    h1,
+    who: c.name,
+    part: c.name,
+    // キャラだけの一覧があれば、名前にも入れる（「ご当地サンリオ・ご当地キティ一覧」）
+    title: (places) => `${subs.length ? `ご当地${c.name}・${subs.map((x) => `ご当地${x.sub.name}`).join('・')}一覧` : h1}｜都道府県ごとのグッズ${placesNote(places)}｜${settings.siteName}`,
+    crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: h1, path }],
+    top: subs.map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}だけを見る</a></p>`).join(''),
+    more: gotouchiWorks.filter((x) => x !== w).map((x) => [`/${x.c.slug}/gotouchi/`, `ご当地${x.c.name}一覧`]),
+  });
+}
+for (const x of gotouchiSubs) {
+  const { c } = x.w;
+  const path = subPath(x);
+  const h1 = `ご当地${x.sub.name}一覧`;
+  const who = x.sub.full ?? x.sub.name;
+  gotouchiListPage({
+    c,
+    items: x.items,
+    newestItems: x.newest,
+    path,
+    h1,
+    who,
+    part: x.sub.name,
+    title: (places) => `${h1}｜都道府県ごとの${who}のご当地グッズ${placesNote(places)}｜${settings.siteName}`,
+    crumbs: [
+      { name: 'トップ', path: '/' },
+      { name: c.name, path: `/${c.slug}/` },
+      { name: 'ご当地', path: `/${c.slug}/gotouchi/` },
+      { name: x.sub.name, path },
+    ],
+    more: [[`/${c.slug}/gotouchi/`, `ご当地${c.name}一覧`], ...gotouchiWorks.filter((y) => y !== x.w).map((y) => [`/${y.c.slug}/gotouchi/`, `ご当地${y.c.name}一覧`])],
   });
 }
 if (gotouchiWorks.length) {
@@ -2107,7 +2165,8 @@ if (process.env.GITHUB_ACTIONS) console.log(`::notice title=推しキャラの�
 const pickText = chars.map((c) => `${c.name}：ランキング${rankedFor(c.slug).length}・レビュー${reviewed(c.slug).length}・大人${adultFor(c.slug).length}・子ども${kidsFor(c.slug).length}`).join('／') + `／話題：${topicPages.map((x) => `${x.t.name}${x.items.length}`).join('・') || 'なし'}`;
 console.log(`選び方のページ：${pickText}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=選び方のページ::${pickText}`);
-const gotouchiText = gotouchiWorks.map((w) => `${w.c.name}${w.items.length}（${topPlaces(w.items).join('・')}）`).join('・') || 'なし';
+const gotouchiText =
+  [...gotouchiWorks.map((w) => `${w.c.name}${w.items.length}（${topPlaces(w.items).join('・')}）`), ...gotouchiSubs.map((x) => `${x.sub.name}${x.items.length}（${topPlaces(x.items).join('・')}）`)].join('・') || 'なし';
 console.log(`ご当地のページ：${gotouchiText}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=ご当地のページ::${gotouchiText}`);
 const seasonText = seasonPages.length

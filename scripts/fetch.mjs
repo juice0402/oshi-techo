@@ -101,10 +101,10 @@ for (const t of topics.filter((x) => !x.until || today <= x.until)) {
   }
 }
 
-// ご当地グッズの特集用に、「作品名 ご当地」でも探す（いつも）。うまくいかなくても、公開は止めない
+// ご当地グッズの特集用に、「作品名 ご当地」でも探す（いつも）。fetch.gotouchiKeywords があれば、その言葉でも（サンリオの「ご当地キティ」）。
+// うまくいかなくても、公開は止めない
 const gotouchiStats = { calls: 0, added: 0, failed: [] };
-for (const char of chars.filter((c) => optsOf(c).gotouchi)) {
-  const keyword = `${char.keywords[0]} ご当地`;
+for (const char of chars.filter((c) => optsOf(c).gotouchi)) for (const keyword of [`${char.keywords[0]} ご当地`, ...optsOf(char).gotouchiKeywords]) {
   try {
     for (let page = 1; page <= (settings.gotouchiPages ?? 3); page++) {
       const { items } = await searchPage({ keyword, page, ngKeyword: ngWords(char), sort: 'standard', availability: '1' });

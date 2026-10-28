@@ -241,6 +241,22 @@
   },
   {
     "slug": "sanrio",
+    "fetch": {
+      "gotouchiKeywords": [
+        "ご当地キティ"
+      ]
+    },
+    "gotouchiSub": [
+      {
+        "slug": "kitty",
+        "name": "キティ",
+        "full": "ハローキティ",
+        "oshi": "hellokitty",
+        "match": [
+          "kitty"
+        ]
+      }
+    ],
     "name": "サンリオ",
     "keywords": [
       "サンリオ"

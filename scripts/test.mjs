@@ -439,6 +439,30 @@ if (process.env.DATA_LATEST) {
     ok(col?.name === 'ご当地スヌーピー一覧' && col.hasPart?.some((x) => x['@type'] === 'WebPageElement' && x.url.endsWith('/snoopy/gotouchi/#p-tokyo')) && !JSON.stringify(ld).includes('"Product"'), 'ご当地：構造化データ（CollectionPage と都道府県の節。商品は入れない）');
     ok(readFileSync('dist/gotouchi/index.html', 'utf8').includes('<title>ご当地グッズ一覧｜') && readFileSync('dist/gotouchi/index.html', 'utf8').includes('<a href="/snoopy/gotouchi/">ご当地スヌーピー一覧</a>'), 'ご当地：/gotouchi/ の名前と作品ごとの一覧へのリンク');
   }
+  {
+    // ご当地キティ（サンリオの gotouchiSub）：商品名にキティがあるご当地だけ
+    const kt = readFileSync('dist/sanrio/gotouchi/kitty/index.html', 'utf8');
+    const ld = [JSON.parse(kt.match(/<script type="application\/ld\+json">(.*?)<\/script>/s)[1])].flat();
+    const crumbs = ld.find((x) => x['@type'] === 'BreadcrumbList')?.itemListElement.map((x) => x.name).join('>');
+    ok(
+      /<title>ご当地キティ一覧｜都道府県ごとのハローキティのご当地グッズ（[^<]*など）｜推しグッズ入荷手帳<\/title>/.test(kt) &&
+        kt.includes('<h1 class="tape">ご当地キティ一覧</h1>') &&
+        kt.includes('<meta name="description" content="ハローキティのご当地グッズを、都道府県ごとに北から南へ並べた一覧です。') &&
+        crumbs === 'トップ>サンリオ>ご当地>キティ' &&
+        kt.includes('<a href="/sanrio/gotouchi/">ご当地</a>／<span>キティ</span>') &&
+        ld.some((x) => x['@type'] === 'CollectionPage' && x.name === 'ご当地キティ一覧'),
+      'ご当地キティ：title・h1・説明文・パンくず・構造化データ',
+    );
+    ok((kt.match(/gotouchik%2F/g) ?? []).length === 7 && !kt.includes('gotouchik%2F8%2F') && !kt.includes('gotouchik%2F9%2F') && kt.includes('gotouchik%2F4%2F'), 'ご当地キティ：キティ（KITTY も）のご当地だけ。ほかのキャラと「ご当地本舗」は入れない');
+    const sg = readFileSync('dist/sanrio/gotouchi/index.html', 'utf8');
+    ok(
+      /<title>ご当地サンリオ・ご当地キティ一覧｜都道府県ごとのグッズ（[^<]*など）｜/.test(sg) && sg.includes('<h1 class="tape">ご当地サンリオ一覧</h1>') && sg.includes('<p class="more"><a href="/sanrio/gotouchi/kitty/">ご当地キティだけを見る</a></p><nav class="gtoc"'),
+      'ご当地キティ：サンリオのご当地の名前と、目次の上の入口',
+    );
+    ok(readFileSync('dist/sanrio/hellokitty/index.html', 'utf8').includes('<p class="more"><a href="/sanrio/gotouchi/kitty/">ご当地キティ一覧</a></p>') && !readFileSync('dist/snoopy/gotouchi/index.html', 'utf8').includes('/kitty/'), 'ご当地キティ：キティのページから入口・ほかの作品には出さない');
+    const sanrioCfg = chars.find((c) => c.slug === 'sanrio');
+    ok(JSON.stringify(sanrioCfg.fetch?.gotouchiKeywords) === '["ご当地キティ"]' && chars.filter((c) => c.fetch?.gotouchiKeywords).length === 1, 'ご当地キティ：「ご当地キティ」でも探すのはサンリオだけ');
+  }
   ok(!readFileSync('dist/chiikawa/new/index.html', 'utf8').includes('gotouchi%2F'), 'ご当地：ご当地で探したものは、作品の新着には出さない');
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
   // 誕生日
