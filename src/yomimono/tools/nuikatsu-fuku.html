@@ -1,0 +1,37 @@
+<div class="fit" id="nfit">
+<p class="fit-mm">左にぬいを測った数、右に服のサイズ表の数</p>
+<p class="fit-mm"><label>身長<input type="number" name="nh" inputmode="decimal" min="5" max="40" step="0.1" value="15">cm</label><label>表<input type="number" name="fh" inputmode="decimal" min="5" max="40" step="0.1" value="15">cm</label></p>
+<p class="fit-mm"><label>頭まわり<input type="number" name="nk" inputmode="decimal" min="5" max="60" step="0.1" value="25">cm</label><label>表<input type="number" name="fk" inputmode="decimal" min="5" max="60" step="0.1" value="25.5">cm</label></p>
+<p class="fit-mm"><label>胴まわり<input type="number" name="nd" inputmode="decimal" min="5" max="60" step="0.1" value="16">cm</label><label>表<input type="number" name="fd" inputmode="decimal" min="5" max="60" step="0.1" value="15">cm</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 60" role="img" aria-label="身長・頭まわり・胴まわりごとに、ぬいの数と服のサイズ表の数をならべた棒"></svg><figcaption>上から身長・頭まわり・胴まわり。それぞれ上の棒がぬい、下の棒が服のサイズ表</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('nfit');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'cmの数字を入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+// メジャーを軽く当てたときと押しこんだときで胴まわりに約0.7cmの差が出た例に合わせて、0.7cmまでの差は「測る力のちがいで出る差くらい」とする
+var NEAR=0.7;
+function say(t,a,b){var d=r1(b-a);
+if(d===0)return t+'は同じ数です。';
+if(Math.abs(d)<=NEAR)return t+'は差が約'+Math.abs(d)+'cmで、測る力のちがいで出る差くらいです。';
+if(d<0)return t+'はぬいのほうが約'+(-d)+'cm大きいです。';
+return t+'は服の表のほうが約'+d+'cm大きいです。';}
+function run(){bad='';
+var nh=num('nh',5,40,'ぬいの身長'),nk=num('nk',5,60,'ぬいの頭まわり'),nd=num('nd',5,60,'ぬいの胴まわり'),fh=num('fh',5,40,'服の表の身長'),fk=num('fk',5,60,'服の表の頭まわり'),fd=num('fd',5,60,'服の表の胴まわり'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+f.querySelector('.fit-ans').textContent=say('身長',nh,fh)+say('頭まわり',nk,fk)+say('胴まわり',nd,fd);
+clear(svg);var rows=[[nh,fh],[nk,fk],[nd,fd]],y=0;
+svg.setAttribute('viewBox','-2 -2 104 70');
+rows.forEach(function(r){var m=Math.max(r[0],r[1]);
+el(svg,'rect',{x:0,y:y,width:Math.max(100*r[0]/m,1.5),height:8,rx:2,'class':'fit-p'});
+el(svg,'rect',{x:0,y:y+9,width:Math.max(100*r[1]/m,1.5),height:8,rx:2,'class':'fit-s'});y+=24;});}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
