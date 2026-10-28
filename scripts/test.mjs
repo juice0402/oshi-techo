@@ -1,7 +1,9 @@
 // 自動テスト：除外ルールと、作ったページ（dist/）が決まりを守っているかを確かめる。
 // 使い方：node scripts/test.mjs （先に node scripts/build.mjs を実行しておく）
 
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { judge } from './lib/filter.mjs';
@@ -403,6 +405,29 @@ if (process.env.DATA_LATEST) {
   ok(topHtml.includes('<p class="fl">特集　') && topHtml.includes('<a href="/christmas/">クリスマス</a>'), '季節の特集：いちばん下にリンク');
   ok(!readFileSync('dist/chiikawa/new/index.html', 'utf8').includes('xmas%2F'), '季節の特集：季節の言葉で探したものは、作品の新着には出さない');
   ok(!files.includes(join('dist', 'fukubukuro', 'index.html')), '季節の特集：期間でなく、前にページがなかった季節のページは作らない');
+  // 福袋の期間（11月）の見本：別の日付で作りなおして、名前・見出し・説明文・構造化データ・買い方メモへの1行を見る（見本データのときだけ）
+  if (process.env.DATA_LATEST) {
+    const out = mkdtempSync(join(tmpdir(), 'oshi-fukubukuro-'));
+    const r = spawnSync(process.execPath, ['scripts/build.mjs'], { env: { ...process.env, DATA_META: 'test/fixture-meta-fukubukuro.json', OUT_DIR: out }, encoding: 'utf8' });
+    ok(r.status === 0, '福袋：11月の見本データでもページを作れる');
+    const rd = (x) => (existsSync(join(out, x)) ? readFileSync(join(out, x), 'utf8') : '');
+    const ck = rd('chiikawa/fukubukuro/index.html');
+    const sr = rd('sanrio/fukubukuro/index.html');
+    const hub = rd('fukubukuro/index.html');
+    const ldOf = (h) => [...h.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].flatMap((m) => [JSON.parse(m[1])].flat());
+    ok(
+      ck.includes('<title>ちいかわの福袋2027一覧｜ハッピーバッグ・予約受付中のものも｜推しグッズ入荷手帳</title>') &&
+        ck.includes('<h1 class="tape">ちいかわの福袋2027</h1>') &&
+        ck.includes('<meta name="description" content="ちいかわの福袋（ハッピーバッグ）を新しい順に並べた一覧です。予約受付中のものもあります。') &&
+        ldOf(ck).some((x) => x['@type'] === 'CollectionPage' && x.name === 'ちいかわの福袋2027') &&
+        !JSON.stringify(ldOf(ck)).includes('"Product"'),
+      '福袋：作品のページの名前・見出し・説明文・構造化データ（予約受付中のものがある日）',
+    );
+    ok(sr.includes('<title>サンリオの福袋2027一覧｜楽天市場で買えるハッピーバッグ｜推しグッズ入荷手帳</title>') && sr.includes('<h1 class="tape">サンリオの福袋2027</h1>'), '福袋：予約受付中のものがない日の名前');
+    ok(/<title>福袋2027一覧｜[^<]*などのキャラクターの福袋・ハッピーバッグ｜推しグッズ入荷手帳<\/title>/.test(hub) && hub.includes('<h1 class="tape">福袋2027</h1>') && ldOf(hub).some((x) => x['@type'] === 'CollectionPage' && x.name === '福袋2027'), '福袋：/fukubukuro/ の名前・見出し・構造化データ');
+    ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
+    rmSync(out, { recursive: true, force: true });
+  }
   {
     // 見本の記録（test/fixture-season-seen.json）では、お正月の特集にちいかわ・サンリオのページがあった
     const later = readFileSync('dist/chiikawa/oshougatsu/index.html', 'utf8');
