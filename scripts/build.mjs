@@ -67,7 +67,7 @@ const banners = readdirSync('src/banners')
 const theme = process.env.THEME || settings.theme;
 // ファビコンの目印：src/icons/ の絵の中身から作る。絵を変えると目印も変わり、ブラウザが古いファビコンを使い続けずに読み直す
 const ICON_V = createHash('sha1')
-  .update(['favicon.svg', 'favicon.ico', 'icon-192.png', 'apple-touch-icon.png'].map((f) => readFileSync(join('src/icons', f)).toString('base64')).join('|'))
+  .update(['favicon.svg', 'favicon.ico', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'].map((f) => readFileSync(join('src/icons', f)).toString('base64')).join('|'))
   .digest('hex')
   .slice(0, 8);
 // SNSで共有したときの画像の目印：画像の中身から作る。画像を変えると URL も変わり、SNS が古い画像を使い続けずに読み直す
@@ -661,6 +661,7 @@ ${verify}
 <link rel="icon" href="/favicon.svg?v=${ICON_V}" type="image/svg+xml">
 <link rel="icon" href="/icon-192.png?v=${ICON_V}" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=${ICON_V}">
+<link rel="manifest" href="/manifest.webmanifest">
 ${ld.length ? `<script type="application/ld+json">${JSON.stringify(ld.length === 1 ? ld[0] : ld).replace(/</g, '\\u003c')}</script>` : ''}
 <style>${css}${decoCss([...new Set([deco, ...decoParts].filter(Boolean))], decoStyle)}</style>
 </head>
@@ -1963,6 +1964,25 @@ files.set(
 if (settings.indexNowKey) files.set(`${settings.indexNowKey}.txt`, settings.indexNowKey);
 // ファビコン（ベリー色の四角に白い「推」）。src/icons/favicon.svg から作った画像
 for (const f of readdirSync('src/icons')) files.set(f, readFileSync(join('src/icons', f)));
+// ホーム画面に追加したときの名前とアイコン。display は browser（ふだんのブラウザで開くので、わたしの推しの保存がそのまま使える。
+// standalone にすると iPhone ではブラウザと保存が分かれ、わたしの推しが空になる）
+files.set(
+  'manifest.webmanifest',
+  JSON.stringify({
+    name: settings.siteName,
+    short_name: settings.siteShortName,
+    lang: 'ja',
+    start_url: '/',
+    scope: '/',
+    display: 'browser',
+    background_color: '#ffffff',
+    theme_color: '#FBD3E2',
+    icons: [
+      { src: `/icon-192.png?v=${ICON_V}`, sizes: '192x192', type: 'image/png' },
+      { src: `/icon-512.png?v=${ICON_V}`, sizes: '512x512', type: 'image/png' },
+    ],
+  }),
+);
 // YouTube の公式ロゴ（src/brand/。1バイトも変えない）
 files.set('youtube-logo.svg', readFileSync('src/brand/youtube-logo.svg'));
 // 推しキャラの誕生日（スマホのカレンダーに入れるファイル）。このサイトが決めた日だけで、楽天のデータは入れない

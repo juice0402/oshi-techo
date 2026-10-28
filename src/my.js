@@ -1,5 +1,5 @@
 // わたしの推し・推し×種類のしおり・前に見てから（ブラウザの中だけで動く。build.mjs がページに入れる）
-// 保存するのは、見ている端末の localStorage の ot-my（推しキャラのページの場所・名前・えらんだ種類）、ot-cur・ot-prev（時刻）だけ。
+// 保存するのは、見ている端末の localStorage の ot-my（推しキャラのページの場所・名前・えらんだ種類）、ot-cur・ot-prev（時刻）、ot-home（ホーム画面の案内をとじた印）だけ。
 // 楽天のデータは保存しない。サイトや楽天には何も送らない。読みにいくのは、このサイトの推しキャラのページだけ。
 (function () {
   var S;
@@ -145,4 +145,19 @@
       box.appendChild(ul);
     }).catch(function () { box.remove(); });
   });
+  // ホーム画面に追加できることを、わたしの推しを選んだ人にだけ棚の下に1行。とじたら ot-home を覚えて、もう出さない
+  if (!S.getItem('ot-home')) {
+    var hm = document.createElement('p');
+    var hb = document.createElement('button');
+    hm.className = 'myhome';
+    hm.textContent = 'ホーム画面に追加すると、わたしの推しをすぐ開けます（ブラウザの共有やメニューの「ホーム画面に追加」から）';
+    hb.type = 'button';
+    hb.textContent = 'とじる';
+    hb.addEventListener('click', function () {
+      try { S.setItem('ot-home', '1'); } catch (e) {}
+      hm.remove();
+    });
+    hm.appendChild(hb);
+    sec.appendChild(hm);
+  }
 })();
