@@ -183,6 +183,7 @@ const html = files.filter((f) => f.endsWith('.html'));
 // 読みもの（/yomimono/）：図の中に字を入れない（字は HTML）・計算の道具はどこにも送らない・絵に大きさの指定・調べた資料へのリンク
 {
   const arts = readJson('config/yomimono.json', []);
+  const KEEP_LOCAL_TOOLS = new Set(['gotouchi-snoopy']);
   for (const a of arts) {
     const p = `dist/yomimono/${a.slug}/index.html`;
     ok(existsSync(p), `${p} がある`);
@@ -190,7 +191,10 @@ const html = files.filter((f) => f.endsWith('.html'));
     const s2 = readFileSync(p, 'utf8');
     const svgs = [...s2.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
     ok(svgs.length >= 5 && svgs.every((x) => !/<text[\s>]/.test(x)), `${p}：図が5つ以上あり、図の中に字を入れていない（${svgs.length}こ）`);
-    ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage/.test(s2.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '').match(/<div class="fit"[\s\S]*?<\/script>/)?.[0] ?? ''), `${p}：計算の道具はどこにも送らず、何も残さない`);
+    const tool = s2.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '').match(/<div class="fit"[\s\S]*?<\/script>/)?.[0] ?? '';
+    // 例外：ご当地スヌーピーの「集めた都道府県のチェック」は、集めた記録を残すための道具なので、その端末の localStorage（ot-gotouchi-snoopy）にだけ残す（#16 で決めた。わたしの推しと同じ「ブラウザの中だけの機能」。どこにも送らない）
+    if (KEEP_LOCAL_TOOLS.has(a.slug)) ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(tool) && tool.includes("KEY='ot-gotouchi-snoopy'") && (tool.match(/localStorage/g) ?? []).length === 1 && /try\{S=window\.localStorage;\}catch/.test(tool), `${p}：チェックの道具はどこにも送らず、この端末のブラウザの中だけに残す`);
+    else ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage/.test(tool), `${p}：計算の道具はどこにも送らず、何も残さない`);
     ok(/<p class="yomi-hero"><img src="\/yomimono\/img\/[a-z0-9-]+\.webp" width="1200" height="600" alt="[^"]+"/.test(s2), `${p}：記事の絵に大きさと説明の指定がある`);
     if (a.sources) ok(s2.includes(`href="/yomimono/${a.slug}/shiryou/"`) && existsSync(`dist/yomimono/${a.slug}/shiryou/index.html`), `${p}：調べた資料のページがある`);
   }
@@ -464,6 +468,15 @@ if (process.env.DATA_LATEST) {
     ok(JSON.stringify(sanrioCfg.fetch?.gotouchiKeywords) === '["ご当地キティ"]' && chars.filter((c) => c.fetch?.gotouchiKeywords).length === 1, 'ご当地キティ：「ご当地キティ」でも探すのはサンリオだけ');
   }
   ok(!readFileSync('dist/chiikawa/new/index.html', 'utf8').includes('gotouchi%2F'), 'ご当地：ご当地で探したものは、作品の新着には出さない');
+  {
+    // 読みもの「ご当地スヌーピーの買える場所と集め方」へ、スヌーピーのご当地・買い方メモ・トップからつなぐ（#16）
+    const yl = '<p class="more"><a href="/yomimono/gotouchi-snoopy/">ご当地スヌーピーはどこで売ってる？（読みもの）</a></p>';
+    const sn = readFileSync('dist/snoopy/gotouchi/index.html', 'utf8');
+    ok(sn.includes(yl + '<nav class="gtoc"') && readFileSync('dist/snoopy/kaikata/index.html', 'utf8').includes(yl) && readFileSync('dist/snoopy/index.html', 'utf8').includes(yl) && !readFileSync('dist/chiikawa/gotouchi/index.html', 'utf8').includes('gotouchi-snoopy'), '読みもの：ご当地スヌーピーの記事へ、スヌーピーのご当地・買い方メモ・トップからつなぐ');
+    const ys = readFileSync('dist/yomimono/gotouchi-snoopy/index.html', 'utf8');
+    ok((ys.match(/<button type="button" data-p="[a-z]+" aria-pressed="false">/g) ?? []).length === 47 && (ys.match(/<rect class="fg-w" data-p="[a-z]+"/g) ?? []).length === 47 && ys.includes('<a href="/snoopy/gotouchi/">ご当地スヌーピー一覧</a>'), '読みもの：集めた都道府県のチェック（47のチェック欄と地図のマス）と一覧へのリンク');
+    ok(readFileSync('dist/privacy/index.html', 'utf8').includes('集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します'), '読みもの：プライバシーポリシーに、チェックをブラウザの中だけに残すことを書く');
+  }
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
   // 誕生日
   ok(topHtml.includes('<h2>もうすぐクロミの誕生日（10月31日）</h2>') && topHtml.includes('<a href="/search/?c=sanrio&amp;q=%E3%82%AF%E3%83%AD%E3%83%9F">クロミのグッズをもっと見る</a>'), '誕生日：近い推しキャラのグッズをトップに');
