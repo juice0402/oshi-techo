@@ -85,6 +85,14 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   ok(nextBirthday('10-31', '2026-10-21').days === 10 && nextBirthday('02-29', '2026-10-21').date === '2027-02-28' && nextBirthday('02-29', '2027-10-21').date === '2028-02-29' && nextBirthday('10-21', '2026-10-21').days === 0, '誕生日：次の誕生日（2月29日生まれは、うるう年でない年は2月28日）');
   const { regionOf, isGotouchi } = await import('./lib/region.mjs');
   ok(isGotouchi('【飛騨高山限定】ちいかわ ご当地 ぬいぐるみ') && isGotouchi('北海道限定　ちいかわ　メロン') && !isGotouchi('ちいかわ 当店限定 マグ') && !isGotouchi('ちいかわ ぬいぐるみ'), 'ご当地：「ご当地」か「地名＋限定」だけ');
+  ok(
+    !isGotouchi('ちいかわ ぬいぐるみ チャーム ご当地本舗 ガチャ') &&
+      !isGotouchi('ちいかわ カプセルラバーマスコット ハチワレ 単品 ガチャ アニメ キャラ グッズ ストラップ カプセル 誕プレ レア フィギュア ご当地') &&
+      isGotouchi('＼ポイント5倍／ 送料無料 【公式】 ちいかわ ご当地キーホルダー') &&
+      isGotouchi('ちいかわ キーホルダー お土産 かわいい 雑貨 ギフト プレゼント 人気 おしゃれ 旅行 ご当地 熱海') &&
+      isGotouchi('御当地ちいかわ ちりめん ポーチ'),
+    'ご当地：お店の名前「ご当地本舗」と、商品名のうしろに並べただけの「ご当地」は数えない（地名があれば数える。御当地も）',
+  );
   ok(regionOf('【飛騨高山限定】ちいかわ').pref === '岐阜' && regionOf('東京都限定 ちいかわ').pref === '東京' && regionOf('ちいかわ 京都限定').area.name === '近畿' && regionOf('ご当地キティ 草津温泉').pref === '群馬' && regionOf('ちいかわ マグ') === null, 'ご当地：地名から都道府県と地方（「東京都」は京都にしない）');
   ok(['富士急ハイランド', '富士吉田', '河口湖', '山中湖'].every((w) => regionOf(`ご当地スヌーピー ${w}`).pref === '山梨') && regionOf('ご当地スヌーピー 富士山').pref === '静岡' && regionOf('お台場限定 スヌーピー').pref === '東京' && regionOf('ご当地 道後 スヌーピー').pref === '愛媛', 'ご当地：名所の地名（富士急ハイランドは山梨・富士山は静岡のまま）');
   const { isAdult, isKids } = await import('./lib/classify.mjs');
