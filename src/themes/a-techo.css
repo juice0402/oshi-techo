@@ -111,10 +111,11 @@ main.sheet .idx+section h2,main.sheet .idx+.my+section h2,main.sheet .idx+.my[hi
 .srt ul{gap:0 8px}
 .srt a{padding:11px 10px}
 .oc{margin:0;font-size:12px;font-weight:700;color:var(--sub)}
-.oshi details{margin:0;border-bottom:1px solid var(--line)}
-.oshi summary{padding:11px 0;font-size:15px;color:var(--ink);border:0}
-.oshi summary::marker{color:var(--berry)}
-.oshi details .chips{padding:0 0 12px}
+.oshi details,.gtoc details{margin:0;border-bottom:1px solid var(--line)}
+.oshi summary,.gtoc summary{padding:11px 0;font-size:15px;color:var(--ink);border:0}
+.oshi summary::marker,.gtoc summary::marker{color:var(--berry)}
+.oshi details .chips,.gtoc details .chips{padding:0 0 12px}
+.gtoc{margin:0 0 8px}.gtr{display:flex;align-items:baseline;gap:0 14px}.gtr .oc{flex:none;width:6.5em}
 
 .myp{margin:-8px 0 12px}
 .myb{color:var(--ink);min-height:44px;padding-top:11px;padding-bottom:11px;line-height:22px}
@@ -189,7 +190,7 @@ footer.ft.wrap::before{content:"";display:block;height:24px;margin:0 calc(50% - 
 .yomi-hero{margin:0 0 16px}.yomi-hero img,.yomi-list img{display:block;width:100%;height:auto;border-radius:10px}
 .yomi-body p{margin:.7em 0;font-size:16px;line-height:1.85}
 main.sheet .yomi-body h2{margin-top:36px}
-.yomi-body h3{margin:22px 0 6px;font-size:16px;color:var(--ink)}
+.yomi-body h3,.gp h3{margin:22px 0 6px;font-size:16px;color:var(--ink)}
 .yomi-body ul.dots{margin:.6em 0;padding:0 0 0 1.2em;line-height:1.8}
 .toc{margin:6px 0 20px;padding:4px 16px 12px;background:var(--lav2);border-radius:10px}
 main.sheet .toc h2{margin:10px 0 4px}
