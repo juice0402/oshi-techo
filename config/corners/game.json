@@ -1,0 +1,950 @@
+{
+  "slug": "game",
+  "name": "ゲーム",
+  "title": "ゲームグッズ",
+  "order": 2,
+  "fetch": {
+    "pages": 2,
+    "oshiPages": 1,
+    "gotouchi": false,
+    "seasons": false,
+    "books": true,
+    "booksPages": 2
+  },
+  "exclude": [
+    "パッケージ版",
+    "ダウンロード版",
+    "サウンドトラック",
+    "攻略",
+    "オンラインコード",
+    "トレーディングカードゲーム",
+    "ゲーミング",
+    "同梱版",
+    "新価格版",
+    "サントラ",
+    "soundtrack",
+    "公式ガイドブック",
+    "ブースターパック",
+    "スターターデッキ",
+    "ダウンロードコード",
+    "追加コンテンツ",
+    "国内専用",
+    "proコントローラー",
+    "ゲームパッド",
+    "ps5版",
+    "ps4版",
+    "switch版",
+    "switch2版",
+    "psvita",
+    "ps vita",
+    "[ps5]",
+    "[ps4]",
+    "[switch]",
+    "【switch】",
+    "【ps5】",
+    "【ps4】",
+    "[nintendo switch]",
+    "[nintendo switch 2]",
+    "【nintendo switch】",
+    "【nintendo switch 2】",
+    "ソフト ※",
+    "ソフト※",
+    "DVD",
+    "Blu-ray",
+    "コミック",
+    "全巻",
+    "switch ソフト",
+    "switch2 ソフト",
+    "nintendo switch ソフト",
+    "プリペイド",
+    "ゲーム機",
+    "カードゲーム",
+    "オリパ",
+    "一番くじ",
+    "ラストワン",
+    "通常版"
+  ],
+  "works": [
+    {
+      "slug": "dragonquest",
+      "name": "ドラゴンクエスト",
+      "keywords": [
+        "ドラゴンクエスト"
+      ],
+      "match": [
+        "ドラゴンクエスト",
+        "ドラクエ",
+        "dragon quest",
+        "dragonquest"
+      ],
+      "exclude": [
+        "交響組曲",
+        "利用券"
+      ],
+      "oshi": [
+        {
+          "name": "スライム",
+          "slug": "slime",
+          "full": "ドラクエ スライム",
+          "match": [
+            "slime"
+          ]
+        },
+        {
+          "name": "はぐれメタル",
+          "slug": "hagure-metal"
+        },
+        {
+          "name": "メタルスライム",
+          "slug": "metal-slime"
+        },
+        {
+          "name": "キングスライム",
+          "slug": "king-slime"
+        },
+        {
+          "name": "ホイミスライム",
+          "slug": "hoimi-slime"
+        },
+        {
+          "name": "ドラキー",
+          "slug": "dracky"
+        }
+      ],
+      "official": [
+        {
+          "name": "ドラクエ・パラダイス",
+          "note": "ドラゴンクエストの公式サイト",
+          "url": "https://www.dragonquest.jp/"
+        },
+        {
+          "name": "ドラゴンクエスト宣伝担当（X）",
+          "note": "公式",
+          "url": "https://x.com/DQ_PR"
+        }
+      ]
+    },
+    {
+      "slug": "minecraft",
+      "name": "マインクラフト",
+      "keywords": [
+        "マインクラフト"
+      ],
+      "match": [
+        "マインクラフト",
+        "マイクラ",
+        "minecraft"
+      ],
+      "exclude": [
+        "マインコイン",
+        "統合版",
+        "java版"
+      ],
+      "oshi": [
+        {
+          "name": "クリーパー",
+          "slug": "creeper",
+          "match": [
+            "creeper"
+          ]
+        },
+        {
+          "name": "スティーブ",
+          "slug": "steve",
+          "full": "マイクラ スティーブ",
+          "match": [
+            "steve"
+          ]
+        },
+        {
+          "name": "エンダーマン",
+          "slug": "enderman",
+          "match": [
+            "enderman"
+          ]
+        },
+        {
+          "name": "アレックス",
+          "slug": "alex",
+          "full": "マイクラ アレックス",
+          "match": [
+            "alex"
+          ],
+          "strict": true
+        },
+        {
+          "name": "ブタ",
+          "slug": "pig",
+          "full": "マイクラ ブタ",
+          "match": [
+            "豚"
+          ],
+          "strict": true
+        },
+        {
+          "name": "ウーパールーパー",
+          "slug": "axolotl",
+          "full": "マイクラ ウーパールーパー",
+          "match": [
+            "axolotl"
+          ]
+        }
+      ],
+      "official": [
+        {
+          "name": "Minecraft公式サイト",
+          "note": "",
+          "url": "https://www.minecraft.net/ja-jp"
+        },
+        {
+          "name": "マインクラフト日本公式（X）",
+          "note": "",
+          "url": "https://x.com/minecraftjapan"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "マインクラフト公式",
+          "channelId": "UCmYEOuRIVGSO5PlExUYHqYQ"
+        }
+      ]
+    },
+    {
+      "slug": "kirby",
+      "name": "星のカービィ",
+      "keywords": [
+        "星のカービィ"
+      ],
+      "match": [
+        "カービィ",
+        "kirby"
+      ],
+      "exclude": [
+        "掃除機",
+        "vacuum"
+      ],
+      "oshi": [
+        {
+          "name": "ワドルディ",
+          "slug": "waddledee",
+          "match": [
+            "waddle dee"
+          ]
+        },
+        {
+          "name": "メタナイト",
+          "slug": "metaknight",
+          "match": [
+            "meta knight"
+          ]
+        },
+        {
+          "name": "デデデ大王",
+          "slug": "dedede",
+          "match": [
+            "デデデ",
+            "dedede"
+          ]
+        },
+        {
+          "name": "マホロア",
+          "slug": "magolor",
+          "match": [
+            "magolor"
+          ]
+        },
+        {
+          "name": "エフィリン",
+          "slug": "elfilin",
+          "match": [
+            "elfilin"
+          ]
+        }
+      ],
+      "official": [
+        {
+          "name": "星のカービィポータル",
+          "note": "公式サイト",
+          "url": "https://www.kirby.jp/"
+        },
+        {
+          "name": "星のカービィ公式（X）",
+          "note": "",
+          "url": "https://x.com/Kirby_JP"
+        }
+      ]
+    },
+    {
+      "slug": "mario",
+      "name": "スーパーマリオ",
+      "keywords": [
+        "スーパーマリオ"
+      ],
+      "match": [
+        "スーパーマリオ",
+        "マリオ",
+        "super mario",
+        "mario kart"
+      ],
+      "exclude": [
+        "マリオネット",
+        "マリオット",
+        "バレンチノ",
+        "ヴァレンティノ",
+        "マリオン"
+      ],
+      "oshi": [
+        {
+          "name": "ヨッシー",
+          "slug": "yoshi",
+          "full": "マリオ ヨッシー",
+          "match": [
+            "yoshi"
+          ]
+        },
+        {
+          "name": "ルイージ",
+          "slug": "luigi",
+          "match": [
+            "luigi"
+          ]
+        },
+        {
+          "name": "ピーチ姫",
+          "slug": "peach",
+          "match": [
+            "プリンセスピーチ",
+            "princess peach"
+          ]
+        },
+        {
+          "name": "クッパ",
+          "slug": "bowser",
+          "full": "マリオ クッパ",
+          "match": [
+            "bowser"
+          ]
+        },
+        {
+          "name": "キノピオ",
+          "slug": "kinopio"
+        }
+      ],
+      "official": [
+        {
+          "name": "マリオポータル",
+          "note": "任天堂の公式サイト",
+          "url": "https://www.nintendo.com/jp/character/mario/index.html"
+        },
+        {
+          "name": "任天堂（X）",
+          "note": "任天堂の公式",
+          "url": "https://x.com/Nintendo"
+        }
+      ]
+    },
+    {
+      "slug": "umamusume",
+      "name": "ウマ娘",
+      "keywords": [
+        "ウマ娘"
+      ],
+      "match": [
+        "ウマ娘",
+        "umamusume",
+        "uma musume",
+        "うまゆる",
+        "ぱかプチ",
+        "ぱかぷち"
+      ],
+      "exclude": [
+        "Blu-ray",
+        "DVD",
+        "カードゲーム",
+        "限定盤",
+        "抱き枕",
+        "ブルーレイ",
+        "特装版",
+        "通常盤",
+        "初回盤",
+        "CD+",
+        "[CD]",
+        "【CD】",
+        "(CD)",
+        "ドラマCD",
+        "サウンドトラック",
+        "サントラ",
+        "キャラクターソング",
+        "キャラソン",
+        "BD-BOX",
+        "card game",
+        "OCG",
+        "スタートデッキ",
+        "デッキセット",
+        "Reバース",
+        "ヴァイスシュヴァルツ",
+        "シングルカード",
+        "ゲームソフト",
+        "パッケージ版",
+        "ダウンロード版",
+        "Switch版",
+        "【Switch】",
+        "PS4",
+        "PS5",
+        "コミックス",
+        "単行本",
+        "全巻",
+        "巻セット",
+        "フルカラー版",
+        "ノベライズ",
+        "ファンブック",
+        "設定資料",
+        "攻略",
+        "楽譜",
+        "抱きまくら",
+        "だきまくら",
+        "ダキマクラ",
+        "等身大",
+        "添い寝",
+        "下着",
+        "ランジェリー",
+        "ショーツ",
+        "ブラジャー",
+        "セクシー",
+        "sexy",
+        "水着",
+        "スク水",
+        "ビキニ",
+        "バニー",
+        "bunny",
+        "キャストオフ",
+        "おっぱい",
+        "立体マウスパッド",
+        "お風呂ポスター",
+        "パンチラ",
+        "R-15",
+        "同人",
+        "ホロスターズ",
+        "holostars",
+        "[本/雑誌]",
+        "ブースターパック",
+        "ノベル",
+        "ふともも",
+        "太もも",
+        "お尻",
+        "ブルマ",
+        "レオタード",
+        "ガーター",
+        "透け",
+        "18歳未満",
+        "一番くじ",
+        "ラストワン"
+      ],
+      "excludeRe": [
+        "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+        "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+        "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+        "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+        "(?<![a-z0-9])[a-z]賞(?![a-z])",
+        "\\[ [^\\]]+ \\]$",
+        "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+        "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+        "soundtrack",
+        "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+      ],
+      "cornerExclude": false,
+      "oshi": [
+        {
+          "name": "スペシャルウィーク",
+          "slug": "special-week",
+          "full": "ウマ娘 スペシャルウィーク"
+        },
+        {
+          "name": "トウカイテイオー",
+          "slug": "tokai-teio",
+          "full": "ウマ娘 トウカイテイオー"
+        },
+        {
+          "name": "ゴールドシップ",
+          "slug": "gold-ship",
+          "full": "ウマ娘 ゴールドシップ"
+        },
+        {
+          "name": "キタサンブラック",
+          "slug": "kitasan-black",
+          "full": "ウマ娘 キタサンブラック"
+        },
+        {
+          "name": "オグリキャップ",
+          "slug": "oguri-cap",
+          "full": "ウマ娘 オグリキャップ"
+        },
+        {
+          "name": "ライスシャワー",
+          "slug": "rice-shower",
+          "full": "ウマ娘 ライスシャワー"
+        }
+      ],
+      "official": [
+        {
+          "name": "ウマ娘 プリティーダービー公式ポータルサイト",
+          "note": "",
+          "url": "https://umamusume.jp/"
+        },
+        {
+          "name": "ウマ娘プロジェクト公式（X）",
+          "note": "",
+          "url": "https://x.com/uma_musu"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "ウマ娘公式",
+          "channelId": "UCAWxPGGuIfWME2KTLUmSCHw"
+        }
+      ]
+    },
+    {
+      "slug": "nikke",
+      "name": "勝利の女神：NIKKE",
+      "keywords": [
+        "勝利の女神 NIKKE"
+      ],
+      "match": [
+        "勝利の女神"
+      ],
+      "exclude": [
+        "Blu-ray",
+        "DVD",
+        "カードゲーム",
+        "限定盤",
+        "抱き枕",
+        "ブルーレイ",
+        "特装版",
+        "通常盤",
+        "初回盤",
+        "CD+",
+        "[CD]",
+        "【CD】",
+        "(CD)",
+        "ドラマCD",
+        "サウンドトラック",
+        "サントラ",
+        "キャラクターソング",
+        "キャラソン",
+        "BD-BOX",
+        "card game",
+        "OCG",
+        "スタートデッキ",
+        "デッキセット",
+        "Reバース",
+        "ヴァイスシュヴァルツ",
+        "シングルカード",
+        "ゲームソフト",
+        "パッケージ版",
+        "ダウンロード版",
+        "Switch版",
+        "【Switch】",
+        "PS4",
+        "PS5",
+        "コミックス",
+        "単行本",
+        "全巻",
+        "巻セット",
+        "フルカラー版",
+        "ノベライズ",
+        "ファンブック",
+        "設定資料",
+        "攻略",
+        "楽譜",
+        "抱きまくら",
+        "だきまくら",
+        "ダキマクラ",
+        "等身大",
+        "添い寝",
+        "下着",
+        "ランジェリー",
+        "ショーツ",
+        "ブラジャー",
+        "セクシー",
+        "sexy",
+        "水着",
+        "スク水",
+        "ビキニ",
+        "バニー",
+        "bunny",
+        "キャストオフ",
+        "おっぱい",
+        "立体マウスパッド",
+        "お風呂ポスター",
+        "パンチラ",
+        "R-15",
+        "同人",
+        "ホロスターズ",
+        "holostars",
+        "[本/雑誌]",
+        "ブースターパック",
+        "ノベル",
+        "ふともも",
+        "太もも",
+        "お尻",
+        "ブルマ",
+        "レオタード",
+        "ガーター",
+        "透け",
+        "18歳未満",
+        "一番くじ",
+        "ラストワン",
+        "ニッケ",
+        "nikkei"
+      ],
+      "excludeRe": [
+        "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+        "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+        "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+        "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+        "(?<![a-z0-9])[a-z]賞(?![a-z])",
+        "\\[ [^\\]]+ \\]$",
+        "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+        "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+        "soundtrack",
+        "/(著|編著|編|訳|原作|監修)(\\s|$|/)",
+        "1/\\d+\\s*スケール"
+      ],
+      "cornerExclude": false,
+      "oshi": [
+        {
+          "name": "ラピ",
+          "slug": "rapi",
+          "full": "NIKKE ラピ",
+          "strict": true
+        },
+        {
+          "name": "アニス",
+          "slug": "anis",
+          "full": "NIKKE アニス",
+          "strict": true
+        },
+        {
+          "name": "アリス",
+          "slug": "alice",
+          "full": "NIKKE アリス",
+          "strict": true
+        },
+        {
+          "name": "紅蓮",
+          "slug": "guren",
+          "full": "NIKKE 紅蓮"
+        },
+        {
+          "name": "モダニア",
+          "slug": "modernia",
+          "full": "NIKKE モダニア",
+          "strict": true
+        },
+        {
+          "name": "レッドフード",
+          "slug": "red-hood",
+          "full": "NIKKE レッドフード",
+          "match": [
+            "レッド・フード"
+          ],
+          "strict": true
+        }
+      ],
+      "official": [
+        {
+          "name": "勝利の女神：NIKKE 公式サイト",
+          "note": "",
+          "url": "https://nikke-jp.com/"
+        },
+        {
+          "name": "勝利の女神：NIKKE 公式（X）",
+          "note": "",
+          "url": "https://x.com/NIKKE_japan"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "勝利の女神：NIKKE 公式",
+          "forHandle": "nikkejapan"
+        }
+      ]
+    },
+    {
+      "slug": "twisted-wonderland",
+      "name": "ツイステッドワンダーランド",
+      "keywords": [
+        "ツイステッドワンダーランド"
+      ],
+      "match": [
+        "ツイステッドワンダーランド",
+        "ツイステッド・ワンダーランド",
+        "ツイステッド ワンダーランド",
+        "twisted-wonderland",
+        "twisted wonderland",
+        "ツイステ ",
+        "ツイステグッズ",
+        "ツイステ】",
+        "ツイステ」",
+        "ツイステ』",
+        "ツイステ)",
+        "ツイステ]",
+        "ツイステ・"
+      ],
+      "exclude": [
+        "DVD",
+        "Blu-ray",
+        "ヴァイスシュヴァルツ",
+        "コミック",
+        "限定盤",
+        "[cd]",
+        "ブルーレイ",
+        "通常盤",
+        "生産盤",
+        "全巻",
+        "ノベライズ",
+        "月号",
+        "ゲームソフト",
+        "-Switch",
+        "-PS4",
+        "-PS5",
+        "ブースターパック",
+        "シングルカード",
+        "同人",
+        "ボーイズラブ",
+        "抱き枕カバー",
+        "抱きまくらカバー",
+        "ウィッグ",
+        "【cd】",
+        "cd+",
+        "シングルcd",
+        "ドラマcd",
+        "[本/雑誌]",
+        "ムビチケ",
+        "前売券",
+        "カードゲーム",
+        "オリパ",
+        "一番くじ",
+        "ラストワン",
+        "サウンドトラック",
+        "アイドルソング",
+        "ユニットソング",
+        "ソングコレクション"
+      ],
+      "excludeRe": [
+        "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+        "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+        "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+        "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+        "(?<![a-z0-9])[a-z]賞(?![a-z])",
+        "\\[ [^\\]]+ \\]$",
+        "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+        "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+        "soundtrack",
+        "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+      ],
+      "cornerExclude": false,
+      "oshi": [
+        {
+          "name": "リドル",
+          "slug": "riddle",
+          "full": "ツイステ リドル",
+          "match": [
+            "リドルローズハート"
+          ],
+          "strict": true
+        },
+        {
+          "name": "エース",
+          "slug": "ace",
+          "full": "ツイステ エース",
+          "match": [
+            "エーストラッポラ"
+          ],
+          "strict": true
+        },
+        {
+          "name": "レオナ",
+          "slug": "leona",
+          "full": "ツイステ レオナ",
+          "match": [
+            "レオナキングスカラー"
+          ],
+          "strict": true
+        },
+        {
+          "name": "フロイド",
+          "slug": "floyd",
+          "full": "ツイステ フロイド",
+          "match": [
+            "フロイドリーチ"
+          ],
+          "strict": true
+        },
+        {
+          "name": "イデア",
+          "slug": "idia",
+          "full": "ツイステ イデア",
+          "match": [
+            "イデアシュラウド"
+          ],
+          "strict": true
+        },
+        {
+          "name": "マレウス",
+          "slug": "malleus",
+          "full": "ツイステ マレウス",
+          "match": [
+            "マレウスドラコニア"
+          ],
+          "strict": true
+        }
+      ],
+      "official": [
+        {
+          "name": "ディズニー ツイステッドワンダーランド公式サイト",
+          "note": "",
+          "url": "https://twisted-wonderland.aniplex.co.jp/"
+        },
+        {
+          "name": "ディズニー ツイステッドワンダーランド公式（X）",
+          "note": "",
+          "url": "https://x.com/twst_jp"
+        }
+      ]
+    },
+    {
+      "slug": "touken-ranbu",
+      "name": "刀剣乱舞",
+      "keywords": [
+        "刀剣乱舞"
+      ],
+      "match": [
+        "刀剣乱舞",
+        "とうらぶ",
+        "toukenranbu",
+        "touken ranbu"
+      ],
+      "exclude": [
+        "DVD",
+        "Blu-ray",
+        "ヴァイスシュヴァルツ",
+        "コミック",
+        "限定盤",
+        "[cd]",
+        "ブルーレイ",
+        "通常盤",
+        "生産盤",
+        "全巻",
+        "ノベライズ",
+        "月号",
+        "ゲームソフト",
+        "-Switch",
+        "-PS4",
+        "-PS5",
+        "ブースターパック",
+        "シングルカード",
+        "同人",
+        "ボーイズラブ",
+        "抱き枕カバー",
+        "抱きまくらカバー",
+        "ウィッグ",
+        "【cd】",
+        "cd+",
+        "シングルcd",
+        "ドラマcd",
+        "[本/雑誌]",
+        "ムビチケ",
+        "前売券",
+        "カードゲーム",
+        "オリパ",
+        "一番くじ",
+        "ラストワン",
+        "サウンドトラック",
+        "アイドルソング",
+        "ユニットソング",
+        "ソングコレクション"
+      ],
+      "excludeRe": [
+        "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+        "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+        "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+        "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+        "(?<![a-z0-9])[a-z]賞(?![a-z])",
+        "\\[ [^\\]]+ \\]$",
+        "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+        "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+        "soundtrack",
+        "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+      ],
+      "cornerExclude": false,
+      "oshi": [
+        {
+          "name": "三日月宗近",
+          "slug": "mikazuki"
+        },
+        {
+          "name": "加州清光",
+          "slug": "kashu"
+        },
+        {
+          "name": "鶴丸国永",
+          "slug": "tsurumaru",
+          "match": [
+            "鶴丸國永"
+          ]
+        },
+        {
+          "name": "へし切長谷部",
+          "slug": "hasebe",
+          "match": [
+            "長谷部"
+          ]
+        },
+        {
+          "name": "山姥切国広",
+          "slug": "yamanbagiri",
+          "match": [
+            "山姥切國廣"
+          ]
+        },
+        {
+          "name": "燭台切光忠",
+          "slug": "shokudaikiri"
+        }
+      ],
+      "official": [
+        {
+          "name": "刀剣乱舞ONLINE公式サイト",
+          "note": "",
+          "url": "https://www.toukenranbu.jp/"
+        },
+        {
+          "name": "刀剣乱舞-本丸通信-公式（X）",
+          "note": "",
+          "url": "https://x.com/tkrb_ht"
+        },
+        {
+          "name": "刀剣乱舞ONLINE運営（X）",
+          "note": "ゲームのお知らせ",
+          "url": "https://x.com/touken_staff"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "刀剣乱舞公式",
+          "channelId": "UC56x--_QtyaWD1QptYrPMqA"
+        }
+      ]
+    }
+  ],
+  "excludeRe": [
+    "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+    "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+    "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+    "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+    "(?<![a-z0-9])[a-z]賞(?![a-z])",
+    "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+  ]
+}

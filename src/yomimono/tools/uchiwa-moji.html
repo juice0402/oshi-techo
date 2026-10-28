@@ -1,0 +1,62 @@
+<div class="fit" id="ufit">
+<fieldset class="pick"><legend>うちわの面</legend>
+<label><input type="radio" name="uf" value="295x285" checked><span>ジャンボ</span></label>
+<label><input type="radio" name="uf" value="243x215"><span>レギュラー</span></label>
+<label><input type="radio" name="uf" value="195x175"><span>コンパクト</span></label>
+<label><input type="radio" name="uf" value="mm"><span>測った大きさ</span></label>
+</fieldset>
+<p class="fit-mm" data-for="uf" hidden><label>横<input type="number" name="ufx" inputmode="numeric" min="100" max="500" value="295">mm</label><label>縦<input type="number" name="ufy" inputmode="numeric" min="100" max="500" value="285">mm</label></p>
+<fieldset class="pick"><legend>1行の文字数</legend>
+<label><input type="radio" name="uc" value="1"><span>1字</span></label>
+<label><input type="radio" name="uc" value="2"><span>2字</span></label>
+<label><input type="radio" name="uc" value="3"><span>3字</span></label>
+<label><input type="radio" name="uc" value="4" checked><span>4字</span></label>
+<label><input type="radio" name="uc" value="5"><span>5字</span></label>
+<label><input type="radio" name="uc" value="6"><span>6字</span></label>
+</fieldset>
+<fieldset class="pick"><legend>行の数</legend>
+<label><input type="radio" name="ur" value="1"><span>1行</span></label>
+<label><input type="radio" name="ur" value="2" checked><span>2行</span></label>
+<label><input type="radio" name="ur" value="3"><span>3行</span></label>
+</fieldset>
+<fieldset class="pick"><legend>ふちとのあいだ</legend>
+<label><input type="radio" name="um" value="10"><span>10mm</span></label>
+<label><input type="radio" name="um" value="20" checked><span>20mm</span></label>
+<label><input type="radio" name="um" value="30"><span>30mm</span></label>
+</fieldset>
+<fieldset class="pick"><legend>文字と文字のあいだ</legend>
+<label><input type="radio" name="ug" value="0"><span>すきまなし</span></label>
+<label><input type="radio" name="ug" value="5" checked><span>5mm</span></label>
+<label><input type="radio" name="ug" value="10"><span>10mm</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 100" role="img" aria-label="うちわの面に文字のマスを並べたところ"></svg><figcaption>うちわの面に、1文字ぶんの四角を並べたところ</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('ufit');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+// 案内表示の文字の大きさのめやす（和文）：この高さがあれば、この距離から読める
+var T=[[120,'30m'],[80,'20m'],[40,'10m'],[20,'4〜5m'],[9,'1〜2m']];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'mmの数字を入れてください。';return 0;}
+// 1文字の大きさ：面の横と縦から、ふちとのあいだと文字のあいだを引いて、文字の数でわった小さいほう（1mm未満は切りすて）
+function size(W,H,c,r,m,g){return Math.floor(Math.min((W-2*m-(c-1)*g)/c,(H-2*m-(r-1)*g)/r));}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+// 図：うちわの面（角の丸い四角）と、まん中にそろえた文字のマス
+function draw(svg,W,H,c,r,m,g,s){while(svg.firstChild)svg.removeChild(svg.firstChild);var pad=Math.max(W,H)*0.02;svg.setAttribute('viewBox',(-pad)+' '+(-pad)+' '+(W+pad*2)+' '+(H+pad*2));el(svg,'rect',{width:W,height:H,rx:Math.min(W,H)*0.22,'class':'fit-w'});var bw=c*s+(c-1)*g,bh=r*s+(r-1)*g,x0=(W-bw)/2,y0=(H-bh)/2;for(var j=0;j<r;j++)for(var i=0;i<c;i++)el(svg,'rect',{x:x0+i*(s+g),y:y0+j*(s+g),width:s,height:s,rx:s*0.12,'class':'fit-c '+C[(i+j)%3]});}
+function run(){bad='';var s0=v('uf'),W,H;f.querySelector('.fit-mm[data-for="uf"]').hidden=s0!=='mm';
+if(s0==='mm'){W=num('ufx',100,500,'うちわの面の横');H=num('ufy',100,500,'うちわの面の縦');}else{var a=s0.split('x');W=+a[0];H=+a[1];}
+var svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;while(svg.firstChild)svg.removeChild(svg.firstChild);return;}
+var c=+v('uc'),r=+v('ur'),m=+v('um'),g=+v('ug'),s=size(W,H,c,r,m,g),ans;
+if(s<5){ans='この面には、この文字の数は入りません。文字を減らすか、ふちとのあいだをせまくしてください。';while(svg.firstChild)svg.removeChild(svg.firstChild);f.querySelector('.fit-ans').textContent=ans;return;}
+ans='1文字の大きさは、たて・よこ約'+s+'mm（約'+(s/10).toFixed(1)+'cm）です。';
+var d='';for(var k=0;k<T.length;k++)if(s>=T[k][0]){d=T[k][1];break;}
+ans+=d?'駅などの案内表示のめやすでは、'+d+'はなれて読める文字の高さに当たります。':'駅などの案内表示のめやすでいちばん近い1〜2mの9mmより小さい大きさです。';
+f.querySelector('.fit-ans').textContent=ans;draw(svg,W,H,c,r,m,g,s);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

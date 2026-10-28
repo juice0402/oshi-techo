@@ -1,0 +1,80 @@
+{
+  "checked": "2026-10-28",
+  "items": [
+    {
+      "name": "ビクセン（双眼鏡の選び方）",
+      "url": "https://www.vixen.co.jp/howtouse/binocular/",
+      "used": "倍率×対物レンズ有効径の読み方、口径の分け方、実視界と1000m先の視界の式（7.0°で約122m）、ひとみ径＝口径÷倍率と明るさ、アイレリーフ15mm以上、手で持つなら10倍まで、距離÷倍率（8倍で200m先は25m）"
+    },
+    {
+      "name": "ニコンイメージング（双眼鏡の選び方ガイド）",
+      "url": "https://nij.nikon.com/cms/sp/howto_binoculars/",
+      "used": "見える大きさは距離÷倍率、12倍くらいまで、実視界は倍率が高いほどせまい、アイレリーフ15mm以上・最低10mm、ライブ会場やホールは4〜8倍・東京ドームのような広い会場は8〜10倍、脇をしめる持ち方"
+    },
+    {
+      "name": "ビクセン（ライブ・コンサート・スポーツ観戦に「＋双眼鏡」）",
+      "url": "https://www.vixen.co.jp/activity/221205a/",
+      "used": "倍率を上げると暗く手ぶれしやすい、口径25mm以上で暗めの会場でも見やすい、ひじを体につける、防振双眼鏡の倍率と電池の時間（単四2本、約12〜30時間、20℃）、機種ごとの重さ、照明のにじみとコーティング、売り場で防振をくらべる"
+    },
+    {
+      "name": "ビクセン（防振双眼鏡について）",
+      "url": "https://www.vixen.co.jp/activity/221205a/230523a-4/",
+      "used": "広いドームやアリーナでは10倍以上、防振双眼鏡の重さ（電池別）、ふつうの双眼鏡より値段が高い"
+    },
+    {
+      "name": "ビクセン（アリーナ HD8x21WP）",
+      "url": "https://www.vixen.co.jp/product/13441_0/",
+      "used": "8×21の実視界6.0°・1000m先105m・ひとみ径2.6mm・アイレリーフ11mm・190g"
+    },
+    {
+      "name": "キヤノン（BINOCULARS 10×20 IS）",
+      "url": "https://personal.canon.jp/product/binoculars/lineup/10x20is",
+      "used": "手ブレ補正つきの10×20で約430g、連続約12時間（23℃）"
+    },
+    {
+      "name": "ビクセン（双眼鏡に関するよくあるお問い合わせ）",
+      "url": "https://www.vixen.co.jp/support/faq_binoculars/",
+      "used": "アイレリーフの意味、眼鏡なら15mm以上、15mm未満でも使えるが黒いふちが見えることがある、見口の折り返し、ブロアーとレンズペーパーとクリーナーでの手入れ、ぬれたら乾かす、湿気とほこりの多い所をさける、シリカゲルを入れた容器"
+    },
+    {
+      "name": "ケンコー・トキナー（双眼鏡の調整と構え方）",
+      "url": "https://www.kenko-tokina.co.jp/lp/logos/topics/how-to-use-binoculars.html",
+      "used": "ストラップは胸の少し上、見口、眼幅、左目でピント・右目で視度、脇をしめて両手で持つ"
+    },
+    {
+      "name": "ケンコー・トキナー（双眼鏡クリーニングキット ビノフォー）",
+      "url": "https://www.kenko-tokina.co.jp/imaging/eq/eq-camera/cleaning/cleaning_set/bino4.html",
+      "used": "ブロワーでほこりを払ってからレンズを清掃する順番"
+    },
+    {
+      "name": "ニコン（双眼鏡 共通使用説明書）",
+      "url": "https://download.nikonimglib.com/archive5/CiA0g00R88Hi05txbd244QcUBC42/936C_3_2107_Binocular_general_instructions_BN_prCN_dl_(14B)3.pdf",
+      "used": "太陽を見ない、歩きながら使わない・ストラップでふり回さない、暑い車の中や熱のそばに置かない、乾燥剤を入れた容器、寒い所から暖かい部屋でくもる"
+    },
+    {
+      "name": "ニコン（MONARCH M5 使用説明書）",
+      "url": "https://download.nikonimglib.com/archive5/hzvIS00Wvugm05HD0GG83EaONf30/965C_1_2208_MONARCH_M5_BN_dl_(Jp)1.pdf",
+      "used": "ストラップはねじれないように取り付ける、落下で全損と認められると修理できない"
+    },
+    {
+      "name": "ニコンイメージング（レンズの扱いかたの基本）",
+      "url": "https://nij.nikon.com/learn/phototech/lenslesson/lesson10.html",
+      "used": "汚れがついたままふくと傷がつくことがある、高温多湿・直射日光をさける"
+    },
+    {
+      "name": "東京ドーム（東京ドームとは）",
+      "url": "https://www.tokyo-dome.co.jp/dome/about/",
+      "used": "グラウンド面積13,000㎡、両翼100m、中堅122m、収容55,000人"
+    },
+    {
+      "name": "GMOアリーナさいたま（スタジアム）",
+      "url": "https://www.saitama-arena.co.jp/business/layout_sizes/layout_sizes_stadium/",
+      "used": "エンドステージ約30,000席、センターステージ約37,000席"
+    },
+    {
+      "name": "GMOアリーナさいたま（メインアリーナ）",
+      "url": "https://www.saitama-arena.co.jp/business/layout_sizes/layout_sizes_main_arena/",
+      "used": "コンサートのエンドステージ約12,500席・約16,000席、センターステージ約22,000席"
+    }
+  ]
+}

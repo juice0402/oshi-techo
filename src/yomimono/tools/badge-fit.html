@@ -1,0 +1,48 @@
+<div class="fit" id="fit">
+<fieldset class="pick"><legend>窓の大きさ</legend>
+<label><input type="radio" name="fw" value="128x182"><span>B6</span></label>
+<label><input type="radio" name="fw" value="148x210"><span>A5</span></label>
+<label><input type="radio" name="fw" value="182x257"><span>B5</span></label>
+<label><input type="radio" name="fw" value="210x297" checked><span>A4</span></label>
+<label><input type="radio" name="fw" value="297x420"><span>A3</span></label>
+<label><input type="radio" name="fw" value="mm"><span>測った大きさ</span></label>
+</fieldset>
+<p class="fit-mm" hidden><label>横<input type="number" name="fx" inputmode="numeric" min="40" max="600" value="210">mm</label><label>縦<input type="number" name="fy" inputmode="numeric" min="40" max="600" value="297">mm</label></p>
+<fieldset class="pick"><legend>窓の向き</legend>
+<label><input type="radio" name="fo" value="t" checked><span>縦長</span></label>
+<label><input type="radio" name="fo" value="y"><span>横長</span></label>
+</fieldset>
+<fieldset class="pick"><legend>缶バッジの大きさ</legend>
+<label><input type="radio" name="fd" value="44"><span>44mm</span></label>
+<label><input type="radio" name="fd" value="57" checked><span>57mm</span></label>
+<label><input type="radio" name="fd" value="65"><span>65mm</span></label>
+<label><input type="radio" name="fd" value="76"><span>76mm</span></label>
+</fieldset>
+<fieldset class="pick"><legend>缶バッジのあいだ</legend>
+<label><input type="radio" name="fg" value="0"><span>すきまなし</span></label>
+<label><input type="radio" name="fg" value="3" checked><span>3mm</span></label>
+<label><input type="radio" name="fg" value="6"><span>6mm</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs"><figure><svg class="fit-a" viewBox="0 0 100 100" role="img" aria-label="格子にならべたとき"></svg><figcaption>格子</figcaption></figure><figure><svg class="fit-b" viewBox="0 0 100 100" role="img" aria-label="たがいちがいにならべたとき"></svg><figcaption>たがいちがい</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('fit');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+function num(n,d){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);return x>=40&&x<=600?x:d;}
+// 格子：横と縦にそろえる
+function grid(W,H,d,g){var p=d+g,c=Math.floor((W+g)/p),r=Math.floor((H+g)/p),out=[];for(var j=0;j<r;j++)for(var i=0;i<c;i++)out.push([d/2+i*p,d/2+j*p]);return {n:out.length,c:c,r:r,pts:out};}
+// たがいちがい：1段ごとに半分ずらして、段のあいだをつめる
+function hex(W,H,d,g){var p=d+g,h=p*Math.sqrt(3)/2,out=[];if(H<d||W<d)return {n:0,pts:out};var rows=Math.floor((H-d)/h+1e-9)+1;for(var j=0;j<rows;j++){var off=j%2?p/2:0,c=Math.floor((W-off+g)/p);for(var i=0;i<c;i++)out.push([d/2+off+i*p,d/2+j*h]);}return {n:out.length,pts:out};}
+function draw(svg,W,H,d,pts){while(svg.firstChild)svg.removeChild(svg.firstChild);var pad=4;svg.setAttribute('viewBox',(-pad)+' '+(-pad)+' '+(W+pad*2)+' '+(H+pad*2));var r=document.createElementNS(NS,'rect');r.setAttribute('width',W);r.setAttribute('height',H);r.setAttribute('rx',Math.min(W,H)*0.04);r.setAttribute('class','fit-w');svg.appendChild(r);pts.forEach(function(q,i){var c=document.createElementNS(NS,'circle');c.setAttribute('cx',q[0]);c.setAttribute('cy',q[1]);c.setAttribute('r',d/2);c.setAttribute('class','fit-c '+C[i%3]);svg.appendChild(c);});}
+function run(){var s=v('fw'),W,H;f.querySelector('.fit-mm').hidden=s!=='mm';if(s==='mm'){W=num('fx',210);H=num('fy',297);}else{var a=s.split('x');W=+a[0];H=+a[1];}
+if(v('fo')==='y'&&W<H){var t=W;W=H;H=t;}if(v('fo')==='t'&&W>H){var u=W;W=H;H=u;}
+var d=+v('fd'),g=+v('fg'),A=grid(W,H,d,g),B=hex(W,H,d,g),B2=hex(H,W,d,g);if(B2.n>B.n)B={n:B2.n,pts:B2.pts.map(function(q){return [q[1],q[0]];})};
+var ans=A.n?'格子にならべると、横'+A.c+'・縦'+A.r+'で'+A.n+'個。':'この大きさの缶バッジは入りません。';
+if(A.n&&B.n>A.n)ans+='たがいちがいにずらすと'+B.n+'個入ります。';else if(A.n)ans+='たがいちがいにしても、数は同じかへります。';
+var best=Math.max(A.n,B.n),wt={44:6,57:10,76:18}[d];if(best&&wt)ans+='缶バッジだけの重さは、'+best+'個で約'+(best*wt)+'gです（1個約'+wt+'gとして）。';f.querySelector('.fit-ans').textContent=ans;draw(f.querySelector('.fit-a'),W,H,d,A.pts);draw(f.querySelector('.fit-b'),W,H,d,B.pts);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

@@ -1,0 +1,117 @@
+{
+  "published": "2026-10-27",
+  "checked": "2026-10-27",
+  "shops": [
+    {
+      "kind": "お店",
+      "name": "スヌーピータウンショップ",
+      "note": "キデイランドが運営する専門店。小さめのスヌーピータウンミニを入れて、公式の店の一覧に28店（2026年10月）",
+      "url": "https://town.snoopy.co.jp/shoplist"
+    },
+    {
+      "kind": "通販",
+      "name": "おかいものSNOOPY",
+      "note": "公式の通販",
+      "url": "https://okaimono-snoopy.jp/"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "SNOOPY.co.jp",
+      "note": "日本のスヌーピー公式サイト",
+      "url": "https://www.snoopy.co.jp/",
+      "gh": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "shinsaku",
+      "h": "新作の出かた",
+      "lines": [
+        "2026年の新作では店が先で、店の通販・取り置きとおかいものSNOOPYは2、3日あとからでした。クリスマスのシリーズは、店が11月7日、通販が11月9日からです",
+        "発売の初日は、1会計につき1商品2個まで、のように買える数が決まり、混むと整理券や入店の制限があります",
+        "通販や取り置きをしない店もあります。2026年7月の誕生祭の新作では、新宿店は通販・取り置きの対象外でした",
+        "楽天ブックスで発売日が決まっているものは[[発売日カレンダー|hatsubai]]に、楽天市場のお店の予約は[[予約受付中|yoyaku]]に並べています"
+      ]
+    },
+    {
+      "id": "kuji",
+      "h": "くじとランダムの商品",
+      "lines": [
+        "バンダイスピリッツの一番くじに、スヌーピーのシリーズがあります。2025年3月のくじは1回800円でした",
+        "バンダイのガシャポンにもなっています。2026年7月からの「フロッキーマスコットチャーム」は1回400円です",
+        "スヌーピータウンショップにも、開けるまで中身が分からない商品があります。「Christmas Night」は1個1,265円で、8個入りのBOXもあります"
+      ]
+    },
+    {
+      "id": "saihan",
+      "h": "再販",
+      "lines": [
+        "スヌーピータウンショップは、再入荷を商品のページで知らせることがあります。2026年10月には「Christmas Night」の再入荷が知らされました",
+        "楽天市場のお店で売り切れから戻ったものは[[再入荷|sainyuka]]に並べています"
+      ]
+    },
+    {
+      "id": "miwake",
+      "h": "公式の見分け方",
+      "lines": [
+        "PEANUTSの商品の告知には「(C) Peanuts Worldwide LLC」の形の権利の表記がつきます",
+        "日本でのPEANUTSのエージェントは、ソニー・クリエイティブプロダクツです",
+        "おかいものSNOOPYをまねた偽のサイトが見つかったことがあり、買う前にアドレスを確かめるよう案内されています"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "from": "2026-11-07",
+      "until": "2026-11-30",
+      "text": "スヌーピータウンショップのクリスマスのシリーズが発売されます。通販と取り置きは11月9日から30日までです"
+    }
+  ],
+  "sources": [
+    {
+      "name": "スヌーピータウンショップ（店舗一覧）",
+      "url": "https://town.snoopy.co.jp/shoplist",
+      "used": "店の一覧と数、スヌーピータウンミニ"
+    },
+    {
+      "name": "財経新聞（スヌーピータウンショップ新宿店）",
+      "url": "https://zaikei.co.jp/releases/2874646/",
+      "used": "キデイランドの運営、ソニー・クリエイティブプロダクツ"
+    },
+    {
+      "name": "スヌーピータウンショップ（クリスマス2026）",
+      "url": "https://town.snoopy.co.jp/item/original/xmas20261107.html",
+      "used": "店と通販の日、初日の買える数、整理券"
+    },
+    {
+      "name": "ウォーカープラス（スヌーピー誕生祭2026）",
+      "url": "https://www.walkerplus.com/article/1423783/",
+      "used": "通販・取り置きをしない店"
+    },
+    {
+      "name": "TOY PEOPLE（一番くじ PEANUTS）",
+      "url": "https://www.toy-people.com/jp/?p=95084",
+      "used": "一番くじの値段"
+    },
+    {
+      "name": "TOY PEOPLE（フロッキーマスコットチャーム）",
+      "url": "https://www.toy-people.com/jp/?p=112451",
+      "used": "ガシャポンの値段"
+    },
+    {
+      "name": "スヌーピータウンショップ（Christmas Night）",
+      "url": "https://town.snoopy.co.jp/item/other/christmas-night.html",
+      "used": "ランダムの商品と再入荷"
+    },
+    {
+      "name": "公募ガイド（PR TIMES PEANUTS 2027年版カレンダー）",
+      "url": "https://koubo.jp/press-release/prtimes/c66939_r94",
+      "used": "権利の表記"
+    },
+    {
+      "name": "おかいものSNOOPY（偽サイトの注意）",
+      "url": "https://okaimono-snoopy.jp/blogs/informattion/snoopyinformation",
+      "used": "偽のサイトとアドレスの確かめ"
+    }
+  ]
+}

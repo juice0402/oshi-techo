@@ -1,0 +1,42 @@
+name: プルリクエストの確認
+
+# 見本データ（test/fixture-*.json。楽天のデータではない作りもの）でページを作ってテストする。
+# 楽天からは取らず、プレビューも出さない（2026-10-28 公開リポジトリへの引っ越しで、しょーくんが決めた）。
+# 本当のデータでのテストは、マージのあとの本番の更新（update.yml）で行う（失敗したら公開しない）。
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE_MODE: preview
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: 楽天のデータが入っていないか確かめる
+        run: |
+          if git ls-files | grep -q '^data/'; then
+            echo "::error title=楽天のデータ::data/ はこのリポジトリに入れない（記録は非公開の oshi-techo-data）"
+            exit 1
+          fi
+
+      - name: 見本データでテスト
+        run: node scripts/build.mjs > /dev/null && node scripts/test.mjs
+        env:
+          DATA_LATEST: test/fixture-latest.json
+          DATA_META: test/fixture-meta.json
+          DATA_BOOKS: test/fixture-books.json
+          DATA_RANKING: test/fixture-ranking.json

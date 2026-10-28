@@ -1,0 +1,88 @@
+{
+  "checked": "2026-10-28",
+  "items": [
+    {
+      "name": "うちわダイレクト（うちわのサイズ）",
+      "url": "https://www.uchiwa-direct.jp/size",
+      "used": "ジャンボ・レギュラー・コンパクト・ミドルの全体の大きさと面の縦、ジャンボの持ち手13.5cm、見る距離ごとの文字の高さのめやす（5mで約8cm、10mで約16cm）"
+    },
+    {
+      "name": "夢画材（応援うちわ 公式うちわサイズ）",
+      "url": "https://www.yumegazai.com/Product/ae-42774",
+      "used": "応援うちわの大きさ（全体420×295mm、面285mm、持ち手135mm）"
+    },
+    {
+      "name": "ダイソーネットストア（コンサート用デコうちわ）",
+      "url": "https://jp.daisonet.com/products/4550480262024",
+      "used": "29×41cmで1本110円、骨はポリプロピレンで面は紙、直射日光・高温多湿・熱源をさける保管",
+      "gh": false
+    },
+    {
+      "name": "ダイソーネットストア（コンサート用デコうちわミニ）",
+      "url": "https://jp.daisonet.com/products/4967574599742",
+      "used": "2本入り110円、約19.7×27.5cmで持ち手をのぞくと縦約17cm、汗や水ぬれ・こすれで色落ちや色移りすること",
+      "gh": false
+    },
+    {
+      "name": "ハピラ（うちわカバー）",
+      "url": "https://www.hpl.co.jp/item/ucwc/",
+      "used": "外の大きさ340×340mm、ジャンボうちわ用（約285×295mm）、厚み7mmまで"
+    },
+    {
+      "name": "手越祐也オフィシャルファンクラブ（応援グッズならびに公演中の注意事項）",
+      "url": "https://yuyategoshi.com/news/detail/879",
+      "used": "2024年10月の案内。うちわは約30×42cmまで、1人2本まで、胸より上にあげない、反射の強い素材は使わない"
+    },
+    {
+      "name": "東方神起 オフィシャルサイト（20th Anniversary LIVE TOUR ～ZONE～ ご来場の注意）",
+      "url": "https://toho-jp.net/en/news/detail.php?id=1121045",
+      "used": "手に持って応援できる大きさのうちわまで、胸の高さより上で使わない"
+    },
+    {
+      "name": "THE FIRST TIMES（東方神起 ZONE ツアーの記事）",
+      "url": "https://www.thefirsttimes.jp/news/0000528807/",
+      "used": "ZONE ツアーが2024年11月に始まり、2025年4月に東京ドームの追加公演があったこと"
+    },
+    {
+      "name": "マイナビ presents The Performance（公式サイト）",
+      "url": "https://theperformance.jp/",
+      "used": "2026年4月の公演。うちわは面が30×30cm以内、胸元の高さで使う"
+    },
+    {
+      "name": "FAMILY CLUB（よくある質問：うちわの大きさ）",
+      "url": "https://contact.fc-member.familyclub.jp/s/fcinq/faq/115002947028",
+      "used": "自分で作ったうちわは規定の大きさの中なら持ちこめること、胸の高さで持つこと、公演により持ちこみの決まりがあること、迷惑になると判断したときは預かること",
+      "gh": false
+    },
+    {
+      "name": "ハンズ ヒントマガジン（応援うちわの作り方）",
+      "url": "https://hands.net/hintmagazine/craft/2308-uchiwa.html",
+      "used": "材料と道具、型紙を印刷してシートの裏に反転して留めること、直線はカッターで曲線ははさみ、縮小した文字でふちどり、キラキラした素材は演じる人の目に反射するので控えること"
+    },
+    {
+      "name": "ソレドコ（応援うちわの作り方ガイド、2024年8月）",
+      "url": "https://soredoko.jp/entry/2024/08/16/103000",
+      "used": "推しの名前や「手振って！」のような言葉、白や黒のうちわ、太めの書体を大きく印刷、ふちどりの2つの方法、ホログラムなどのキラキラ素材が使えない場合があること"
+    },
+    {
+      "name": "セントウェル印刷（カッティングシートの貼り方）",
+      "url": "https://www.centwell.co.jp/blog/archives/1956",
+      "used": "貼る面をふく、台紙を少しずつはがしながら貼る、中から外へ空気を押し出す、気泡は針で穴をあける、15〜25℃"
+    },
+    {
+      "name": "MARK・SHOP（切り文字の貼り方・剥がし方）",
+      "url": "https://www.palec.co.jp/cutting2.html",
+      "used": "貼る面の油やほこりをとる、定規で位置を決めマスキングテープで留める、適温10〜30℃、10℃以下はドライヤーで温める"
+    },
+    {
+      "name": "国土交通省（バリアフリー整備ガイドライン 旅客施設編 視覚表示設備）",
+      "url": "https://www.mlit.go.jp/sogoseisaku/barrierfree/content/001913508.pdf",
+      "used": "文字の大きさの選択の目安（和文：1〜2mで9mm以上、4〜5mで20mm以上、10mで40mm以上、20mで80mm以上、30mで120mm以上）"
+    },
+    {
+      "name": "サインモール（看板の文字の大きさ）",
+      "url": "https://www.signmall.jp/blog/character-size-of-signboard/",
+      "used": "案内表示のガイドラインの視距離と文字の高さの表の説明（上の資料の確かめ）"
+    }
+  ]
+}

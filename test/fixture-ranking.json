@@ -1,0 +1,49 @@
+{
+ "fetchedAt": "2026-10-18T07:20:00.000Z",
+ "items": [
+  {
+   "code": "shopr:1",
+   "c": "sanrio",
+   "name": "サンリオ クロミ ぬいぐるみ L ランキング",
+   "price": 4400,
+   "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopr%2F1%2F",
+   "img": "https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/r1.jpg?_ex=128x128",
+   "shop": "テストのお店R",
+   "avail": 1,
+   "genre": "566382",
+   "catchcopy": "",
+   "start": "",
+   "end": "",
+   "reviews": 530,
+   "rating": 4.71,
+   "pointRate": 1,
+   "pointStart": "",
+   "pointEnd": "",
+   "rank": 3,
+   "kind": "f20",
+   "genreQuery": ""
+  },
+  {
+   "code": "shopa:1",
+   "c": "chiikawa",
+   "name": "【送料無料】ちいかわ ぬいぐるみ S ハチワレ もちもち マスコット かわいい プレゼント",
+   "price": 2420,
+   "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopa%2F1%2F",
+   "img": "https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/a.jpg?_ex=128x128",
+   "shop": "キャラクターグッズ専門店テスト",
+   "avail": 1,
+   "genre": "566382",
+   "catchcopy": "",
+   "start": "",
+   "end": "",
+   "reviews": 128,
+   "rating": 4.62,
+   "pointRate": 1,
+   "pointStart": "",
+   "pointEnd": "",
+   "rank": 12,
+   "kind": "genre",
+   "genreQuery": "566382"
+  }
+ ]
+}

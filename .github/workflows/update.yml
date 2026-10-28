@@ -1,0 +1,149 @@
+name: 更新
+
+# 1日2回（日本時間 12:07・19:07）楽天から集めて、ページを作り直し、
+# 本番（https://nyuka-techo.com/。Cloudflare Pages のプロジェクト oshi-techo）に公開する。変わったページは IndexNow で知らせる。
+#
+# このリポジトリは公開。楽天のデータは公開の場所に置けない（楽天の規約 第10条9号）ので、
+# 記録（data/）は非公開の juice0402/oshi-techo-data から持ってきて、終わったら戻す。
+# 各ステップの出力（商品名が出る）も scripts/quiet.sh で oshi-techo-data の notes/update.log にだけ書き、
+# 公開のログには「済」「失敗」だけを出す。
+on:
+  schedule:
+    - cron: '7 3,10 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: '変化がなくても公開する'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SITE_MODE: production
+      DEPLOY_BRANCH: main
+      NOTES: ${{ github.workspace }}/kiroku/notes/update.log
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 記録を持ってくる（非公開の oshi-techo-data）
+        uses: actions/checkout@v5
+        with:
+          repository: juice0402/oshi-techo-data
+          token: ${{ secrets.DATA_TOKEN }}
+          path: kiroku
+          fetch-depth: 1
+
+      - name: 記録を data/ に置く
+        run: |
+          cp -r kiroku/data data
+          mkdir -p kiroku/notes
+          : > "$NOTES"
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: 楽天から集める
+        run: bash scripts/quiet.sh node scripts/fetch.mjs
+        env:
+          RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+
+      - name: 楽天のランキングを集める
+        run: bash scripts/quiet.sh node scripts/fetch-ranking.mjs
+        env:
+          RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+
+      - name: 楽天ブックスから発売日を集める
+        run: bash scripts/quiet.sh node scripts/fetch-books.mjs
+        env:
+          RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+
+      - name: 読みものの棚を集める
+        run: bash scripts/quiet.sh node scripts/fetch-yomimono.mjs
+        env:
+          RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+
+      - name: ページを作る
+        run: bash scripts/quiet.sh node scripts/build.mjs
+
+      - name: テスト
+        run: bash scripts/quiet.sh node scripts/test.mjs
+
+      - name: 変化があるか調べる
+        id: diff
+        run: |
+          NEW=$(node scripts/dist-hash.mjs)
+          OLD=$(cat data/deployed.txt 2>/dev/null || true)
+          if [ "$NEW" != "$OLD" ] || [ "${{ inputs.force }}" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+          echo "hash=$NEW" >> "$GITHUB_OUTPUT"
+
+      - name: 探す・公式の最新情報の鍵をCloudflareに入れる
+        if: steps.diff.outputs.changed == 'true'
+        run: bash scripts/quiet.sh node scripts/pages-secrets.mjs
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          RAKUTEN_APPLICATION_ID: ${{ secrets.RAKUTEN_APPLICATION_ID }}
+          RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
+          RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: 公開する
+        if: steps.diff.outputs.changed == 'true'
+        run: bash scripts/quiet.sh npx --yes wrangler@4 pages deploy dist --project-name=oshi-techo --branch="$DEPLOY_BRANCH" --commit-dirty=true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: 「探す」と公式の最新情報を試す
+        if: steps.diff.outputs.changed == 'true'
+        run: bash scripts/quiet.sh node scripts/check-search.mjs https://nyuka-techo.com
+
+      - name: 検索エンジンに知らせる（IndexNow）
+        if: steps.diff.outputs.changed == 'true'
+        run: bash scripts/quiet.sh node scripts/indexnow.mjs
+
+      - name: 古い公開（デプロイ）を消す
+        if: steps.diff.outputs.changed == 'true'
+        continue-on-error: true
+        run: bash scripts/quiet.sh node scripts/cleanup-deployments.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: 記録を保存する（非公開の oshi-techo-data）
+        run: |
+          if [ "${{ steps.diff.outputs.changed }}" = "true" ]; then
+            echo "${{ steps.diff.outputs.hash }}" > data/deployed.txt
+          fi
+          rm -rf kiroku/data
+          cp -r data kiroku/data
+          bash scripts/save-kiroku.sh "記録を更新"
+
+      - name: 失敗したときのメモを保存する（記録はそのまま）
+        if: failure()
+        run: |
+          [ -d kiroku/.git ] || exit 0
+          bash scripts/save-kiroku.sh "更新の失敗のメモ"

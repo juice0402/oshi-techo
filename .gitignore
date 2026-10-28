@@ -1,0 +1,5 @@
+dist/
+node_modules/
+# 楽天APIの記録は公開しない（非公開の juice0402/oshi-techo-data に置く）
+data/
+src/og/*.ttf

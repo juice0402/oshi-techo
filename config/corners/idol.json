@@ -1,0 +1,543 @@
+{
+  "slug": "idol",
+  "name": "アイドル",
+  "title": "アイドル・VTuberグッズ",
+  "order": 3,
+  "fetch": {
+    "pages": 2,
+    "oshiPages": 1,
+    "gotouchi": false,
+    "seasons": false,
+    "books": true,
+    "booksPages": 2
+  },
+  "exclude": [
+    "Blu-ray",
+    "DVD",
+    "カードゲーム",
+    "限定盤",
+    "抱き枕",
+    "ブルーレイ",
+    "特装版",
+    "通常盤",
+    "初回盤",
+    "CD+",
+    "[CD]",
+    "【CD】",
+    "(CD)",
+    "ドラマCD",
+    "サウンドトラック",
+    "サントラ",
+    "キャラクターソング",
+    "キャラソン",
+    "BD-BOX",
+    "card game",
+    "OCG",
+    "スタートデッキ",
+    "デッキセット",
+    "Reバース",
+    "ヴァイスシュヴァルツ",
+    "シングルカード",
+    "ゲームソフト",
+    "パッケージ版",
+    "ダウンロード版",
+    "Switch版",
+    "【Switch】",
+    "PS4",
+    "PS5",
+    "コミックス",
+    "単行本",
+    "全巻",
+    "巻セット",
+    "フルカラー版",
+    "ノベライズ",
+    "ファンブック",
+    "設定資料",
+    "攻略",
+    "楽譜",
+    "抱きまくら",
+    "だきまくら",
+    "ダキマクラ",
+    "等身大",
+    "添い寝",
+    "下着",
+    "ランジェリー",
+    "ショーツ",
+    "ブラジャー",
+    "セクシー",
+    "sexy",
+    "水着",
+    "スク水",
+    "ビキニ",
+    "バニー",
+    "bunny",
+    "キャストオフ",
+    "おっぱい",
+    "立体マウスパッド",
+    "お風呂ポスター",
+    "パンチラ",
+    "R-15",
+    "同人",
+    "ホロスターズ",
+    "holostars",
+    "[本/雑誌]",
+    "ブースターパック",
+    "ノベル",
+    "ふともも",
+    "太もも",
+    "お尻",
+    "ブルマ",
+    "レオタード",
+    "ガーター",
+    "透け",
+    "18歳未満",
+    "一番くじ",
+    "ラストワン"
+  ],
+  "works": [
+    {
+      "slug": "lovelive",
+      "name": "ラブライブ！",
+      "keywords": [
+        "ラブライブ"
+      ],
+      "match": [
+        "ラブライブ",
+        "μ's",
+        "μ’s",
+        "aqours",
+        "虹ヶ咲",
+        "虹ケ咲",
+        "liella",
+        "蓮ノ空"
+      ],
+      "exclude": [],
+      "oshi": [
+        {
+          "name": "高坂穂乃果",
+          "slug": "honoka",
+          "match": [
+            "穂乃果"
+          ]
+        },
+        {
+          "name": "高海千歌",
+          "slug": "chika",
+          "match": [
+            "高海 千歌"
+          ]
+        },
+        {
+          "name": "津島善子",
+          "slug": "yoshiko",
+          "match": [
+            "津島 善子",
+            "ヨハネ"
+          ]
+        },
+        {
+          "name": "中須かすみ",
+          "slug": "kasumi",
+          "match": [
+            "中須 かすみ"
+          ]
+        },
+        {
+          "name": "澁谷かのん",
+          "slug": "kanon",
+          "match": [
+            "渋谷かのん",
+            "澁谷 かのん",
+            "渋谷 かのん"
+          ]
+        },
+        {
+          "name": "日野下花帆",
+          "slug": "kaho",
+          "match": [
+            "日野下 花帆"
+          ]
+        }
+      ],
+      "official": [
+        {
+          "name": "ラブライブ！シリーズ公式サイト",
+          "note": "",
+          "url": "https://www.lovelive-anime.jp/"
+        },
+        {
+          "name": "ラブライブ！シリーズ公式（X）",
+          "note": "",
+          "url": "https://x.com/LoveLive_staff"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "ラブライブ！公式",
+          "channelId": "UCTkyJbRhal4voLZxmdRSssQ"
+        }
+      ]
+    },
+    {
+      "slug": "idolmaster",
+      "name": "アイドルマスター",
+      "keywords": [
+        "アイドルマスター"
+      ],
+      "match": [
+        "アイドルマスター",
+        "シンデレラガールズ",
+        "ミリオンライブ",
+        "シャイニーカラーズ",
+        "シャニマス",
+        "デレステ",
+        "ミリシタ"
+      ],
+      "exclude": [
+        "SideM"
+      ],
+      "oshi": [
+        {
+          "name": "天海春香",
+          "slug": "haruka",
+          "match": [
+            "天海 春香"
+          ]
+        },
+        {
+          "name": "渋谷凛",
+          "slug": "rin",
+          "match": [
+            "渋谷 凛"
+          ]
+        },
+        {
+          "name": "島村卯月",
+          "slug": "uzuki",
+          "match": [
+            "島村 卯月"
+          ]
+        },
+        {
+          "name": "春日未来",
+          "slug": "mirai",
+          "match": [
+            "春日 未来"
+          ]
+        },
+        {
+          "name": "月岡恋鐘",
+          "slug": "kogane",
+          "match": [
+            "月岡 恋鐘"
+          ]
+        },
+        {
+          "name": "藤田ことね",
+          "slug": "kotone",
+          "match": [
+            "藤田 ことね"
+          ]
+        }
+      ],
+      "official": [
+        {
+          "name": "アイドルマスター公式ポータル",
+          "note": "",
+          "url": "https://idolmaster-official.jp/"
+        },
+        {
+          "name": "アイドルマスター公式（X）",
+          "note": "",
+          "url": "https://x.com/imas_official"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "アイドルマスター公式",
+          "channelId": "UCe3uJZIjfYwNNR0S6W3GvEA"
+        }
+      ]
+    },
+    {
+      "slug": "enstars",
+      "name": "あんさんぶるスターズ！！",
+      "keywords": [
+        "あんさんぶるスターズ"
+      ],
+      "match": [
+        "あんさんぶるスターズ",
+        "あんスタ"
+      ],
+      "exclude": [
+        "DVD",
+        "Blu-ray",
+        "ヴァイスシュヴァルツ",
+        "コミック",
+        "限定盤",
+        "[cd]",
+        "ブルーレイ",
+        "通常盤",
+        "生産盤",
+        "全巻",
+        "ノベライズ",
+        "月号",
+        "ゲームソフト",
+        "-Switch",
+        "-PS4",
+        "-PS5",
+        "ブースターパック",
+        "シングルカード",
+        "同人",
+        "ボーイズラブ",
+        "抱き枕カバー",
+        "抱きまくらカバー",
+        "ウィッグ",
+        "【cd】",
+        "cd+",
+        "シングルcd",
+        "ドラマcd",
+        "[本/雑誌]",
+        "ムビチケ",
+        "前売券",
+        "カードゲーム",
+        "オリパ",
+        "一番くじ",
+        "ラストワン",
+        "サウンドトラック",
+        "アイドルソング",
+        "ユニットソング",
+        "ソングコレクション"
+      ],
+      "excludeRe": [
+        "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+        "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+        "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+        "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+        "(?<![a-z0-9])[a-z]賞(?![a-z])",
+        "\\[ [^\\]]+ \\]$",
+        "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+        "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+        "soundtrack",
+        "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+      ],
+      "cornerExclude": false,
+      "oshi": [
+        {
+          "name": "氷鷹北斗",
+          "slug": "hokuto"
+        },
+        {
+          "name": "明星スバル",
+          "slug": "subaru"
+        },
+        {
+          "name": "朔間凛月",
+          "slug": "ritsu"
+        },
+        {
+          "name": "瀬名泉",
+          "slug": "izumi"
+        },
+        {
+          "name": "天城燐音",
+          "slug": "rinne"
+        },
+        {
+          "name": "巴日和",
+          "slug": "hiyori"
+        }
+      ],
+      "official": [
+        {
+          "name": "あんさんぶるスターズ！！公式サイト",
+          "note": "",
+          "url": "https://ensemble-stars.jp/"
+        },
+        {
+          "name": "あんさんぶるスターズ！！公式（X）",
+          "note": "",
+          "url": "https://x.com/ensemble_stars"
+        },
+        {
+          "name": "あんスタ！！グッズ情報公式（X）",
+          "note": "グッズのお知らせ",
+          "url": "https://x.com/es_goods_info"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "あんさんぶるスターズ！公式",
+          "channelId": "UCuxfK38dUXj6oY_L4JjTCkA"
+        }
+      ]
+    },
+    {
+      "slug": "hololive",
+      "name": "ホロライブ",
+      "keywords": [
+        "ホロライブ"
+      ],
+      "match": [
+        "ホロライブ",
+        "hololive",
+        "宝鐘マリン",
+        "兎田ぺこら",
+        "さくらみこ",
+        "星街すいせい",
+        "白上フブキ",
+        "戌神ころね"
+      ],
+      "exclude": [],
+      "oshi": [
+        {
+          "name": "宝鐘マリン",
+          "slug": "marine",
+          "match": [
+            "houshou marine"
+          ]
+        },
+        {
+          "name": "兎田ぺこら",
+          "slug": "pekora",
+          "match": [
+            "usada pekora"
+          ]
+        },
+        {
+          "name": "さくらみこ",
+          "slug": "miko",
+          "match": [
+            "sakura miko"
+          ]
+        },
+        {
+          "name": "星街すいせい",
+          "slug": "suisei",
+          "match": [
+            "hoshimachi suisei"
+          ]
+        },
+        {
+          "name": "白上フブキ",
+          "slug": "fubuki",
+          "match": [
+            "shirakami fubuki"
+          ]
+        },
+        {
+          "name": "戌神ころね",
+          "slug": "korone",
+          "match": [
+            "inugami korone"
+          ]
+        }
+      ],
+      "official": [
+        {
+          "name": "ホロライブ公式サイト",
+          "note": "",
+          "url": "https://hololive.hololivepro.com/"
+        },
+        {
+          "name": "ホロライブプロダクション公式（X）",
+          "note": "",
+          "url": "https://x.com/hololivetv"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "ホロライブ公式",
+          "channelId": "UCJFZiqLMntJufDCHc6bQixg"
+        }
+      ]
+    },
+    {
+      "slug": "miku",
+      "name": "初音ミク",
+      "keywords": [
+        "初音ミク"
+      ],
+      "match": [
+        "初音ミク",
+        "hatsune miku",
+        "hatsunemiku",
+        "雪ミク",
+        "snow miku",
+        "桜ミク",
+        "レーシングミク",
+        "マジカルミライ",
+        "鏡音リン",
+        "鏡音レン",
+        "巡音ルカ"
+      ],
+      "exclude": [],
+      "oshi": [
+        {
+          "name": "雪ミク",
+          "slug": "yukimiku",
+          "match": [
+            "snow miku"
+          ]
+        },
+        {
+          "name": "鏡音リン",
+          "slug": "rin"
+        },
+        {
+          "name": "鏡音レン",
+          "slug": "len"
+        },
+        {
+          "name": "巡音ルカ",
+          "slug": "luka"
+        },
+        {
+          "name": "KAITO",
+          "slug": "kaito",
+          "strict": true
+        },
+        {
+          "name": "MEIKO",
+          "slug": "meiko",
+          "strict": true
+        }
+      ],
+      "official": [
+        {
+          "name": "piapro.net",
+          "note": "クリプトンの公式ポータル",
+          "url": "https://piapro.net/"
+        },
+        {
+          "name": "初音ミク公式ブログ",
+          "note": "クリプトンのお知らせ",
+          "url": "https://blog.piapro.net/"
+        },
+        {
+          "name": "初音ミク公式（X）",
+          "note": "",
+          "url": "https://x.com/cfm_miku"
+        }
+      ],
+      "youtube": [
+        {
+          "name": "初音ミク公式",
+          "channelId": "UCJwGWV914kBlV4dKRn7AEFA"
+        }
+      ]
+    }
+  ],
+  "excludeRe": [
+    "-\\s*(nintendo\\s*)?(switch\\s*2?|ps[45])(\\s|$|[\\]】)])",
+    "^(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用)).*(switch\\s*2?|スイッチ)\\s*$",
+    "^(※[^※]*※\\s*)?nintendo switch\\s(?!.*(ケース|カバー|フィルム|ポーチ|グリップ|スタンド|専用|対応|用))",
+    "アルティメット\\s?ヒッツ|mega hits|(standard|deluxe) edition",
+    "(?<![a-z0-9])[a-z]賞(?![a-z])",
+    "\\[ [^\\]]+ \\]$",
+    "\\([^)]*(文庫|コミックス|コミック)[^)]*\\)",
+    "(?<![a-z])cd(?=[\\s」』\\]】)、]|$)",
+    "soundtrack",
+    "/(著|編著|編|訳|原作|監修)(\\s|$|/)"
+  ]
+}

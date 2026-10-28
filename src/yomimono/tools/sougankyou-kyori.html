@@ -1,0 +1,36 @@
+<div class="fit" id="skyori">
+<p class="fit-mm"><label>ステージまで<input type="number" name="sd" inputmode="decimal" min="5" max="300" step="1" value="50">m</label></p>
+<fieldset class="pick"><legend>倍率</legend>
+<label><input type="radio" name="sm" value="4"><span>4倍</span></label>
+<label><input type="radio" name="sm" value="6"><span>6倍</span></label>
+<label><input type="radio" name="sm" value="8" checked><span>8倍</span></label>
+<label><input type="radio" name="sm" value="10"><span>10倍</span></label>
+<label><input type="radio" name="sm" value="12"><span>12倍</span></label>
+<label><input type="radio" name="sm" value="14"><span>14倍</span></label>
+</fieldset>
+<p class="fit-mm"><label>実視界<input type="number" name="sf" inputmode="decimal" min="2" max="12" step="0.1" value="6">度</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 40" role="img" aria-label="ステージまでの距離と、同じ大きさに見える肉眼の距離の棒"></svg><figcaption>上の棒がステージまでの距離、下の棒が同じ大きさに見える肉眼の距離</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('skyori');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t,u){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+'の数字を入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function run(){bad='';
+var d=num('sd',5,300,'ステージまでの距離','m'),fv=num('sf',2,12,'実視界','度'),m=+v('sm'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 見える大きさ：距離÷倍率の所から肉眼で見るのと同じ。見える範囲：2×距離×tan(実視界÷2)
+var e=d/m,w=2*d*Math.tan(fv*Math.PI/360);
+f.querySelector('.fit-ans').textContent=m+'倍で'+d+'m先を見ると、肉眼で約'+e.toFixed(1)+'mの所から見るのと同じ大きさです。実視界'+fv+'度なら、'+d+'m先で横に約'+w.toFixed(1)+'mの範囲が見えます。';
+clear(svg);svg.setAttribute('viewBox','-2 -2 104 34');
+el(svg,'rect',{x:0,y:0,width:100,height:12,rx:3,'class':'fit-w'});
+el(svg,'rect',{x:0,y:18,width:Math.max(100*e/d,1.5),height:12,rx:3,'class':'fit-p'});}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

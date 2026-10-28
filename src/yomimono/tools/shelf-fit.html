@@ -1,0 +1,62 @@
+<div class="fit" id="sfit">
+<fieldset class="pick"><legend>棚の幅</legend>
+<label><input type="radio" name="sw" value="220"><span>22cm</span></label>
+<label><input type="radio" name="sw" value="300" checked><span>30cm</span></label>
+<label><input type="radio" name="sw" value="440"><span>44cm</span></label>
+<label><input type="radio" name="sw" value="600"><span>60cm</span></label>
+<label><input type="radio" name="sw" value="mm"><span>測った大きさ</span></label>
+</fieldset>
+<p class="fit-mm" data-for="sw" hidden><label>幅<input type="number" name="swx" inputmode="numeric" min="30" max="3000" value="400">mm</label></p>
+<fieldset class="pick"><legend>1段の奥行</legend>
+<label><input type="radio" name="sd" value="50"><span>5cm</span></label>
+<label><input type="radio" name="sd" value="70"><span>7cm</span></label>
+<label><input type="radio" name="sd" value="120" checked><span>12cm</span></label>
+<label><input type="radio" name="sd" value="250"><span>25cm</span></label>
+<label><input type="radio" name="sd" value="mm"><span>測った大きさ</span></label>
+</fieldset>
+<p class="fit-mm" data-for="sd" hidden><label>奥行<input type="number" name="sdx" inputmode="numeric" min="20" max="1000" value="100">mm</label></p>
+<fieldset class="pick"><legend>段の数</legend>
+<label><input type="radio" name="sk" value="1" checked><span>1段</span></label>
+<label><input type="radio" name="sk" value="2"><span>2段</span></label>
+<label><input type="radio" name="sk" value="3"><span>3段</span></label>
+<label><input type="radio" name="sk" value="4"><span>4段</span></label>
+</fieldset>
+<fieldset class="pick"><legend>アクスタの横幅</legend>
+<label><input type="radio" name="sb" value="50x35"><span>5cm</span></label>
+<label><input type="radio" name="sb" value="75x50" checked><span>7.5cm</span></label>
+<label><input type="radio" name="sb" value="100x65"><span>10cm</span></label>
+<label><input type="radio" name="sb" value="mm"><span>測った大きさ</span></label>
+</fieldset>
+<p class="fit-mm" data-for="sb" hidden><label>横幅<input type="number" name="sbx" inputmode="numeric" min="10" max="400" value="75">mm</label><label>台座の奥行<input type="number" name="sby" inputmode="numeric" min="10" max="300" value="50">mm</label></p>
+<fieldset class="pick"><legend>となりとのあいだ</legend>
+<label><input type="radio" name="sg" value="0"><span>すきまなし</span></label>
+<label><input type="radio" name="sg" value="5" checked><span>5mm</span></label>
+<label><input type="radio" name="sg" value="10"><span>10mm</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 100" role="img" aria-label="1段を上から見たところ。四角が台座、線がアクスタの本体の板"></svg><figcaption>1段を上から見たところ（四角が台座、線が本体の板）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('sfit');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'mmの数字を入れてください。';return 0;}
+// 「測った大きさ」をえらんだときだけ、数字を入れる欄を出す
+function pick(n,m,lo,hi,t){var s=v(n);f.querySelector('.fit-mm[data-for="'+n+'"]').hidden=s!=='mm';return s==='mm'?num(m,lo,hi,t):+s;}
+// 横に何個：アクスタの横幅とすきまを1組にして、棚の幅に何組入るか。前後に何列：台座の奥行とすきまを1組にして、1段の奥行に何組入るか
+function lay(W,D,w,d,g){var p=w+g,q=d+g,c=Math.max(0,Math.floor((W+g)/p)),r=Math.max(0,Math.floor((D+g)/q)),pts=[];for(var j=0;j<r;j++)for(var i=0;i<c;i++)pts.push([i*p,D-d-j*q,j]);return {c:c,r:r,n:pts.length,pts:pts};}
+// 上から見た図：台座（四角）と、その上に立つ本体の板（線）
+function draw(svg,W,D,w,b,d,pts){while(svg.firstChild)svg.removeChild(svg.firstChild);var pad=Math.max(W,D)*0.015;svg.setAttribute('viewBox',(-pad)+' '+(-pad)+' '+(W+pad*2)+' '+(D+pad*2));var r=document.createElementNS(NS,'rect');r.setAttribute('width',W);r.setAttribute('height',D);r.setAttribute('class','fit-w');svg.appendChild(r);pts.forEach(function(q,i){var s=document.createElementNS(NS,'rect');s.setAttribute('x',q[0]+(w-b)/2);s.setAttribute('y',q[1]);s.setAttribute('width',b);s.setAttribute('height',d);s.setAttribute('rx',Math.min(b,d)*0.12);s.setAttribute('class','fit-c '+C[(i+q[2])%3]);svg.appendChild(s);var l=document.createElementNS(NS,'path');l.setAttribute('d','M'+q[0]+' '+(q[1]+d/2)+'h'+w);l.setAttribute('class','fit-plate');svg.appendChild(l);});}
+function run(){bad='';var W=pick('sw','swx',30,3000,'棚の幅'),D=pick('sd','sdx',20,1000,'1段の奥行'),s=v('sb'),w,d,b;f.querySelector('.fit-mm[data-for="sb"]').hidden=s!=='mm';
+if(s==='mm'){w=num('sbx',10,400,'アクスタの横幅');d=num('sby',10,300,'台座の奥行');}else{var a=s.split('x');w=+a[0];d=+a[1];}b=Math.min(w,d);
+if(bad){f.querySelector('.fit-ans').textContent=bad;var e=f.querySelector('.fit-a');while(e.firstChild)e.removeChild(e.firstChild);return;}
+var g=+v('sg'),k=+v('sk'),A=lay(W,D,w,d,g),ans;
+if(!A.n)ans='この棚の段には、この大きさのアクスタは並びません。';
+else{ans=A.r>1?'1段に、横'+A.c+'個×前後'+A.r+'列で'+A.n+'個並びます。':'1段に、横に'+A.c+'個並びます。';if(k>1)ans+=k+'段で'+(A.n*k)+'個です。';if(A.r>1)ans+='同じ高さの段では、うしろの列は前の列にかくれます。';}
+f.querySelector('.fit-ans').textContent=ans;draw(f.querySelector('.fit-a'),W,D,w,b,d,A.pts);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

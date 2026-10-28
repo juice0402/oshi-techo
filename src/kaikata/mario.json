@@ -1,0 +1,201 @@
+{
+  "published": "2026-10-27",
+  "checked": "2026-10-27",
+  "shops": [
+    {
+      "kind": "お店",
+      "name": "Nintendo TOKYO/OSAKA/KYOTO/FUKUOKA",
+      "short": "任天堂の直営店",
+      "note": "任天堂の直営店。渋谷PARCO・ルクア サウス・京都髙島屋S.C.・アミュプラザ博多に4店（2026年10月）。混む日は整理券を1人1枚配ります",
+      "url": "https://www.nintendo.com/jp/officialstore/index.html"
+    },
+    {
+      "kind": "通販",
+      "name": "Nintendo Store",
+      "note": "任天堂の公式の通販。前の名前は My Nintendo Store で、2026年5月27日からこの名前にすると5月に発表されていました",
+      "url": "https://store-jp.nintendo.com/"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "任天堂のスーパーマリオのグッズ",
+      "note": "直営店で売っているマリオのグッズのシリーズ",
+      "url": "https://www.nintendo.com/jp/character/mario/goods/index.html"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "直営店のX",
+      "note": "新商品やイベントの案内",
+      "url": "https://x.com/N_Officialstore",
+      "gh": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "shinsaku",
+      "h": "新作の出かた",
+      "lines": [
+        "公式サイトのQ&Aでは、任天堂のオリジナルの商品を店で買えるのは直営の4店だけとされています。一部はNintendo Storeでも売られますが、店とNintendo Storeでは一部の商品がちがいます",
+        "2026年の例では、9月4日のハロウィンのグッズと、10月8日の『マリオカート ワールド』のクリアバッグが、直営の4店とNintendo Storeで同じ日に発売されました",
+        "新商品の案内は、直営店の公式Xに出ます",
+        "直営店のない地域で、期間限定の店が開いたこともあります。2026年6月の発表では、8月14日から9月6日に大丸札幌店で任天堂のオフィシャルストアのポップアップを開き、直営店でしか買えなかった商品の一部も売る予定でした",
+        "ライセンス商品は、一部を除いて、一般の店や通販サイトで買えると案内されています",
+        "楽天ブックスで発売日が決まっているものは[[発売日カレンダー|hatsubai]]にまとめています"
+      ]
+    },
+    {
+      "id": "yoyaku",
+      "h": "予約",
+      "lines": [
+        "amiiboのマリオ&チコとロゼッタ&チコは、2025年9月16日に当時のMy Nintendo Storeで予約が始まり、発売は2026年4月2日でした。予約できたのは、Nintendo Switch Onlineの有料プランに入っている人です",
+        "楽天市場のお店の予約は[[予約受付中|yoyaku]]に並べています"
+      ],
+      "short": "予約"
+    },
+    {
+      "id": "kuji",
+      "h": "くじとランダムの商品",
+      "lines": [
+        "バンダイスピリッツの一番くじにマリオのシリーズがあり、直営の4店も売る店に入ることがあります。2026年は4月24日に「ザ・スーパーマリオギャラクシー・ムービー」、5月23日にヨッシーだけを集めたくじが出て、どちらも1回750円でした",
+        "バンダイのカプセルトイにもなっています。2026年5月第4週の「スーパーマリオ めじるしアクセサリー ～ヨッシーコレクション～」は、全10種で1回300円でした"
+      ]
+    },
+    {
+      "id": "saihan",
+      "h": "再販",
+      "lines": [
+        "カプセルトイの「スーパーマリオ めじるしアクセサリー」は、2024年10月に出たあと、2025年5月第5週に再販されました",
+        "ねんどろいどのマリオとルイージは、2015年と2014年に出たものが再販されます。グッドスマイルカンパニーの公式サイトで2026年6月30日から7月20日まで予約を受け付け、発売は2027年1月の予定です",
+        "楽天市場のお店で売り切れから戻ったものは[[再入荷|sainyuka]]に並べています"
+      ]
+    },
+    {
+      "id": "miwake",
+      "h": "公式の見分け方",
+      "lines": [
+        "2026年のグッズの告知では、「© Nintendo」の形の権利の表記がついた例があります。ほかの会社が許可を受けて作る商品には、「© Nintendo Licensed by Nintendo」と書かれた例があります",
+        "任天堂のロゴを使い、商品が大きく値引きされているように見せる偽のサイトについて、2022年1月に任天堂が注意を出しています。任天堂のホームページは nintendo.co.jp です"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "from": "2026-10-10",
+      "to": "2026-12-31",
+      "until": "2026-12-31",
+      "text": "さっぽろテレビ塔1階のお店で、「スーパーマリオ : RUN TO THE GOAL in Hokkaido 2026」の限定グッズを数量限定で売っています"
+    },
+    {
+      "from": "2026-11-12",
+      "until": "2026-11-18",
+      "text": "任天堂販売の『マリオカート ワールド』のエコバッグとチャームが発売の予定です"
+    },
+    {
+      "from": "2026-11-17",
+      "to": "2026-11-23",
+      "until": "2026-11-23",
+      "text": "Nintendo OSAKAのあるルクア サウス13階は、17日は休み、18〜23日はルクアの会員向けの抽選のプレオープンに当たった人だけが入れます"
+    },
+    {
+      "from": "2026-11-24",
+      "until": "2026-12-31",
+      "text": "ルクア サウスの10〜13階は、開業からしばらく、混み具合によって入場を制限します。入るには、事前抽選か先着の整理券が要ります"
+    },
+    {
+      "from": "2027-01",
+      "until": "2027-01-31",
+      "text": "ねんどろいどのマリオとルイージの再販が発売の予定です"
+    }
+  ],
+  "sources": [
+    {
+      "name": "任天堂（Nintendo TOKYO/OSAKA/KYOTO/FUKUOKA）",
+      "url": "https://www.nintendo.com/jp/officialstore/index.html",
+      "used": "直営店の場所と数、整理券、オリジナルの商品を売る店、Nintendo Storeとのちがい、ライセンス商品、公式X"
+    },
+    {
+      "name": "4Gamer（Nintendo FUKUOKA 2025年11月14日）",
+      "url": "https://www.4gamer.net/games/999/G999903/20251114007/",
+      "used": "国内4店目の直営店"
+    },
+    {
+      "name": "電撃オンライン（2026年5月11日）",
+      "url": "https://dengekionline.com/article/202605/74437",
+      "used": "My Nintendo Storeの名前が変わった日"
+    },
+    {
+      "name": "任天堂（スーパーマリオのグッズ）",
+      "url": "https://www.nintendo.com/jp/character/mario/goods/index.html",
+      "used": "直営店で売るマリオのグッズのシリーズ"
+    },
+    {
+      "name": "GAME Watch（ハロウィンのグッズ 2026年9月4日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/2138189.html",
+      "used": "直営店とNintendo Storeで同じ日に発売"
+    },
+    {
+      "name": "Nintendo DREAM WEB（2026年10月8日）",
+      "url": "https://www.ndw.jp/mario-goods-261008/",
+      "used": "クリアバッグを直営店とNintendo Storeで発売"
+    },
+    {
+      "name": "超!アニメディア（2026年6月30日）",
+      "url": "https://cho-animedia.jp/article/2026/06/30/60817.html",
+      "used": "大丸札幌店のポップアップの期間と並んだ商品"
+    },
+    {
+      "name": "GAME Watch（amiibo 2025年9月16日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/2047537.html",
+      "used": "amiiboの予約の始まりと発売の日、予約できた人"
+    },
+    {
+      "name": "ファミ通（2026年4月13日）",
+      "url": "https://www.famitsu.com/article/202604/71720",
+      "used": "一番くじ ザ・スーパーマリオギャラクシー・ムービーの発売の日と値段、売る店"
+    },
+    {
+      "name": "ファミ通（2026年5月15日）",
+      "url": "https://www.famitsu.com/article/202605/74878",
+      "used": "一番くじ スーパーマリオ with YOSHIの発売の日と値段、売る店"
+    },
+    {
+      "name": "GAME Watch（2026年5月17日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/2107882.html",
+      "used": "カプセルトイの時期と値段、種類の数"
+    },
+    {
+      "name": "GAME Watch（2025年5月31日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/2016990.html",
+      "used": "カプセルトイの再販"
+    },
+    {
+      "name": "Nintendo DREAM WEB（2026年6月30日）",
+      "url": "https://www.ndw.jp/mario-goods-260630-03/",
+      "used": "ねんどろいどの再販の予約と発売の時期、ライセンス商品の権利の表記"
+    },
+    {
+      "name": "Nintendo DREAM WEB（2026年9月4日）",
+      "url": "https://www.ndw.jp/mario-goods-260904/",
+      "used": "任天堂のグッズの権利の表記"
+    },
+    {
+      "name": "任天堂（偽サイトの注意 2022年1月14日）",
+      "url": "https://www.nintendo.co.jp/corporate/release/2022/220114.html",
+      "used": "偽のサイトの注意と、正しいホームページ"
+    },
+    {
+      "name": "Nintendo DREAM WEB（2026年10月10日）",
+      "url": "https://www.ndw.jp/mario-goods-261010/",
+      "used": "さっぽろテレビ塔の限定グッズの期間"
+    },
+    {
+      "name": "Nintendo DREAM WEB（2026年10月5日）",
+      "url": "https://www.ndw.jp/mario-goods-261005/",
+      "used": "任天堂販売のエコバッグとチャームの発売の日"
+    },
+    {
+      "name": "ルクア大阪（ルクア サウス13階のお知らせ 2026年10月9日）",
+      "url": "https://www.lucua.jp/news/p-1955679.html",
+      "used": "13階の休みとプレオープン、11月24日からの整理券"
+    }
+  ]
+}

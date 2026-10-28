@@ -1,0 +1,117 @@
+[
+  {
+    "slug": "halloween",
+    "name": "ハロウィン",
+    "keyword": "ハロウィン",
+    "words": [
+      "ハロウィン",
+      "ハロウィーン",
+      "halloween"
+    ],
+    "event": "10-31",
+    "from": "09-20",
+    "to": "10-31",
+    "label": "ハロウィングッズ"
+  },
+  {
+    "slug": "christmas",
+    "name": "クリスマス",
+    "keyword": "クリスマス",
+    "words": [
+      "クリスマス",
+      "xmas",
+      "x'mas",
+      "christmas",
+      "サンタ",
+      "アドベントカレンダー"
+    ],
+    "event": "12-25",
+    "from": "10-15",
+    "to": "12-25",
+    "label": "クリスマスグッズ",
+    "gift": true
+  },
+  {
+    "slug": "fukubukuro",
+    "name": "福袋",
+    "keyword": "福袋",
+    "words": [
+      "福袋",
+      "ハッピーバッグ",
+      "happy bag",
+      "happybag",
+      "ハッピーバック"
+    ],
+    "from": "10-20",
+    "to": "01-31",
+    "label": "福袋"
+  },
+  {
+    "slug": "oshougatsu",
+    "name": "お正月",
+    "keyword": "お正月",
+    "words": [
+      "正月",
+      "年賀",
+      "干支",
+      "鏡餅",
+      "鏡もち",
+      "門松"
+    ],
+    "event": "01-01",
+    "from": "12-01",
+    "to": "01-15",
+    "label": "お正月グッズ"
+  },
+  {
+    "slug": "valentine",
+    "name": "バレンタイン",
+    "keyword": "バレンタイン",
+    "words": [
+      "バレンタイン",
+      "valentine"
+    ],
+    "event": "02-14",
+    "from": "01-10",
+    "to": "02-14",
+    "label": "バレンタイングッズ",
+    "gift": true
+  },
+  {
+    "slug": "whiteday",
+    "name": "ホワイトデー",
+    "keyword": "ホワイトデー",
+    "words": [
+      "ホワイトデー",
+      "white day",
+      "whiteday"
+    ],
+    "event": "03-14",
+    "from": "02-15",
+    "to": "03-14",
+    "label": "ホワイトデーのグッズ",
+    "gift": true
+  },
+  {
+    "slug": "techo",
+    "name": "手帳・カレンダー",
+    "label": "手帳・カレンダー",
+    "keyword": "手帳 {year}",
+    "keywords": [
+      "手帳 {year}",
+      "カレンダー {year}"
+    ],
+    "words": [
+      "手帳",
+      "ダイアリー",
+      "スケジュール帳",
+      "カレンダー",
+      "日めくり"
+    ],
+    "require": [
+      "{year}"
+    ],
+    "from": "09-01",
+    "to": "01-31"
+  }
+]

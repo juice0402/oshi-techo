@@ -1,0 +1,199 @@
+{
+  "published": "2026-10-27",
+  "checked": "2026-10-27",
+  "shops": [
+    {
+      "kind": "お店",
+      "name": "もふもふストア",
+      "note": "mofusandの常設の公式ショップ。東京駅と、名古屋・心斎橋・札幌・福岡・広島・仙台のPARCOに7店（2026年10月）",
+      "url": "https://mofusand-info.jp/tenpo.html"
+    },
+    {
+      "kind": "お店",
+      "name": "mofusand TOKYO",
+      "note": "テーマを決めたシリーズを売る原宿の店。支払いはキャッシュレスだけです",
+      "url": "https://mofusand-info.jp/mofusand_tokyo/harajuku/"
+    },
+    {
+      "kind": "通販",
+      "name": "もふもふマーケット",
+      "note": "公式の通販。注文には無料の会員登録が要ります",
+      "url": "https://mofusand-mofumofu-market.jp/"
+    },
+    {
+      "kind": "くじ",
+      "name": "mofusandくじ",
+      "note": "もふもふマーケットのオンラインくじ",
+      "url": "https://online-kuji.mofusand-mofumofu-market.jp/store"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "もふもふマーケットのX",
+      "note": "通販の新商品と、売り切れた商品の入荷予定の案内",
+      "url": "https://x.com/mofusand_market",
+      "gh": false
+    },
+    {
+      "kind": "お知らせ",
+      "name": "もふもふストアのX",
+      "note": "店の新商品や、混む日の入り方の案内",
+      "url": "https://x.com/mofumofu_store",
+      "gh": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "shinsaku",
+      "h": "新作の出かた",
+      "lines": [
+        "原宿のmofusand TOKYOは、2026年6月と10月にシリーズを入れかえたとき、どちらも店を数日閉めてから再開しました。新しいシリーズは再開の日に始まり、もふもふマーケットでも同じ日の11時から売られました",
+        "新商品を売る店は商品ごとに決まり、公式サイトの店舗の一覧に出ます。2026年5月1日発売の商品は、もふもふマーケットと東京駅の店、大丸梅田店の出張所が発売の日で、期間限定の店では5月8日や13日からでした",
+        "東京駅の店と原宿の店では、「1会計3点まで」のように買える数が商品ごとに決まっています。中身を選べない箱の商品は、1箱までの例があります",
+        "楽天ブックスで発売日が決まっているものは[[発売日カレンダー|hatsubai]]にまとめています"
+      ]
+    },
+    {
+      "id": "yoyaku",
+      "h": "予約の商品",
+      "lines": [
+        "もふもふマーケットの予約の商品は、ふつうの商品と同じ注文にできません。注文のあとのキャンセルは原則できず、代金は商品が届く前に引き落とされることがあります",
+        "一部の商品をのぞき、届くのは発送が始まる予定の日から7営業日以内で、届く日は指定できません",
+        "2024年のハッピーバッグは1会計1個までで、ほかの商品や予約の商品と同じ注文にできませんでした",
+        "楽天市場のお店の予約は[[予約受付中|yoyaku]]に並べています"
+      ],
+      "short": "予約"
+    },
+    {
+      "id": "kuji",
+      "h": "くじとランダムの商品",
+      "lines": [
+        "もふもふマーケットには、オンラインくじのmofusandくじがあります。2026年1月の「和！和！和！スーベニアくじ」は1週間の受付で、1回1,200円、はずれなしでした。配送の手数料は別で、くじ用の会員登録が要ります",
+        "バンダイスピリッツの一番くじにもmofusandのシリーズがあります。2026年7月31日からの「ひんやりくつろぎ時間」は1回750円で、売る店にもふもふストアも入っていました",
+        "中身を選べない箱の商品には、1箱で全種そろうものと、箱で買ってもそろわないことがあるものがあります。どちらなのかは商品ごとの案内に書かれています"
+      ]
+    },
+    {
+      "id": "saihan",
+      "h": "再販",
+      "lines": [
+        "もふもふマーケットには再入荷の欄があります。2026年10月は、9日・16日・23日に再入荷した商品が並びました",
+        "売り切れた商品は、商品ページの入荷通知のボタンで知らせを受けられます。入荷の予定は公式Xで知らせると案内されています",
+        "カプセルトイの「mofusand めじるしアクセサリー2」は、2026年9月第3週に再販されると、2026年9月に発表されました。1回300円です",
+        "楽天市場のお店で売り切れから戻ったものは[[再入荷|sainyuka]]に並べています"
+      ]
+    },
+    {
+      "id": "miwake",
+      "h": "公式の見分け方",
+      "lines": [
+        "2026年の公式の発表では、「©mofusand」の形の権利の表記がついていました。作者はイラストレーターのぢゅのです",
+        "もふもふマーケットは、mofusandのグッズを作っているグレイ・パーカー・サービスが運営しています",
+        "もふもふマーケットを装ったメールが送られた例があります。公式の通販は、返信せず、リンクや添付を開かないよう案内しています（2025年1月）"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "from": "2026-10-30",
+      "until": "2026-11-05",
+      "text": "もふもふストア東京駅で、「mofusand×日比谷花壇」の一般の商品が発売の予定です"
+    },
+    {
+      "from": "2026-11-06",
+      "until": "2026-11-12",
+      "text": "もふもふストア東京駅で、「ぬくぬくソックス」が発売の予定です"
+    },
+    {
+      "from": "2027-02",
+      "until": "2027-02-28",
+      "text": "大丸梅田店のもふもふストア出張所が、下旬で終わる予定です"
+    }
+  ],
+  "sources": [
+    {
+      "name": "mofusand インフォ（もふもふストア 常設店）",
+      "url": "https://mofusand-info.jp/tenpo.html",
+      "used": "もふもふストアの店の一覧と数"
+    },
+    {
+      "name": "mofusand インフォ（もふもふストア 東京駅）",
+      "url": "https://mofusand-info.jp/mofu2_store/tokyo/",
+      "used": "買える数の決まり、10月30日と11月6日の発売の予定"
+    },
+    {
+      "name": "mofusand インフォ（mofusand TOKYO 原宿）",
+      "url": "https://mofusand-info.jp/mofusand_tokyo/harajuku/",
+      "used": "原宿の店の買える数と支払い"
+    },
+    {
+      "name": "シブヤ経済新聞（2025年10月23日）",
+      "url": "https://www.shibukei.com/headline/19502/",
+      "used": "mofusand TOKYO がシリーズを入れかえる店であること"
+    },
+    {
+      "name": "mofusand インフォ（もふもふストア出張所 大丸梅田店）",
+      "url": "https://mofusand-info.jp/mofu2_store/umeda/index.html",
+      "used": "出張所の期間"
+    },
+    {
+      "name": "mofusand インフォ（新商品取扱い店舗情報）",
+      "url": "https://mofusand-info.jp/p23/mofu_fm/index.html",
+      "used": "商品ごとの売る店と発売の日、箱の商品で全種そろうかどうか"
+    },
+    {
+      "name": "PR TIMES（mofusand TOKYO 第4弾 2026年10月9日）",
+      "url": "https://prtimes.jp/main/html/rd/p/000000077.000168561.html",
+      "used": "店の再開の日と通販の発売の時刻、権利の表記、作者"
+    },
+    {
+      "name": "PR TIMES（mofusand TOKYO 第3弾 2026年6月5日）",
+      "url": "https://prtimes.jp/main/html/rd/p/000000054.000168561.html",
+      "used": "店の再開の日と通販の発売の時刻"
+    },
+    {
+      "name": "もふもふマーケット（User Guide）",
+      "url": "https://mofusand-mofumofu-market.jp/en/pages/guide",
+      "used": "会員登録、予約の商品の注文とキャンセル、届く時期、代金の引き落とし"
+    },
+    {
+      "name": "もふもふマーケット（FAQ）",
+      "url": "https://mofusand-mofumofu-market.jp/en/pages/faq",
+      "used": "届く日の指定、入荷通知、入荷の予定を公式Xで知らせること"
+    },
+    {
+      "name": "もふもふマーケット（ハッピーバッグ2024）",
+      "url": "https://mofusand-mofumofu-market.jp/products/4582662906884",
+      "used": "福袋の買える数と、同じ注文にできないこと"
+    },
+    {
+      "name": "もふもふマーケット（トップ）",
+      "url": "https://mofusand-mofumofu-market.jp/en",
+      "used": "再入荷の欄、運営の会社"
+    },
+    {
+      "name": "PR TIMES（スーベニアくじ 2026年1月20日）",
+      "url": "https://prtimes.jp/main/html/rd/p/000000033.000168561.html",
+      "used": "オンラインくじの期間と値段、はずれなし、会員登録"
+    },
+    {
+      "name": "コラボカフェ（一番くじ ひんやりくつろぎ時間）",
+      "url": "https://collabo-cafe.com/events/collabo/mofusand-hinyari-time-ichiban-kuji-2026/",
+      "used": "一番くじの発売の日と値段、売る店"
+    },
+    {
+      "name": "コラボカフェ（めじるしアクセサリー2の再販）",
+      "url": "https://collabo-cafe.com/en/events/collabo/mofusand-capsule-toy-gashapon-mejirushi-accessory2-2026/",
+      "used": "カプセルトイの再販の時期と値段"
+    },
+    {
+      "name": "グレイ・パーカー・サービス",
+      "url": "https://grayparkaservice.com/en",
+      "used": "mofusandのグッズを作り、公式の通販を運営する会社"
+    },
+    {
+      "name": "もふもふマーケット（なりすましメールの注意 2025年1月21日）",
+      "url": "https://mofusand-mofumofu-market.jp/en/blogs/info/20250121",
+      "used": "なりすましメールの注意"
+    }
+  ]
+}

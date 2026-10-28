@@ -1,0 +1,151 @@
+{
+  "published": "2026-10-27",
+  "checked": "2026-10-27",
+  "shops": [
+    {
+      "kind": "お店",
+      "name": "miffy style",
+      "note": "キデイランドが運営するミッフィーの専門店。全国に19店（2026年10月）",
+      "url": "https://www.kiddyland.co.jp/shoplist/miffystyle/"
+    },
+    {
+      "kind": "通販",
+      "name": "miffy style online",
+      "note": "miffy style の通販。Yahoo!ショッピングにあります",
+      "url": "https://store.shopping.yahoo.co.jp/miffystyle-online/"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "miffy style のX",
+      "note": "入場の予約や、店の新しい情報",
+      "url": "https://x.com/miffy_style_t",
+      "gh": false
+    },
+    {
+      "kind": "公式",
+      "name": "dickbruna.jp",
+      "note": "日本のミッフィー公式サイト。ほかのショップも載っています",
+      "url": "https://dickbruna.jp/shop/"
+    }
+  ],
+  "sections": [
+    {
+      "id": "shinsaku",
+      "h": "新作の出かた",
+      "lines": [
+        "miffy style の限定品は、店と miffy style online で同じ日に売り出し、店の通販・取り置きは数日あとから始まります。受け付けない店もあります",
+        "2026年のクリスマスは11月7日の発売で、通販と取り置きは11月9日からです。初日は1会計につき各2個まで、のように買える数が決まります",
+        "新しい店やポップアップの最初の日は、入場が予約制になることがあり、案内は公式サイトや公式Xに出ます",
+        "楽天ブックスで発売日が決まっているものは[[発売日カレンダー|hatsubai]]にまとめています"
+      ]
+    },
+    {
+      "id": "yoyaku",
+      "h": "予約と受注生産",
+      "lines": [
+        "ブランドとのコラボは、発売より先に予約が始まることがあります。2026年9月のMILKFED.とのコラボは、予約が11日、発売が18日でした",
+        "楽天市場のお店の予約は[[予約受付中|yoyaku]]に並べています"
+      ]
+    },
+    {
+      "id": "kuji",
+      "h": "くじとランダムの商品",
+      "lines": [
+        "カプセルトイでもミッフィーが出ています。2026年10月中旬からの「miffy ファンシーバラエティーコレクション」は全6種で1回500円です"
+      ]
+    },
+    {
+      "id": "saihan",
+      "h": "再販",
+      "lines": [
+        "ポップアップの限定品は、売り切れても再販の予定がないと書かれていることがあります。2026年11月の札幌のポップアップがそうです",
+        "楽天市場のお店で売り切れから戻ったものは[[再入荷|sainyuka]]に並べています"
+      ]
+    },
+    {
+      "id": "miwake",
+      "h": "公式の見分け方",
+      "lines": [
+        "公式の告知には「Illustrations Dick Bruna © copyright Mercis bv」の形の表記がつき、www.miffy.com も書かれています",
+        "日本の窓口はディック・ブルーナ・ジャパンです。MILKFED.とのコラボは、こことの商品化の契約で作られたと書かれています"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "from": "2026-09-19",
+      "to": "2026-11-08",
+      "until": "2026-11-08",
+      "text": "福井県立美術館で「誕生70周年記念 ミッフィー展」が開かれています"
+    },
+    {
+      "from": "2026-10-31",
+      "to": "2026-11-17",
+      "until": "2026-11-17",
+      "text": "キデイランド大阪梅田店で miffy style のポップアップが開かれます。限定品は通販も取り置きもありません"
+    },
+    {
+      "from": "2026-11-06",
+      "to": "2026-11-24",
+      "until": "2026-11-24",
+      "text": "札幌アピアで miffy style のポップアップが開かれます。11月6日から8日までは先着の予約制です"
+    }
+  ],
+  "sources": [
+    {
+      "name": "キデイランド（miffy style 店舗リスト）",
+      "url": "https://www.kiddyland.co.jp/shoplist/miffystyle/",
+      "used": "miffy style の店と数"
+    },
+    {
+      "name": "財経新聞（miffy style 原宿店）",
+      "url": "https://zaikei.co.jp/releases/3377144/",
+      "used": "キデイランドの運営、公式X、入場の予約制"
+    },
+    {
+      "name": "キデイランド（miffy style のクリスマス2026）",
+      "url": "https://www.kiddyland.co.jp/event/miffy_xmas20261107/",
+      "used": "店と通販の日、初日の買える数"
+    },
+    {
+      "name": "キデイランド（2026年10月10日発売の限定品）",
+      "url": "https://www.kiddyland.co.jp/event/miffy_20261010/",
+      "used": "miffy style online"
+    },
+    {
+      "name": "インサイド（MILKFED.×ミッフィー）",
+      "url": "https://www.inside-games.jp/release/prtimes/20260911/306593.html",
+      "used": "先に予約が始まるコラボ、商品化の契約"
+    },
+    {
+      "name": "インサイド（ファンシーバラエティーコレクション）",
+      "url": "https://www.inside-games.jp/release/prtimes/20261015/312726.html",
+      "used": "カプセルトイの値段"
+    },
+    {
+      "name": "キデイランド（札幌のポップアップ）",
+      "url": "https://www.kiddyland.co.jp/event/miffy_sapporo20261106/",
+      "used": "札幌の期間と予約、再販しない限定品"
+    },
+    {
+      "name": "キデイランド（大阪梅田のポップアップ）",
+      "url": "https://www.kiddyland.co.jp/event/miffy_popup_umeda2026_info/",
+      "used": "大阪梅田の期間、通販と取り置きがないこと"
+    },
+    {
+      "name": "インサイド（miffy style POP UP SHOP）",
+      "url": "https://www.inside-games.jp/release/prtimes/20260907/305501.html",
+      "used": "権利の表記"
+    },
+    {
+      "name": "ウォーカープラス（ミッフィー展）",
+      "url": "https://www.walkerplus.com/event/ar0518e607219/data.html",
+      "used": "福井の会場と期間"
+    },
+    {
+      "name": "ディック・ブルーナ・ジャパン（ショップ情報）",
+      "url": "https://dickbruna.jp/shop/",
+      "used": "日本の公式サイトとショップ"
+    }
+  ]
+}

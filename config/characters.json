@@ -1,0 +1,696 @@
+[
+  {
+    "slug": "chiikawa",
+    "name": "ちいかわ",
+    "keywords": [
+      "ちいかわ"
+    ],
+    "match": [
+      "ちいかわ",
+      "ハチワレ"
+    ],
+    "exclude": [],
+    "oshi": [
+      {
+        "name": "ちいかわ"
+      },
+      {
+        "name": "ハチワレ",
+        "slug": "hachiware",
+        "match": [
+          "hachiware"
+        ]
+      },
+      {
+        "name": "うさぎ",
+        "slug": "usagi",
+        "full": "ちいかわ うさぎ",
+        "match": [
+          "usagi"
+        ]
+      },
+      {
+        "name": "モモンガ",
+        "slug": "momonga",
+        "full": "ちいかわ モモンガ",
+        "match": [
+          "momonga"
+        ]
+      },
+      {
+        "name": "くりまんじゅう",
+        "slug": "kurimanju",
+        "full": "ちいかわ くりまんじゅう",
+        "match": [
+          "栗まんじゅう"
+        ]
+      },
+      {
+        "name": "ラッコ",
+        "slug": "rakko",
+        "full": "ちいかわ ラッコ"
+      },
+      {
+        "name": "シーサー",
+        "slug": "shisa",
+        "full": "ちいかわ シーサー"
+      }
+    ],
+    "official": [
+      {
+        "name": "ちいかわインフォ",
+        "note": "公式の情報サイト",
+        "url": "https://chiikawa-info.jp/"
+      },
+      {
+        "name": "ちいかわグッズ公式（X）",
+        "note": "",
+        "url": "https://x.com/chiikawa_kouhou"
+      },
+      {
+        "name": "ちいかわマーケット公式（X）",
+        "note": "公式通販のお知らせ",
+        "url": "https://x.com/chiikawa_market"
+      }
+    ],
+    "youtube": [
+      {
+        "name": "ちいかわマーケット公式",
+        "channelId": "UCTaQ1acgUkNynUbhh-Fhylw"
+      }
+    ]
+  },
+  {
+    "slug": "pokemon",
+    "corner": "game",
+    "ngFirst": "work",
+    "fetch": {
+      "oshiPages": 2,
+      "gotouchi": true,
+      "seasons": true,
+      "booksPages": null
+    },
+    "name": "ポケモン",
+    "keywords": [
+      "ポケモン"
+    ],
+    "match": [
+      "ポケモン",
+      "ポケットモンスター",
+      "ピカチュウ",
+      "pokemon",
+      "pokémon"
+    ],
+    "exclude": [
+      "ポケカ",
+      "トレカ",
+      "トレーディングカード",
+      "カードゲーム",
+      "拡張パック",
+      "強化拡張",
+      "ハイクラスパック",
+      "シングルカード",
+      "PSA",
+      "デッキ",
+      "スリーブ",
+      "オリパ",
+      "カードパック"
+    ],
+    "pages": 8,
+    "oshi": [
+      {
+        "name": "ピカチュウ",
+        "slug": "pikachu",
+        "match": [
+          "pikachu"
+        ]
+      },
+      {
+        "name": "イーブイ",
+        "slug": "eevee",
+        "match": [
+          "eevee"
+        ]
+      },
+      {
+        "name": "ミミッキュ",
+        "slug": "mimikyu",
+        "match": [
+          "mimikyu"
+        ]
+      },
+      {
+        "name": "ゲンガー",
+        "slug": "gengar",
+        "match": [
+          "gengar"
+        ]
+      },
+      {
+        "name": "カビゴン",
+        "slug": "kabigon",
+        "match": [
+          "snorlax"
+        ]
+      },
+      {
+        "name": "ヤドン",
+        "slug": "yadon",
+        "match": [
+          "slowpoke"
+        ]
+      },
+      {
+        "name": "メタモン",
+        "slug": "metamon"
+      },
+      {
+        "name": "ポッチャマ",
+        "slug": "pochama",
+        "match": [
+          "piplup"
+        ]
+      },
+      {
+        "name": "ミュウ",
+        "slug": "mew",
+        "match": [
+          "mew"
+        ],
+        "strict": true
+      },
+      {
+        "name": "リザードン",
+        "slug": "charizard",
+        "match": [
+          "charizard"
+        ]
+      },
+      {
+        "name": "ヒトカゲ",
+        "slug": "charmander",
+        "match": [
+          "charmander"
+        ]
+      },
+      {
+        "name": "ゼニガメ",
+        "slug": "squirtle",
+        "match": [
+          "squirtle"
+        ]
+      },
+      {
+        "name": "ルカリオ",
+        "slug": "lucario",
+        "match": [
+          "lucario"
+        ]
+      },
+      {
+        "name": "ニンフィア",
+        "slug": "sylveon",
+        "match": [
+          "sylveon"
+        ]
+      }
+    ],
+    "official": [
+      {
+        "name": "ポケモン公式サイト",
+        "note": "",
+        "url": "https://www.pokemon.co.jp/"
+      },
+      {
+        "name": "ポケモン公式（X）",
+        "note": "",
+        "url": "https://x.com/Pokemon_cojp"
+      },
+      {
+        "name": "ポケモン情報局（X）",
+        "note": "公式の情報アカウント",
+        "url": "https://x.com/poke_times"
+      }
+    ],
+    "youtube": [
+      {
+        "name": "ポケモン公式",
+        "channelId": "UC_SI1j1d8vJo_rYMV5o_dRg"
+      }
+    ]
+  },
+  {
+    "slug": "sanrio",
+    "name": "サンリオ",
+    "keywords": [
+      "サンリオ"
+    ],
+    "match": [
+      "サンリオ",
+      "sanrio",
+      "ハローキティ",
+      "キティ",
+      "マイメロ",
+      "クロミ",
+      "シナモロール",
+      "シナモン",
+      "ポムポムプリン",
+      "ポチャッコ",
+      "ハンギョドン",
+      "キキララ",
+      "リトルツインスターズ",
+      "けろけろけろっぴ",
+      "タキシードサム",
+      "バッドばつ丸",
+      "ぐでたま",
+      "こぎみゅん",
+      "はぴだんぶい",
+      "ウィッシュミーメル",
+      "マロンクリーム"
+    ],
+    "exclude": [],
+    "pages": 8,
+    "oshi": [
+      {
+        "name": "マイメロディ",
+        "slug": "mymelody",
+        "match": [
+          "マイメロ",
+          "my melody",
+          "mymelody"
+        ],
+        "birthday": "01-18"
+      },
+      {
+        "name": "クロミ",
+        "slug": "kuromi",
+        "match": [
+          "kuromi"
+        ],
+        "birthday": "10-31"
+      },
+      {
+        "name": "シナモロール",
+        "slug": "cinnamoroll",
+        "match": [
+          "シナモン",
+          "cinnamoroll"
+        ],
+        "birthday": "03-06"
+      },
+      {
+        "name": "ハローキティ",
+        "slug": "hellokitty",
+        "match": [
+          "キティ",
+          "hello kitty",
+          "hellokitty"
+        ],
+        "birthday": "11-01"
+      },
+      {
+        "name": "ポムポムプリン",
+        "slug": "pompompurin",
+        "match": [
+          "ポムプリン",
+          "pompompurin"
+        ],
+        "birthday": "04-16"
+      },
+      {
+        "name": "ポチャッコ",
+        "slug": "pochacco",
+        "match": [
+          "pochacco"
+        ],
+        "birthday": "02-29",
+        "birthdayNote": "うるう年生まれ"
+      },
+      {
+        "name": "ハンギョドン",
+        "slug": "hangyodon",
+        "match": [
+          "hangyodon"
+        ],
+        "birthday": "03-14"
+      },
+      {
+        "name": "キキララ",
+        "slug": "kikilala",
+        "match": [
+          "リトルツインスターズ",
+          "little twin stars",
+          "littletwinstars"
+        ],
+        "birthday": "12-24"
+      },
+      {
+        "name": "けろけろけろっぴ",
+        "slug": "keroppi",
+        "match": [
+          "けろっぴ",
+          "keroppi"
+        ],
+        "birthday": "07-10"
+      },
+      {
+        "name": "タキシードサム",
+        "slug": "tuxedosam",
+        "match": [
+          "tuxedosam",
+          "tuxedo sam"
+        ],
+        "birthday": "05-12"
+      },
+      {
+        "name": "バッドばつ丸",
+        "slug": "badbadtzmaru",
+        "match": [
+          "ばつ丸",
+          "badbadtz"
+        ]
+      }
+    ],
+    "official": [
+      {
+        "name": "サンリオ公式サイト",
+        "note": "キャラクターのグッズとお知らせ",
+        "url": "https://www.sanrio.co.jp/"
+      },
+      {
+        "name": "サンリオ公式（X）",
+        "note": "",
+        "url": "https://x.com/sanrio_news"
+      }
+    ],
+    "youtube": [
+      {
+        "name": "サンリオ公式",
+        "forUsername": "sanriojapan"
+      }
+    ]
+  },
+  {
+    "slug": "snoopy",
+    "name": "スヌーピー",
+    "keywords": [
+      "スヌーピー"
+    ],
+    "match": [
+      "スヌーピー",
+      "snoopy",
+      "peanuts",
+      "ウッドストック"
+    ],
+    "exclude": [],
+    "oshi": [
+      {
+        "name": "スヌーピー",
+        "birthday": "08-10"
+      },
+      {
+        "name": "ウッドストック",
+        "slug": "woodstock",
+        "match": [
+          "woodstock"
+        ]
+      },
+      {
+        "name": "チャーリーブラウン",
+        "slug": "charliebrown",
+        "match": [
+          "チャーリー・ブラウン",
+          "チャーリー ブラウン",
+          "charlie brown"
+        ]
+      },
+      {
+        "name": "オラフ",
+        "slug": "olaf",
+        "full": "スヌーピー オラフ",
+        "match": [
+          "olaf"
+        ]
+      },
+      {
+        "name": "ベル",
+        "slug": "belle",
+        "full": "スヌーピー ベル",
+        "match": [
+          "belle"
+        ],
+        "strict": true
+      },
+      {
+        "name": "ルーシー",
+        "slug": "lucy",
+        "full": "スヌーピー ルーシー",
+        "match": [
+          "lucy"
+        ]
+      },
+      {
+        "name": "サリー",
+        "slug": "sally",
+        "full": "スヌーピー サリー",
+        "match": [
+          "sally"
+        ]
+      },
+      {
+        "name": "ライナス",
+        "slug": "linus",
+        "full": "スヌーピー ライナス",
+        "match": [
+          "linus"
+        ]
+      }
+    ],
+    "official": [
+      {
+        "name": "スヌーピー公式サイト",
+        "note": "",
+        "url": "https://www.snoopy.co.jp/"
+      },
+      {
+        "name": "Snoopy Japan（X）",
+        "note": "",
+        "url": "https://x.com/snoopyjapan"
+      },
+      {
+        "name": "Snoopy News Japan（X）",
+        "note": "お知らせ",
+        "url": "https://x.com/snoopy_jp_info"
+      }
+    ]
+  },
+  {
+    "slug": "miffy",
+    "name": "ミッフィー",
+    "keywords": [
+      "ミッフィー"
+    ],
+    "match": [
+      "ミッフィー",
+      "miffy",
+      "うさこちゃん",
+      "ブルーナ",
+      "bruna"
+    ],
+    "exclude": [],
+    "oshi": [
+      {
+        "name": "ミッフィー",
+        "birthday": "06-21",
+        "birthdayNote": "絵本が生まれた日"
+      },
+      {
+        "name": "ボリス",
+        "slug": "boris",
+        "full": "ミッフィー ボリス",
+        "match": [
+          "boris"
+        ]
+      },
+      {
+        "name": "メラニー",
+        "slug": "melanie",
+        "full": "ミッフィー メラニー",
+        "match": [
+          "melanie"
+        ]
+      },
+      {
+        "name": "スナッフィー",
+        "slug": "snuffy",
+        "full": "ミッフィー スナッフィー",
+        "match": [
+          "snuffy"
+        ]
+      },
+      {
+        "name": "ダーン",
+        "slug": "dan",
+        "full": "ミッフィー ダーン"
+      }
+    ],
+    "official": [
+      {
+        "name": "日本のミッフィー情報サイト",
+        "note": "",
+        "url": "https://dickbruna.jp/"
+      },
+      {
+        "name": "日本のミッフィー情報サイト（X）",
+        "note": "",
+        "url": "https://x.com/miffy_japan"
+      }
+    ]
+  },
+  {
+    "slug": "sumikko",
+    "name": "すみっコぐらし",
+    "keywords": [
+      "すみっコぐらし"
+    ],
+    "match": [
+      "すみっコぐらし",
+      "すみっこぐらし",
+      "すみっコ",
+      "sumikko"
+    ],
+    "exclude": [],
+    "oshi": [
+      {
+        "name": "しろくま",
+        "slug": "shirokuma",
+        "full": "すみっコぐらし しろくま"
+      },
+      {
+        "name": "ぺんぎん？",
+        "slug": "penguin",
+        "full": "すみっコぐらし ぺんぎん？",
+        "match": [
+          "ぺんぎん"
+        ]
+      },
+      {
+        "name": "とんかつ",
+        "slug": "tonkatsu",
+        "full": "すみっコぐらし とんかつ"
+      },
+      {
+        "name": "ねこ",
+        "slug": "neko",
+        "full": "すみっコぐらし ねこ"
+      },
+      {
+        "name": "とかげ",
+        "slug": "tokage",
+        "full": "すみっコぐらし とかげ"
+      },
+      {
+        "name": "えびふらいのしっぽ",
+        "slug": "ebifurai",
+        "full": "すみっコぐらし えびふらいのしっぽ",
+        "match": [
+          "えびふらい"
+        ]
+      },
+      {
+        "name": "ふろしき",
+        "slug": "furoshiki",
+        "full": "すみっコぐらし ふろしき"
+      },
+      {
+        "name": "たぴおか",
+        "slug": "tapioka",
+        "full": "すみっコぐらし たぴおか",
+        "match": [
+          "タピオカ"
+        ]
+      },
+      {
+        "name": "ざっそう",
+        "slug": "zassou",
+        "full": "すみっコぐらし ざっそう"
+      },
+      {
+        "name": "すずめ",
+        "slug": "suzume",
+        "full": "すみっコぐらし すずめ"
+      },
+      {
+        "name": "にせつむり",
+        "slug": "nisetsumuri",
+        "full": "すみっコぐらし にせつむり"
+      }
+    ],
+    "official": [
+      {
+        "name": "すみっコぐらし公式サイト",
+        "note": "サンエックスのキャラクターのページ",
+        "url": "https://www.san-x.co.jp/ja/characters/sumikkogurashi/"
+      },
+      {
+        "name": "すみっコぐらし公式（X）",
+        "note": "",
+        "url": "https://x.com/sumikko_335"
+      }
+    ]
+  },
+  {
+    "slug": "mofusand",
+    "name": "mofusand",
+    "keywords": [
+      "mofusand"
+    ],
+    "match": [
+      "mofusand",
+      "モフサンド",
+      "もふさんど"
+    ],
+    "exclude": [],
+    "oshi": [
+      {
+        "name": "サメにゃん",
+        "slug": "samenyan",
+        "match": [
+          "さめにゃん"
+        ]
+      },
+      {
+        "name": "えびにゃん",
+        "slug": "ebinyan",
+        "match": [
+          "エビにゃん"
+        ]
+      },
+      {
+        "name": "うさにゃん",
+        "slug": "usanyan",
+        "match": [
+          "ウサにゃん",
+          "ウサニャン"
+        ]
+      }
+    ],
+    "official": [
+      {
+        "name": "mofusandインフォ",
+        "note": "公式の情報サイト",
+        "url": "https://mofusand-info.jp/"
+      },
+      {
+        "name": "mofusand もふもふマーケット",
+        "note": "公式通販",
+        "url": "https://mofusand-mofumofu-market.jp/"
+      },
+      {
+        "name": "ぢゅの（X）",
+        "note": "作者",
+        "url": "https://x.com/mofu_sand"
+      }
+    ]
+  }
+]

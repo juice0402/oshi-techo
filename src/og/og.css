@@ -1,0 +1,4 @@
+:root{--ink:#4E3657;--pink:#FBD3E2;--lav:#E3D9FB;--berry:#B23F78}
+*{box-sizing:border-box;margin:0}
+html,body{width:1200px;height:630px;overflow:hidden;background:#fff}
+body{position:relative;font-family:"Noto Sans CJK JP",sans-serif;font-weight:700;font-feature-settings:"palt";color:var(--ink)}

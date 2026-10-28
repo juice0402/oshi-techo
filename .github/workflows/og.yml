@@ -1,0 +1,45 @@
+name: SNSの画像を作る
+
+# src/og/ の HTML を 1200×630 で写して、画像（og.png）を作る。
+# 字は Noto Sans CJK JP（端末の角ゴとおそろい）。サイト名は sitename.svg（字の形を線にしたもの）なので字のデータはいらない。
+# main 以外のブランチで動かすと、写した画像を src/og/renders/ にコミットする（スマホやAPIから見られるように）。
+# よいものを src/og.png に置きかえ、src/og/renders/ は消してからマージする。
+# 手で動かす（Actions の画面の Run workflow で、ブランチをえらぶ）。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  og:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: 字を入れる
+        run: sudo apt-get install -y -qq fonts-noto-cjk > /dev/null
+
+      - name: 写す
+        run: |
+          mkdir -p og-out
+          for f in src/og/og.html src/og/variants/*.html; do
+            [ -f "$f" ] || continue
+            name=$(basename "$f" .html)
+            google-chrome --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=4000 --screenshot="$PWD/og-out/$name.png" "file://$PWD/$f"
+          done
+          ls -la og-out
+
+      - name: 写した画像をブランチに置く（main 以外）
+        run: |
+          branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          if [ "$branch" = "main" ]; then echo "main には置かない"; exit 0; fi
+          git fetch -q origin "$branch"
+          git checkout -q -B "$branch" "origin/$branch"
+          mkdir -p src/og/renders
+          cp og-out/*.png src/og/renders/
+          git add src/og/renders
+          if git diff --cached --quiet; then echo "変化なし"; exit 0; fi
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "SNSの画像を写した"
+          git push -q origin HEAD:"$branch"

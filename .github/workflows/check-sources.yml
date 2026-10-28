@@ -1,0 +1,52 @@
+name: 読みものの資料の点検
+
+# 毎週月曜 7:41（日本時間）に、読みものの「調べた資料」と買い方メモのリンクが開けるかを見る（1回1分ほど）
+# 問題があれば Issue「資料の点検」に書く（開いた Issue があればコメントを足す）。Claude の使用量は使わない
+# 資料（src/yomimono/sources・src/kaikata）を変える PR では、Issue は作らず結果だけ注記に出す（PR は止めない）
+
+on:
+  schedule:
+    - cron: '41 22 * * 0'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/check-sources.mjs'
+      - '.github/workflows/check-sources.yml'
+      - 'src/yomimono/sources/**'
+      - 'src/kaikata/**'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: 資料を開いてみる
+        id: chk
+        run: |
+          if node scripts/check-sources.mjs > report.md; then echo "ng=0" >> "$GITHUB_OUTPUT"; else echo "ng=1" >> "$GITHUB_OUTPUT"; fi
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice title=資料の点検::$(head -1 report.md)"
+          grep '^- ' report.md | head -40 | while IFS= read -r l; do echo "::warning title=資料の点検::$l"; done
+
+      - name: Issue に書く
+        if: steps.chk.outputs.ng == '1' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create "資料の点検" --color D93F0B --description "毎週の読みものの資料の点検" --repo "$GITHUB_REPOSITORY" 2>/dev/null || true
+          N=$(gh issue list --repo "$GITHUB_REPOSITORY" --label "資料の点検" --state open --json number --jq '.[0].number')
+          if [ -n "$N" ]; then
+            gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file report.md
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "読みものの資料の点検：直すところがあります" --label "資料の点検" --body-file report.md
+          fi

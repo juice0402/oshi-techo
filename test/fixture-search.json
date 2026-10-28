@@ -1,0 +1,11 @@
+{
+ "count": 1234,
+ "page": 1,
+ "pageCount": 42,
+ "Items": [
+  {"itemName": "ちいかわ ハチワレ ぬいぐるみ M もちもち", "itemCode": "shopa:10", "itemPrice": 2860, "affiliateUrl": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopa%2F10%2F", "mediumImageUrls": ["https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/10.jpg?_ex=128x128"], "shopName": "テストのお店A", "availability": 1, "catchcopy": "", "startTime": "", "endTime": ""},
+  {"itemName": "【予約】ちいかわ ハチワレ マスコット 締切11/30 12月下旬発送", "itemCode": "shopb:11", "itemPrice": 1980, "affiliateUrl": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopb%2F11%2F", "mediumImageUrls": [{"imageUrl": "https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/11.jpg?_ex=128x128"}], "shopName": "テストのお店B", "availability": 1, "catchcopy": "", "startTime": "", "endTime": ""},
+  {"itemName": "【中古】ちいかわ ハチワレ ぬいぐるみ", "itemCode": "shopc:12", "itemPrice": 900, "affiliateUrl": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopc%2F12%2F", "mediumImageUrls": ["https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/12.jpg?_ex=128x128"], "shopName": "テストのお店C", "availability": 1, "catchcopy": "", "startTime": "", "endTime": ""},
+  {"itemName": "ちいかわ風 ねこ キーホルダー", "itemCode": "shopd:13", "itemPrice": 500, "affiliateUrl": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fshopd%2F13%2F", "mediumImageUrls": ["https://thumbnail.image.rakuten.co.jp/@0_mall/test/cabinet/13.jpg?_ex=128x128"], "shopName": "テストのお店D", "availability": 1, "catchcopy": "", "startTime": "", "endTime": ""}
+ ]
+}
