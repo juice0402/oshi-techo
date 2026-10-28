@@ -22,6 +22,13 @@ const ok = (cond, msg) => {
 // 1. 除外ルール
 const { works: chars, corners } = loadWorks();
 const settings = readJson('config/settings.json');
+// 買える商品がある作品（build.mjs と同じデータを読む。見本データのときはコーナーごとの見本も足す）
+const buyableAll = [
+  ...readJson(process.env.DATA_LATEST ?? 'data/latest.json', []),
+  ...(process.env.DATA_LATEST ? readdirSync('test').filter((f) => /^fixture-corner-[a-z]+\.json$/.test(f)).flatMap((f) => readJson(`test/${f}`, [])) : []),
+].filter((i) => i.avail !== 0);
+const liveWorks = chars.filter((c) => buyableAll.some((i) => i.c === c.slug));
+const noItemWorks = chars.filter((c) => !liveWorks.includes(c));
 const chiikawa = chars.find((c) => c.slug === 'chiikawa');
 const pokemon = chars.find((c) => c.slug === 'pokemon');
 const base = { code: 'shop:1', url: 'https://hb.afl.rakuten.co.jp/hgc/x/', img: 'https://thumbnail.image.rakuten.co.jp/x.jpg', price: 1000 };
@@ -200,6 +207,7 @@ const html = files.filter((f) => f.endsWith('.html'));
       k.sources.every((x) => x.name && x.used && /^https:\/\//.test(x.url));
     ok(shape, `買い方メモ ${slug}：作品・確かめた日・お店・節・予定・資料がそろっている`);
     const p = `dist/${slug}/kaikata/index.html`;
+    if (noItemWorks.some((c) => c.slug === slug)) continue;
     ok(existsSync(p), `${p} がある`);
     if (!existsSync(p)) continue;
     const s2 = readFileSync(p, 'utf8');
@@ -212,8 +220,34 @@ const html = files.filter((f) => f.endsWith('.html'));
   }
 }
 ok(files.length < 1000, `ファイル数が少ない（${files.length}件、上限2万件）`);
-for (const need of ['dist/index.html', 'dist/about/index.html', 'dist/privacy/index.html', 'dist/404.html', 'dist/sitemap.xml', 'dist/robots.txt', ...chars.flatMap((c) => [`dist/${c.slug}/index.html`, `dist/${c.slug}/new/index.html`])]) {
+for (const need of ['dist/index.html', 'dist/about/index.html', 'dist/privacy/index.html', 'dist/404.html', 'dist/sitemap.xml', 'dist/robots.txt', ...liveWorks.flatMap((c) => [`dist/${c.slug}/index.html`, `dist/${c.slug}/new/index.html`])]) {
   ok(files.includes(need), `${need} がある`);
+}
+// 買える商品がない作品はページを作らない（楽天から取れなかった日など）。テストは止めず、注記で知らせるだけ
+for (const c of noItemWorks) {
+  console.log(`注意  ${c.name}：買える商品がないので、作品のページを作っていない`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::warning title=商品のない作品::${c.name}：買える商品がないので、作品のページを作っていない`);
+  ok(!files.includes(`dist/${c.slug}/index.html`), `${c.name}：買える商品がない作品のページは作らない`);
+}
+// 作品名の新着が0件で、推しキャラの名前などで見つけた商品だけある作品（見本ではラブライブ！）：トップと新着のページを作る
+{
+  const newsZero = liveWorks.filter((c) => !buyableAll.some((i) => i.c === c.slug && !i.via));
+  if (process.env.DATA_LATEST) ok(newsZero.some((c) => c.slug === 'lovelive') && noItemWorks.some((c) => c.slug === 'miku'), '見本：新着が0件の作品（ラブライブ！）と、買える商品がない作品（初音ミク）がある');
+  if (process.env.DATA_LATEST) ok(existsSync('dist/lovelive/oshougatsu/index.html') && !existsSync('dist/miku/oshougatsu/index.html'), '見本：新着が0件の作品にも季節の特集の期間外のページ。商品がない作品には作らない');
+  const sm = readFileSync('dist/sitemap.xml', 'utf8');
+  for (const c of newsZero) {
+    const p = `dist/${c.slug}/new/index.html`;
+    if (!existsSync(p)) continue;
+    const s2 = readFileSync(p, 'utf8');
+    ok(s2.includes('<p class="next">この7日に作品名で見つけた新着は、いまはありません。</p>') && !s2.includes('<ul class="grid"'), `${p}：新着が0件の日は1行だけで、ほかの商品で埋めない`);
+    ok((process.env.SITE_MODE !== 'production' || s2.includes('<meta name="robots" content="noindex,follow">')) && !sm.includes(`/${c.slug}/new/</loc>`), `${p}：新着が0件の日は noindex,follow でサイトマップに入れない`);
+    const top = readFileSync(`dist/${c.slug}/index.html`, 'utf8');
+    ok(!top.includes('data-s="new"') && !top.includes(`href="/${c.slug}/new/"`), `dist/${c.slug}/index.html：新着が0件の日は新着の棚を出さない`);
+    for (const f of html.filter((x) => x.startsWith(join('dist', c.slug) + '/') && /<p class="next">次は/.test(readFileSync(x, 'utf8')))) {
+      const s3 = readFileSync(f, 'utf8');
+      ok(!s3.includes(`の新着を並べています`) && s3.includes(`<a href="/${c.slug}/">${c.name}グッズのトップへ</a>`), `${f}：季節の特集の期間外のページ。新着が0件の日は「新着を並べています」と書かず、作品のトップへの1行`);
+    }
+  }
 }
 ok(!files.some((f) => f.endsWith('.json')), 'データファイルを公開していない');
 // もっと見るのリンクに件数は出さない（「これだけしかない」と思われないように）

@@ -17,7 +17,7 @@ import { decoCss, DECO_STYLES } from '../src/deco/deco.mjs';
 const OUT = 'dist';
 const production = process.env.SITE_MODE === 'production';
 
-const { works: chars, corners } = loadWorks();
+const { works: allWorks, corners } = loadWorks();
 const settings = readJson('config/settings.json');
 // 見本データのときは、コーナーごとの見本（test/fixture-corner-<コーナー>.json）も足す
 const latest = [
@@ -35,6 +35,12 @@ const rankingRaw = readJson(process.env.DATA_RANKING ?? 'data/ranking.json', { f
 // ランキングが2日より古いとき（集められない日が続いたとき）は、もう入っていないかもしれないので「ランキング入り」を出さない
 const ranking =
   rankingRaw.fetchedAt && Date.parse(meta.fetchedAt) - Date.parse(rankingRaw.fetchedAt) <= 2 * 86400000 ? rankingRaw : { fetchedAt: '', items: [] };
+// 買える商品が1件もない作品（楽天から取れなかった日など）は、ページを作らず、どこからもリンクしない（リンク切れにしない）。
+// 作品名の新着が0件でも、推しキャラの名前などで見つけた買える商品があれば、作品のページを作る
+const hasBuyable = new Set(latest.filter((i) => i.avail !== 0).map((i) => i.c));
+const chars = allWorks.filter((c) => hasBuyable.has(c.slug));
+const noItemWorks = allWorks.filter((c) => !hasBuyable.has(c.slug));
+if (noItemWorks.length) console.warn(`買える商品がないので作らなかった作品：${noItemWorks.map((c) => c.name).join('・')}`);
 // 外した作品（config/ にない作品）の記録は使わない。外した直後は、前に集めた楽天ブックス・ランキングに残っていることがある
 const workSlugs = new Set(chars.map((c) => c.slug));
 for (const list of [latest, books.items, ranking.items]) {
@@ -442,7 +448,9 @@ const seasonLater = seasons
     const sp = seasonPages.find((x) => x.s.slug === s.slug);
     const cur = new Set((sp?.works ?? []).map((w) => w.c.slug));
     const seen = chars.filter((c) => cur.has(c.slug) || (seasonSeen[s.slug] ?? []).includes(c.slug));
-    if (seen.length) nextSeasonSeen[s.slug] = seen.map((c) => c.slug);
+    // 買える商品がない日の作品（chars から外した作品）も、前の記録は残す（1回取れなかっただけで消さない）
+    const keep = (seasonSeen[s.slug] ?? []).filter((x) => noItemWorks.some((c) => c.slug === x));
+    if (seen.length || keep.length) nextSeasonSeen[s.slug] = [...seen.map((c) => c.slug), ...keep];
     const act = seasonActive.find((x) => x.slug === s.slug);
     const hit = act ? seasonMatcher(act) : null;
     return {
@@ -562,8 +570,8 @@ function tocGroups() {
   return [cornerBySlug.get('chara'), ...liveCorners]
     .filter(Boolean)
     .map((k) => {
-      // ページのある作品だけ（新着が0の日は作品のページができないので、リンク切れにしない）
-      const ws = worksIn(k.slug).filter((c) => buyable.some((i) => i.c === c.slug && !i.via));
+      // ページのある作品だけ（買える商品がない作品は chars から外してある）
+      const ws = worksIn(k.slug);
       if (!ws.length) return '';
       return `<div class="tg"><p class="tgh"><a href="${cornerHref(k.slug)}">${esc(k.title || k.name)}</a></p><p>${ws.map((c) => `<a href="/${c.slug}/">${esc(c.name)}</a>`).join('／')}</p></div>`;
     })
@@ -1026,7 +1034,7 @@ function chooseNav(c) {
 // ---- キャラごと ----
 for (const c of chars) {
   const L = listsFor(c.slug);
-  if (!L.news.length) continue;
+  if (!L.all.length) continue;
   const base = `/${c.slug}/`;
   const crumbs = [{ name: 'トップ', path: '/' }, { name: c.name, path: base }];
   const sub = (key) => L[key].length >= MIN_PAGE;
@@ -1057,7 +1065,7 @@ for (const c of chars) {
     decoParts: mySeasons.map(({ s }) => s.slug),
     crumbs,
     title: `${c.name}グッズの通販・新着まとめ（予約・再入荷・人気ランキング）｜${settings.siteName}`,
-    description: sentence(`楽天市場の${c.name}グッズを1日2回集めています`, `${newsLine(L.news)}、予約受付中は${Y.total}件です`, mixLine(L.all)),
+    description: sentence(`楽天市場の${c.name}グッズを1日2回集めています`, L.news.length ? `${newsLine(L.news)}、予約受付中は${Y.total}件です` : `作品名で見つけた新着は、この7日はありません。予約受付中は${Y.total}件です`, mixLine(L.all)),
     h1: `${c.name}グッズ新着`,
     body:
       oshiRow(c) +
@@ -1076,7 +1084,7 @@ for (const c of chars) {
       memoSection(c, L, Y) +
       `<p class="more"><a href="/koushiki/#${esc(c.slug)}">${esc(c.name)}の公式の動画とお知らせ</a></p>` +
       tsugiWorks(c),
-    lastmod: newest(L.news),
+    lastmod: newest(L.news.length ? L.news : L.all),
   });
 
   const subPages = [
@@ -1094,16 +1102,23 @@ for (const c of chars) {
   for (const s of subPages) {
     const list = L[s.key];
     if (s.key !== 'news' && list.length < MIN_PAGE) continue;
+    // 作品名で見つけた新着が0件の日：棚の場所に1行と、推しキャラ・種類のページへの道。検索には出さない（推しキャラの名前で見つけた物で埋めない）
+    const empty = s.key === 'news' && !list.length;
     page({
       path: `${base}${s.slug}/`,
       tab: c.slug,
       count: list.length,
+      noindex: empty ? 'follow' : false,
       crumbs: [...crumbs, { name: s.name, path: `${base}${s.slug}/` }],
       title: `${s.title}｜${settings.siteName}`,
-      description: s.desc(list),
+      description: empty
+        ? sentence(`${c.name}のグッズを、楽天市場で作品名から新しい順に探して並べるページです`, 'この7日に作品名で見つけた新着は、いまはありません', '推しキャラや種類のページから探せます')
+        : s.desc(list),
       h1: s.h1,
       lead: s.lead,
-        body: (s.key === 'news' ? sortGrid(list.slice(0, settings.listItems)) : grid(list.slice(0, settings.listItems), true)) + priceAt(),
+      body: empty
+        ? `<section data-s="new"><p class="next">この7日に作品名で見つけた新着は、いまはありません。</p></section>${oshiRow(c) + catNav || `<p class="more"><a href="${base}">${esc(c.name)}グッズのトップへ</a></p>`}`
+        : (s.key === 'news' ? sortGrid(list.slice(0, settings.listItems)) : grid(list.slice(0, settings.listItems), true)) + priceAt(),
       lastmod: newest(list),
     });
   }
@@ -1308,14 +1323,16 @@ for (const x of seasonLater) {
       description: sentence(
         `${c.name}の${label}の特集は、${seasonSpan(s)}です`,
         active ? `${c.name}の${label}が見つかったら、ここに並べます` : `次は${ymdLabel(next)}からはじまります`,
-        nowLabels.length ? `いまは${joinTo(nowLabels)}の特集を並べています` : `いまは${c.name}の新着を並べています`,
+        nowLabels.length ? `いまは${joinTo(nowLabels)}の特集を並べています` : news.length ? `いまは${c.name}の新着を並べています` : `${c.name}のグッズは、作品のトップから探せます`,
       ),
       h1: `${c.name}の${label}`,
       body:
         note +
         (nowParts.length
           ? nowParts.join('') + `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p>`
-          : section(`${c.name}グッズ新着`, news, { limit: settings.topItems, more: `/${c.slug}/new/`, moreLabel: '新着をすべて見る', eager: true })) +
+          : news.length
+            ? section(`${c.name}グッズ新着`, news, { limit: settings.topItems, more: `/${c.slug}/new/`, moreLabel: '新着をすべて見る', eager: true })
+            : `<p class="more"><a href="/${c.slug}/">${esc(c.name)}グッズのトップへ</a></p>`) +
         (nowParts.length || news.length ? priceAt() : ''),
     });
   }
@@ -1696,18 +1713,21 @@ page({
 // 公式のYouTubeの新しい動画は、ページを開いたときに Cloudflare の関数（functions/koushiki/）が
 // YouTube Data API から取って <!--yt:作品--> の目印に入れる。ここ（静的なページ）には動画の情報を入れない。
 // YouTube のデータがあるページなので、楽天の広告（バナー・広告の表示）は出さない（YouTube API サービスの決まり III.G.1.d）
+// 公式のリンクは楽天の商品と関係がないので、買える商品がない日の作品も出す（作品のページへのリンクは置かない）。題と説明文の作品名も本文と同じ並びから
+const koushikiWorks = allWorks.filter((c) => c.official?.length || c.youtube?.length);
+const koushikiChara = koushikiWorks.filter((c) => c.corner === 'chara');
+const koushikiCorners = corners.filter((k) => k.slug !== 'chara' && koushikiWorks.some((c) => c.corner === k.slug)).map((k) => k.name).join('・');
 page({
   path: '/koushiki/',
   tab: 'koushiki',
   ads: false,
   crumbs: [{ name: 'トップ', path: '/' }, { name: '公式の最新情報', path: '/koushiki/' }],
-  title: `${shortNames}の公式の最新情報（動画・お知らせ）｜${settings.siteName}`,
+  title: `${namesOf(koushikiChara)}の公式の最新情報（動画・お知らせ）｜${settings.siteName}`,
   // 作品が多いので、YouTube のある作品は3つ＋「など」まで（説明文は125字まで）
-  description: `${allNames}の公式サイト・公式Xへのリンクをまとめています。${namesOf(chars.filter((c) => c.youtube?.length))}は、公式YouTubeチャンネルの新しい動画も出します。`,
+  description: `${koushikiChara.map((c) => c.name).join('・')}${koushikiCorners ? `と、${koushikiCorners}の作品` : ''}の公式サイト・公式Xへのリンクをまとめています。${namesOf(koushikiWorks.filter((c) => c.youtube?.length))}は、公式YouTubeチャンネルの新しい動画も出します。`,
   h1: '公式の最新情報',
   body:
-    chars
-      .filter((c) => c.official?.length || c.youtube?.length)
+    koushikiWorks
       .map(
         (c) =>
           `<section id="${esc(c.slug)}"><h2>${esc(c.name)}</h2>${c.youtube?.length ? `<!--yt:${esc(c.slug)}-->` : ''}<p class="oc">公式サイト・公式X</p><ul class="links">${(c.official ?? [])
@@ -1995,6 +2015,8 @@ for (const [path, content] of files) {
 }
 console.log(`${files.size}ファイルを作りました（${production ? '本番' : 'プレビュー'}・見た目 ${theme}）。商品 ${latest.length}件（買える ${buyable.length}件）`);
 // 検索に出すかどうかの記録（本当のデータで作ったときだけ。data/ は非公開）
+// 買える商品がない日の作品のページの記録も残す（次に商品が戻ったとき、検索に出すかどうかを前の続きで決める）
+for (const [path, v] of Object.entries(indexState)) if (!(path in nextIndexState) && noItemWorks.some((c) => path.startsWith(`/${c.slug}/`))) nextIndexState[path] = v;
 if (!process.env.DATA_LATEST) writeJson(INDEX_STATE, Object.fromEntries(Object.entries(nextIndexState).sort(([a], [b]) => a.localeCompare(b))));
 // 一度できた季節の特集のページの記録（期間が過ぎてもページを残すため）
 if (!process.env.DATA_LATEST) writeJson(SEASON_SEEN, nextSeasonSeen);
