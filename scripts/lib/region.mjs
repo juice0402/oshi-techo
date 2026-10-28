@@ -21,6 +21,7 @@ const PLACES = {
   富士急ハイランド: '山梨', 富士吉田: '山梨', 河口湖: '山梨', 山中湖: '山梨',
   お台場: '東京', スカイツリー: '東京', 秋葉原: '東京', 原宿: '東京', 渋谷: '東京', 新宿: '東京',
   知床: '北海道', 登別: '北海道', 白川郷: '岐阜', 道頓堀: '大阪', 通天閣: '大阪', 美ら海: '沖縄',
+  大涌谷: '神奈川', ハワイアンズ: '福島',
 };
 
 // 都道府県のローマ字（ページの中の見出しの id。#p-<ローマ字>）
@@ -52,9 +53,21 @@ export function regionOf(name) {
   return { pref: best.pref, area: AREA_OF[best.pref], order: PREF_ORDER.indexOf(best.pref) };
 }
 
-// ご当地グッズかどうか：「ご当地」か「（地名）限定」が商品名にある
+// ご当地グッズかどうか：「（地名）限定」「（地名）ご当地」があるもの。「ご当地」だけのときは、地名もあるか、「ご当地」が商品名のはじめ
+// （宣伝の【】などと「送料無料」を除いて HEAD 文字まで）にあるもの。ガチャのお店の名前「ご当地本舗」と、商品名のうしろに言葉を並べただけの
+// 「ご当地」は数えない（2026-10-29、本当のデータで、ガチャの単品・学習机のマットなどがご当地のページにまざっていた）
 const LIMITED = new RegExp(`(${WORDS.join('|')})(県|府|都)?(限定|ご当地)`);
+const HEAD = 40;
 export function isGotouchi(name) {
-  const n = normalize(name).replace(/東京都/g, '東京');
-  return n.includes('ご当地') || LIMITED.test(n);
+  const n = normalize(name).replace(/東京都/g, '東京').replace(/御当地/g, 'ご当地').replace(/ご当地本舗/g, '');
+  if (LIMITED.test(n)) return true;
+  if (!n.includes('ご当地')) return false;
+  if (WORDS.some((w) => n.includes(w))) return true;
+  const head = n
+    .replace(/【[^】]*】|\\[^/]*\/|\[[^\]]*\]|★[^★]*★/g, ' ')
+    .replace(/^\s*送料無料\s*/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const i = head.indexOf('ご当地');
+  return i >= 0 && i <= HEAD;
 }
