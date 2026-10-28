@@ -49,6 +49,7 @@ export function fetchOpts(corner, settings, work = null) {
     pages: f.pages ?? settings.pagesPerKeyword,
     oshiPages: f.oshiPages ?? settings.oshiPages ?? 2,
     gotouchi: f.gotouchi ?? true,
+    gotouchiKeywords: f.gotouchiKeywords ?? [], // 「作品名 ご当地」のほかに探す言葉（サンリオの「ご当地キティ」）
     seasons: f.seasons ?? true,
     books: f.books ?? true,
     booksPages: f.booksPages ?? null, // 楽天ブックスを何ページまで見るか（null は fetch-books.mjs の決まり）
