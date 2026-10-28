@@ -20,7 +20,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 1,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:2",
@@ -43,7 +44,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 0,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:3",
@@ -66,7 +68,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 1,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:4",
@@ -89,7 +92,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 0,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:5",
@@ -112,7 +116,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 1,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:6",
@@ -135,7 +140,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 0,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:7",
@@ -158,7 +164,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 1,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:8",
@@ -181,7 +188,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 0,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:9",
@@ -204,7 +212,8 @@
     "pointEnd": "",
     "soldOut": "",
     "postage": 1,
-    "gift": 1
+    "gift": 1,
+    "via": "oshi"
   },
   {
     "code": "cnidol:10",
@@ -1062,7 +1071,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F61%2F",
     "first": "2026-10-11T13:45:00.000Z",
     "rank": 261,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1085,7 +1094,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F62%2F",
     "first": "2026-10-14T14:31:00.000Z",
     "rank": 262,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1108,7 +1117,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F63%2F",
     "first": "2026-10-17T15:16:00.000Z",
     "rank": 263,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1131,7 +1140,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F64%2F",
     "first": "2026-10-13T07:03:00.000Z",
     "rank": 264,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1154,7 +1163,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F65%2F",
     "first": "2026-10-16T07:48:00.000Z",
     "rank": 265,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1177,7 +1186,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F66%2F",
     "first": "2026-10-11T23:35:00.000Z",
     "rank": 266,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1200,7 +1209,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F67%2F",
     "first": "2026-10-15T00:20:00.000Z",
     "rank": 267,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1223,7 +1232,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F68%2F",
     "first": "2026-10-18T01:06:00.000Z",
     "rank": 268,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1246,7 +1255,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F69%2F",
     "first": "2026-10-13T16:53:00.000Z",
     "rank": 269,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1269,7 +1278,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F70%2F",
     "first": "2026-10-16T17:38:00.000Z",
     "rank": 270,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1293,7 +1302,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F71%2F",
     "first": "2026-10-12T09:25:00.000Z",
     "rank": 271,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1317,7 +1326,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F72%2F",
     "first": "2026-10-15T10:10:00.000Z",
     "rank": 272,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1341,7 +1350,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F73%2F",
     "first": "2026-10-11T01:57:00.000Z",
     "rank": 273,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1365,7 +1374,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F74%2F",
     "first": "2026-10-14T02:43:00.000Z",
     "rank": 274,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
@@ -1389,7 +1398,7 @@
     "url": "https://hb.afl.rakuten.co.jp/hgc/g00test.test.g00test.test/?pc=https%3A%2F%2Fitem.rakuten.co.jp%2Fcnidol%2F75%2F",
     "first": "2026-10-17T03:28:00.000Z",
     "rank": 275,
-    "avail": 1,
+    "avail": 0,
     "restock": "",
     "drop": null,
     "catchcopy": "",
