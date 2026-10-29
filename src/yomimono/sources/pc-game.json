@@ -1,0 +1,96 @@
+{
+  "checked": "2026-10-29",
+  "items": [
+    {
+      "name": "ウマ娘 プリティーダービー DMM GAMES版 公式サイト",
+      "url": "https://dmg.umamusume.jp/",
+      "used": "動作環境（必須と推奨の欄は分かれていない）：OS Windows 11、プロセッサ Intel Core i3-9100 / AMD Ryzen 3 3200G 同等以上、メモリ 8GB以上必須、グラフィック NVIDIA GeForce GTX 1650 / AMD Radeon RX 5500 XT 同等以上、DirectX 11以上必須、ディスク空き容量 20GB以上（SSD環境推奨）、画面解像度 1920×1080以上。DMM GAME PLAYER のインストールが必要。DMMアカウントが必要。スマートフォン版とデータ連携して遊べる。連携後にDMM GAMES版でログインするとアイテムのプレゼント"
+    },
+    {
+      "name": "GAME Watch（PC版ウマ娘の配信、2021年3月10日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/1310747.html",
+      "used": "PC版は2021年3月10日にDMM GAMESで配信。配信中のスマートフォン版とデータを連携して遊べる"
+    },
+    {
+      "name": "勝利の女神：NIKKE 公式サイト（ダウンロード）",
+      "url": "https://nikke-jp.com/download.html",
+      "used": "公式サイトのダウンロードのページ。PCの端末でダウンロードするよう書かれている。動作環境の数字はこのページにない"
+    },
+    {
+      "name": "ファミ通.com（NIKKE の PC版、2023年2月15日）",
+      "url": "https://www.famitsu.com/news/202302/15292821.html",
+      "used": "2023年2月15日にPC版がリリース。公式サイトのダウンロードのページから入れ、ランチャーの画面を使う。メールアドレスや外部のアカウントを連携しておかないとデータが失われる可能性がある。ニケの切りかえはQWERのキー、バーストスキルは1・2・3のキー。この時点ではコントローラーに対応していない"
+    },
+    {
+      "name": "Game*Spark（NIKKE の PC版の発表、2023年2月10日）",
+      "url": "https://www.gamespark.jp/article/2023/02/10/126963.html",
+      "used": "PC版はiOS・Androidと同じアカウントでログインでき、キャラクター・進み具合・アイテム・購入が共通になると発表されていた。キーボードとマウスでより細かく狙えると紹介されていた"
+    },
+    {
+      "name": "DMM GAMES（刀剣乱舞ONLINE）",
+      "url": "https://games.dmm.com/detail/tohken",
+      "used": "対応環境：Windows 11 64bit以上、Mac OS X 10.12以上、ブラウザ（64bit版）Google Chrome / Mozilla Firefox の最新版、メモリ4GB以上・推奨メモリ8GB以上。空き容量の数字は書かれていない"
+    },
+    {
+      "name": "Minecraft（Java版のシステム要件の記事、2026年7月21日）",
+      "url": "https://www.minecraft.net/en-us/article/minecraft-java-edition-system-requirements",
+      "used": "最低：1080p・30FPS・Fast の設定の目安。4コアのプロセッサ、別のグラフィックなら8GB・CPUに入ったグラフィックなら12GBのメモリ、Vulkan 1.3 に対応しVRAM 2GB以上のグラフィック、64bitのシステム。推奨：1080p・60FPS・Fancy の設定の目安。メモリ16GB、VRAM 6GBのグラフィック。推奨のシステム要件は7月21日に変わる"
+    },
+    {
+      "name": "Minecraft（Java & Bedrock Edition for PC の販売ページ）",
+      "url": "https://www.minecraft.net/en-us/store/minecraft-java-bedrock-edition-pc",
+      "used": "Java版：OS 最低 Windows 10 64-bit・推奨 Windows 11 64-bit、メモリ 最低8GB（別のグラフィック）か12GB（CPUに入ったグラフィック）・推奨16GB、ストレージ 最低2GB・推奨4GB、コントローラーには今のところ対応していない、遊べる相手はWindows・Mac・Linuxだけ。統合版（Bedrock Edition）：OS Windows 10 バージョン19041.0以上、メモリ 最低4GB・推奨8GB、ストレージ 最低4GB・推奨8GB、対応するゲームコントローラーかタッチ画面で遊べる、Windows・Xbox・Nintendo Switch・PS5・スマホと一緒に遊べる。Microsoft アカウントで Minecraft Launcher にサインインして遊ぶ。新しいPCに入れ直すときは買ったときと同じ Microsoft アカウントでログインする"
+    },
+    {
+      "name": "Steam（ドラゴンクエストXI 過ぎ去りし時を求めて S）",
+      "url": "https://store.steampowered.com/app/1295510/XI__S/?l=japanese",
+      "used": "最低：Windows 10 64-bit、AMD Ryzen 3 1200 / Intel Core i3-3330、メモリ8GB、AMD Radeon R7 260X / NVIDIA GeForce GTX 750（VRAM 1GB）、ストレージ40GBの空き容量。推奨：Windows 10 64-bit、AMD Ryzen 3 1200 / Intel Core i5-6500、メモリ8GB、AMD Radeon R7 370 / NVIDIA GeForce GTX 960（VRAM 2GB）、ストレージ40GBの空き容量。XINPUTのゲームパッドに対応",
+      "gh": false
+    },
+    {
+      "name": "マイクロソフト サポート（Windows デバイスに関する情報を検索する）",
+      "url": "https://support.microsoft.com/ja-jp/windows/experience/find-information-about-your-windows-device",
+      "used": "Windows 11 では「スタート」を右クリックして「設定」を選び、「システム」の「バージョン情報」を開く。「デバイスの仕様」でプロセッサ、インストールされているRAMの量、32ビットか64ビットか。「Windows の仕様」でエディションとバージョン"
+    },
+    {
+      "name": "マイクロソフト サポート（Storage settings in Windows）",
+      "url": "https://support.microsoft.com/en-us/windows/experience/storage-filemanagement/storage-settings-in-windows",
+      "used": "設定を開き、システム、ストレージの順に選ぶ。ストレージの使われ方が種類ごとに出る。「ストレージの詳細設定」から、ほかのドライブの使われ方も見られる"
+    },
+    {
+      "name": "マイクロソフト サポート（Windows 11 のシステム要件）",
+      "url": "https://support.microsoft.com/ja-jp/windows/experience/compatibility/windows-11-system-requirements",
+      "used": "プロセッサは2コア以上・1GHz以上で、承認済みのCPUの一覧にあるもの。RAM 4GB。ストレージ64GB以上。UEFI とセキュアブート。TPM 2.0。DirectX 12以降とWDDM 2.0ドライバーに対応したグラフィックス。PC正常性チェック アプリで、Windows 10 のPCが Windows 11 の要件を満たすかを確かめられる"
+    },
+    {
+      "name": "Microsoft Lifecycle（Windows 10 のサポート終了）",
+      "url": "https://learn.microsoft.com/ja-jp/lifecycle/announcements/windows-10-end-of-support",
+      "used": "Windows 10 は2025年10月14日にサポートが終了し、その日からセキュリティ更新プログラムを受け取れない。互換性があれば Windows 11 へのアップグレードか、Windows 11 のPCへの交換を案内。家庭では PC正常性チェック アプリかシステム要件で互換性を確かめる"
+    },
+    {
+      "name": "国民生活センター（通信販売はクーリング・オフできません、2024年1月16日）",
+      "url": "https://www.kokusen.go.jp/mimamori/mj_mailmag/mj-shinsen471.html",
+      "used": "通信販売には法律上のクーリング・オフ制度はない。返品できるかと条件は、事業者の特約があればそれに従う。特約がないときは、受け取った日を含めて8日以内なら送料を負担して返品できる。買う前に返品の条件を確かめる。受け取ったらすぐに中身を確かめる"
+    },
+    {
+      "name": "バッファロー（マウスパッド BSPD16GY）",
+      "url": "https://www.buffalo.jp/product/detail/bspd16gy.html",
+      "used": "低反発リストレスト付きのマウスパッド。約200mm×約23mm×約230mm（幅×高さ×奥行）。BlueLED式・レーザー式・光学式・ボール式のマウスに向く。光学系のマウスでは一部対応できない場合がある"
+    },
+    {
+      "name": "ロジクール サポート（Erratic cursor movement）",
+      "url": "https://support.logi.com/hc/en-us/articles/360023371213-Erratic-cursor-movement",
+      "used": "カーソルが飛ぶ原因に、マウスパッドや面の読み取りがある。ワイヤレスのマウスは、USBレシーバーに近づける。PCのうしろのポートのレシーバーは本体にさえぎられることがあるので前のポートへ。近くの無線の機器はレシーバーからはなす"
+    },
+    {
+      "name": "WHO（ゲームをする人の聴力を守る WHO と ITU の基準、2025年2月28日）",
+      "url": "https://www.who.int/news/item/28-02-2025-new-who-and-itu-standard-aims-to-prevent-hearing-loss-among-gamers",
+      "used": "ゲーム機・PC・ヘッドホン・ヘッドセットに、音を聞いた量の記録、知らせ、調整しやすい音量、ヘッドホンとスピーカーを切りかえたときに音量を下げる機能を求める。ゲームのソフトには、音の種類ごとの音量の調整と、大きな音と長い時間で聴力を失うおそれの注意を求める"
+    },
+    {
+      "name": "厚生労働省（情報機器作業における労働衛生管理のためのガイドライン、令和元年12月作成のリーフレット）",
+      "url": "https://www.mhlw.go.jp/content/000580827.pdf",
+      "used": "仕事で情報機器を使う人向け。1日の作業時間が長すぎないように。1時間以内で1サイクル、サイクルの間は10〜15分の作業休止、サイクル中にも1、2回の小休止。ディスプレイは眼から40cm以上。画面の上端は眼の高さまで"
+    }
+  ]
+}
