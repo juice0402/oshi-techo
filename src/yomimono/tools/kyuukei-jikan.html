@@ -1,0 +1,50 @@
+<div class="fit" id="kkjikan">
+<p class="fit-mm"><label>はじめる時刻<input type="time" name="ks" value="19:00" style="width:7em"></label><label>終わる時刻<input type="time" name="ke" value="22:00" style="width:7em"></label></p>
+<fieldset class="pick"><legend>ひと続きに遊ぶ長さ</legend>
+<label><input type="radio" name="kb" value="60" checked><span>1時間</span></label>
+<label><input type="radio" name="kb" value="45"><span>45分</span></label>
+<label><input type="radio" name="kb" value="30"><span>30分</span></label>
+</fieldset>
+<fieldset class="pick"><legend>あいだの休けい</legend>
+<label><input type="radio" name="kr" value="10"><span>10分</span></label>
+<label><input type="radio" name="kr" value="15" checked><span>15分</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<ol class="kj-list"></ol>
+<div class="fit-figs" style="grid-template-columns:1fr"><figure><svg class="fit-a" viewBox="0 0 100 10" role="img" aria-label="はじめる時刻から終わる時刻までを左から右への帯にして、遊ぶ時間に色を、休けいを点線の白い四角にした"></svg><figcaption>色の所が遊ぶ時間、点線の所が休けい、色の中の白い線が小休止の例</figcaption></figure></div>
+<p>仕事向けのめやすをもとにした例です。疲れや痛みがあるときは、時刻より前にやめてください。</p>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('kkjikan');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?+e.value:0;}
+// 「19:30」の形の時刻を、0時からの分にする。形がちがうときは -1
+function mins(n){var m=/^(\d{1,2}):(\d{2})/.exec(f.querySelector('input[name="'+n+'"]').value||'');if(!m)return -1;var h=+m[1],x=+m[2];return h<24&&x<60?h*60+x:-1;}
+function hm(t){t=((t%1440)+1440)%1440;var h=Math.floor(t/60),m=t%60;return h+':'+(m<10?'0':'')+m;}
+function dur(t){var h=Math.floor(t/60),m=t%60;return h&&m?h+'時間'+m+'分':h?h+'時間':m+'分';}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(x){while(x.firstChild)x.removeChild(x.firstChild);}
+function run(){
+var s=mins('ks'),e=mins('ke'),b=v('kb'),r=v('kr'),ans=f.querySelector('.fit-ans'),ol=f.querySelector('.kj-list'),svg=f.querySelector('.fit-a');
+clear(ol);clear(svg);
+// 入れた時刻が空や形ちがいのときは、勝手に別の時刻で計算せず、直してほしいことを出す
+if(s<0||e<0){ans.textContent='はじめる時刻と終わる時刻を、0:00〜23:59で入れてください。';return;}
+// 終わる時刻がはじめる時刻より前なら、次の日の時刻とみる（22:00〜1:00 など）
+var L=e-s;if(L<=0)L+=1440;
+if(L<10||L>720){ans.textContent='終わる時刻は、はじめる時刻の10分あと〜12時間あとの時刻を入れてください。';return;}
+// ひと続き b 分遊んだら r 分休む、をくり返す。最後のひと続きと休けいは、終わる時刻で切る
+var seg=[],t=0,play=0,rest=0;
+while(t<L){var pe=Math.min(t+b,L);seg.push([0,t,pe]);play+=pe-t;t=pe;if(t>=L)break;var re=Math.min(t+r,L);seg.push([1,t,re]);rest+=re-t;t=re;}
+var nr=seg.filter(function(x){return x[0]===1;}).length;
+ans.textContent=nr?'休けいは'+nr+'回、合わせて'+dur(rest)+'です。遊ぶ時間は合わせて'+dur(play)+'です。':'この長さなら、あいだの休けいはありません。遊ぶのは'+dur(play)+'です。';
+seg.forEach(function(x){var li=document.createElement('li');li.textContent=hm(s+x[1])+'〜'+hm(s+x[2])+(x[0]?'　休けい':'　遊ぶ');ol.appendChild(li);});
+// 帯の絵：全体の長さを横幅にして、遊ぶ時間は色、休けいは点線の四角。遊ぶ時間が30分以上なら、3つに分けた所に小休止の白い線
+svg.setAttribute('viewBox',(-L*0.01)+' -2 '+(L*1.02)+' '+(L*0.12+4));var h=L*0.12,k=0;
+seg.forEach(function(x){var w=x[2]-x[1];if(x[0]){el(svg,'rect',{x:x[1],y:0,width:w,height:h,'class':'fit-w'});return;}
+el(svg,'rect',{x:x[1],y:0,width:w,height:h,'class':'fit-c '+C[k++%3]});
+if(w>=30)[1,2].forEach(function(i){el(svg,'rect',{x:x[1]+w*i/3-L*0.003,y:0,width:L*0.006,height:h,fill:'#fff'});});});
+}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
