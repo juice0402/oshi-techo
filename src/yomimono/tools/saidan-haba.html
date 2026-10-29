@@ -1,0 +1,58 @@
+<div class="fit" id="sdhaba">
+<fieldset class="pick"><legend>置き場所の幅</legend>
+<label><input type="radio" name="dw" value="41.9" checked><span>41.9cm</span></label>
+<label><input type="radio" name="dw" value="60"><span>60cm</span></label>
+<label><input type="radio" name="dw" value="90"><span>90cm</span></label>
+<label><input type="radio" name="dw" value="x"><span>測った幅</span></label>
+</fieldset>
+<p class="fit-mm" data-for="dw" hidden><label>置き場所の幅<input type="number" name="dwx" inputmode="decimal" min="10" max="300" step="0.1" value="45">cm</label></p>
+<fieldset class="pick"><legend>バルーンの数</legend>
+<label><input type="radio" name="dn" value="1"><span>1つ</span></label>
+<label><input type="radio" name="dn" value="2" checked><span>2つ</span></label>
+<label><input type="radio" name="dn" value="3"><span>3つ</span></label>
+<label><input type="radio" name="dn" value="4"><span>4つ</span></label>
+<label><input type="radio" name="dn" value="x"><span>数を入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="dn" hidden><label>バルーンの数<input type="number" name="dnx" inputmode="numeric" min="1" max="10" step="1" value="5">つ</label></p>
+<fieldset class="pick"><legend>1つの横幅</legend>
+<label><input type="radio" name="db" value="15"><span>15cm</span></label>
+<label><input type="radio" name="db" value="23" checked><span>23cm</span></label>
+<label><input type="radio" name="db" value="25"><span>25cm</span></label>
+<label><input type="radio" name="db" value="34"><span>34cm</span></label>
+<label><input type="radio" name="db" value="x"><span>横幅を入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="db" hidden><label>1つの横幅<input type="number" name="dbx" inputmode="decimal" min="5" max="150" step="0.1" value="20">cm</label></p>
+<fieldset class="pick"><legend>となりとのあいだ</legend>
+<label><input type="radio" name="dg" value="0"><span>すきまなし</span></label>
+<label><input type="radio" name="dg" value="2" checked><span>2cm</span></label>
+<label><input type="radio" name="dg" value="5"><span>5cm</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 20" role="img" aria-label="置き場所の幅の枠と、その中に並べたバルーンの横幅を正面から見た図"></svg><figcaption>正面から見たところ（枠が置き場所の幅、ぬった四角がバルーンの横幅）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('sdhaba');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t,u,whole){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi&&(!whole||x===Math.floor(x)))return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+'の'+(whole?'整数':'数字')+'を入れてください。';return 0;}
+// 「入れる」をえらんだときだけ、数字を入れる欄を出す
+function pick(n,m,lo,hi,t,u,whole){var s=v(n);f.querySelector('.fit-mm[data-for="'+n+'"]').hidden=s!=='x';return s==='x'?num(m,lo,hi,t,u,whole):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+// 正面の図：置き場所の幅の枠と、バルーンの横幅の四角を左から並べる。はみ出す分も描く
+function draw(svg,W,b,n,g){clear(svg);var T=n*b+(n-1)*g,L=Math.max(W,T),h=Math.min(b*1.4,L*0.4),pad=L*0.02;svg.setAttribute('viewBox',(-pad)+' '+(-pad)+' '+(L+pad*2)+' '+(h+pad*2));el(svg,'rect',{x:0,y:0,width:W,height:h,'class':'fit-w'});for(var i=0;i<n;i++)el(svg,'rect',{x:i*(b+g),y:h*0.1,width:b,height:h*0.8,rx:Math.min(b,h)*0.15,'class':'fit-c '+C[i%3]});}
+function run(){bad='';
+var W=pick('dw','dwx',10,300,'置き場所の幅','cm'),n=pick('dn','dnx',1,10,'バルーンの数','',true),b=pick('db','dbx',5,150,'1つの横幅','cm'),g=+v('dg'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 合わせた横幅 ＝ 1つの横幅 × 数 ＋ あいだ × （数 − 1）。入る数 ＝ （置き場所の幅 ＋ あいだ） ÷ （1つの横幅 ＋ あいだ） の小数を切り捨て。比べるときの計算の誤差をよけるため、ごく小さな数を足す
+var T=r1(n*b+(n-1)*g),k=Math.floor((W+g)/(b+g)+1e-9),ans='合わせた横幅は'+T+'cmです。';
+if(T<=W+1e-9)ans+='置き場所の幅'+r1(W)+'cmに入り、のこりは'+r1(W-T)+'cmです。';
+else ans+='置き場所の幅'+r1(W)+'cmより'+r1(T-W)+'cm広く、'+(k?'この幅に並ぶのは'+k+'つまでです。':'1つも入りません。');
+f.querySelector('.fit-ans').textContent=ans;draw(svg,W,b,n,g);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
