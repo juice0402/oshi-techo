@@ -39,11 +39,11 @@ const open = async (u) => {
 
 const bad = [];
 const blocked = [];
-// 1件ずつだと資料がふえて10分をこえるので、6件ずつ同時に開く（結果の並びは資料の順のまま）
+// 1件ずつだと資料がふえて10分をこえるので、4件ずつ同時に開く（結果の並びは資料の順のまま）
 const items = [...list.values()];
 const whys = new Array(items.length);
 let next = 0;
-await Promise.all(Array.from({ length: 6 }, async () => {
+await Promise.all(Array.from({ length: 4 }, async () => {
   while (next < items.length) {
     const i = next++;
     whys[i] = await open(items[i].url);

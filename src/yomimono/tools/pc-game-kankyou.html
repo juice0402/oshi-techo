@@ -53,7 +53,7 @@ var g=W[v('gw')],m=pick('gm','gmx',1,256,'メモリ'),d=pick('gd','gdx',0,10000,
 if(bad){f.querySelector('.fit-ans').textContent=bad;clear(f.querySelector('.fit-a'));clear(f.querySelector('.fit-b'));return;}
 var a;
 // Java版は、CPUに入ったグラフィックだと最低が12GB（別のグラフィックなら8GB）
-if(g.ig&&m>=g.m[0]&&m<g.ig)a='メモリは、グラフィックが別についていれば最低（'+g.m[0]+'GB）に届きます。CPUに入ったグラフィックなら最低は'+g.ig+'GBで、あと'+r1(g.ig-m)+'GBです。';
+if(g.ig&&m>=g.m[0]&&m<g.ig)a='メモリは、グラフィックが別についていれば最低（'+g.m[0]+'GB）に届きます。CPUに入ったグラフィックなら最低は'+g.ig+'GBで、あと'+r1(g.ig-m)+'GBです。推奨（'+g.m[1]+'GB）にはあと'+r1(g.m[1]-m)+'GBです。';
 else a=say('メモリ',m,g.m,g.one);
 a+=g.d?say('空き容量',d,g.d,g.one):'公式の表に空き容量の数字はありません。';
 a+='CPUとグラフィックの名前はくらべていません。公式の表と見くらべてください。';
