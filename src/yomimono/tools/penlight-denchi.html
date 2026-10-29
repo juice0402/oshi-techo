@@ -1,0 +1,58 @@
+<div class="fit" id="pldenchi">
+<fieldset class="pick"><legend>点く時間の表示（短いほう）</legend>
+<label><input type="radio" name="ph" value="2.5"><span>2.5時間</span></label>
+<label><input type="radio" name="ph" value="3"><span>3時間</span></label>
+<label><input type="radio" name="ph" value="4" checked><span>4時間</span></label>
+<label><input type="radio" name="ph" value="6"><span>6時間</span></label>
+<label><input type="radio" name="ph" value="x"><span>表示の時間</span></label>
+</fieldset>
+<p class="fit-mm" data-for="ph" hidden><label>点く時間<input type="number" name="phx" inputmode="decimal" min="0.5" max="50" step="0.5" value="5">時間</label></p>
+<fieldset class="pick"><legend>公演の長さ</legend>
+<label><input type="radio" name="pl" value="2"><span>2時間</span></label>
+<label><input type="radio" name="pl" value="2.5"><span>2.5時間</span></label>
+<label><input type="radio" name="pl" value="3" checked><span>3時間</span></label>
+<label><input type="radio" name="pl" value="4"><span>4時間</span></label>
+<label><input type="radio" name="pl" value="x"><span>入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="pl" hidden><label>公演の長さ<input type="number" name="plx" inputmode="decimal" min="0.5" max="12" step="0.5" value="3.5">時間</label></p>
+<fieldset class="pick"><legend>公演の数</legend>
+<label><input type="radio" name="pn" value="1"><span>1回</span></label>
+<label><input type="radio" name="pn" value="2" checked><span>2回</span></label>
+<label><input type="radio" name="pn" value="3"><span>3回</span></label>
+<label><input type="radio" name="pn" value="4"><span>4回</span></label>
+</fieldset>
+<fieldset class="pick"><legend>電池</legend>
+<label><input type="radio" name="pb" value="3" checked><span>単4を3本</span></label>
+<label><input type="radio" name="pb" value="x"><span>本数を入れる</span></label>
+<label><input type="radio" name="pb" value="0"><span>充電式</span></label>
+</fieldset>
+<p class="fit-mm" data-for="pb" hidden><label>1組の本数<input type="number" name="pbx" inputmode="numeric" min="1" max="8" step="1" value="2">本</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 20" role="img" aria-label="公演の時間を合わせた長さの帯を、電池1組で点く時間ごとに色を変えて分けた"></svg><figcaption>公演の時間を合わせた帯（色の変わり目が電池を替える所、細い線が公演の区切り）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('pldenchi');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t,u,whole){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi&&(!whole||x===Math.floor(x)))return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+'の'+(whole?'整数':'数字')+'を入れてください。';return 0;}
+function pick(n,m,lo,hi,t,u,whole){var s=v(n),p=f.querySelector('.fit-mm[data-for="'+n+'"]');p.hidden=s!=='x';return s==='x'?num(m,lo,hi,t,u,whole):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+// 帯の絵：合わせた時間を横の長さにして、電池1組で点く時間ごとに色を変える。公演の区切りに細い線
+function draw(svg,T,h,L,k){clear(svg);var W=100,H=14,s=W/T;svg.setAttribute('viewBox','-1 -1 102 '+(H+2));el(svg,'rect',{x:0,y:0,width:W,height:H,'class':'fit-w'});for(var i=0;i*h<T-1e-9;i++){var a=i*h,b=Math.min(T,(i+1)*h);el(svg,'rect',{x:a*s,y:0,width:(b-a)*s,height:H,'class':'fit-c '+C[i%3]});}for(var j=1;j<k;j++)el(svg,'rect',{x:j*L*s-0.3,y:0,width:0.6,height:H,'class':'fit-w'});}
+function run(){bad='';
+var h=pick('ph','phx',0.5,50,'点く時間','時間'),L=pick('pl','plx',0.5,12,'公演の長さ','時間'),k=+v('pn'),b=pick('pb','pbx',1,8,'1組の本数','本',true),svg=f.querySelector('.fit-a');
+if(v('pb')==='0'){b=0;f.querySelector('.fit-mm[data-for="pb"]').hidden=true;}
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 合わせた時間 ＝ 公演の長さ × 公演の数。いる組の数 ＝ 合わせた時間 ÷ 点く時間 の小数を切り上げる。割り切れるときに計算の誤差で1組ふえないよう、ごく小さな数を引いてから切り上げる
+var T=L*k,n=Math.ceil(T/h-1e-9),ans='合わせて'+r1(T)+'時間です。';
+if(b){ans+='電池は'+n+'組・'+(n*b)+'本いります。はじめに入れる分をふくめた数で、替えは'+((n-1)*b)+'本です。';}
+else{ans+='満充電で点く時間の'+n+'回分です。';ans+=n>1?'公演のあいだに'+(n-1)+'回の充電がいります。':'1回の満充電でまにあいます。';}
+f.querySelector('.fit-ans').textContent=ans;draw(svg,T,h,L,k);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
