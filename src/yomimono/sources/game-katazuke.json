@@ -1,0 +1,110 @@
+{
+  "checked": "2026-10-29",
+  "items": [
+    {
+      "name": "任天堂（Nintendo Switch 2 安全に使用するために）",
+      "url": "https://www.nintendo.com/jp/anzen/switch2/switch2_anzen.pdf",
+      "used": "吸気口・排気口をふさがない、ドックは立てて使う、ぐらつく所・ほこりや油煙・湿気・熱がこもる所に置かない、ケーブルを強く曲げない・きつく巻きつけない・引っぱらない、バッテリーを入れた機器は半年に1度充電、掃除は電源を切りケーブルを外す、ACアダプターは乾いた布・ほかは水でぬらしてかたくしぼった布、消毒は70％ほどのエタノール、濃い消毒液やシンナー・ベンジンは使わない、乾いてから使う、ゲームカードを強い磁石とくっつけない・小さな子の手の届く所に置かない"
+    },
+    {
+      "name": "任天堂（Nintendo Switch 2 機能・仕様）",
+      "url": "https://www.nintendo.com/jp/hardware/switch2/specs/index.html",
+      "used": "ドックの大きさ（縦115mm×横201mm×厚さ51.2mm）、Joy-Con 2 は本体か充電グリップで充電・充電時間約3時間30分、使う所の温度5〜35℃と湿度20〜80％、両方のゲームカードが入る"
+    },
+    {
+      "name": "任天堂（Nintendo Switch 2 専用周辺機器）",
+      "url": "https://www.nintendo.com/jp/hardware/switch2/accessories/index.html",
+      "used": "Joy-Con 2 充電グリップ（USB充電ケーブルかACアダプターで充電）、ドックセットの中身（ドック・ACアダプター・HDMIケーブル）"
+    },
+    {
+      "name": "ソニー・インタラクティブエンタテインメント（PlayStation 5 セーフティーガイド CFI-2000）",
+      "url": "https://manuals.playstation.net/document/pdf/CFI-2000AB_7.0_2.pdf",
+      "used": "通風孔をふさがない・壁などから10cm以上はなす、毛足の長いじゅうたんや布団の上に置かない、密閉された狭い所に押しこまない・布で包まない、横置き用フットと縦置きスタンド、通風孔のほこりは掃除機で、乾いたやわらかい布でふく、シンナー・ベンジン・アルコール・化学ぞうきんは使わない、ケーブルをはさまない・物をのせない・折り曲げない・プラグを持ってまっすぐ抜く、コントローラーは10〜30℃で充電・1年に1度満充電、ディスクはふちを持ちケースにしまう、使う所の温度5〜35℃"
+    },
+    {
+      "name": "ワークアップ（CDケース・DVDケースのサイズ比較表）",
+      "url": "https://www.fukuro.in/page/834",
+      "used": "ゲームソフトのケースの大きさ（任天堂スイッチ・スイッチ2用 105×170×11mm、PS4・PS5用 134×170×14mm）、ケースは製造会社で大きさがちがう"
+    },
+    {
+      "name": "ワークアップ（ゲーム用OPP袋のサイズ一覧）",
+      "url": "https://www.fukuro.in/page/2342",
+      "used": "同じ会社のゲームのケースの大きさ（スイッチ・スイッチ2用、PS4・PS5用）"
+    },
+    {
+      "name": "サイズ.COM（Nintendo Switch パッケージ版ソフトのサイズ）",
+      "url": "https://www.sizekensaku.com/game/switch_card.html",
+      "used": "Switch のソフトのケース 縦170mm×横105mm×厚さ11mm"
+    },
+    {
+      "name": "オーダーダンボール（任天堂スイッチソフトの梱包にピッタリな段ボール箱）",
+      "url": "https://www.bestcarton.jp/packing/box/Y0567.html",
+      "used": "スイッチのソフトの寸法として縦170mm×横105mm×厚さ11mm"
+    },
+    {
+      "name": "smartx24（ゲームソフト パッケージのサイズ一覧）",
+      "url": "https://smartx24.com/videogames-size/",
+      "used": "PS5 の1本の例が約17.0×13.5×1.5cm、Switch の例が約17.0×10.5×1.1cm（どれも約）"
+    },
+    {
+      "name": "サイバーガジェット（CYBER・ゲームカードラック SWITCH用）",
+      "url": "https://www.cybergadget.co.jp/products/4544859027789.html",
+      "used": "Switch のソフトのケースを12本、1本ずつ仕切りのあるラックに立てて入れる例（販売終了）"
+    },
+    {
+      "name": "HORI（カードケース for Nintendo Switch 2）",
+      "url": "https://hori.jp/products/nsx/nsx-008/",
+      "used": "ゲームカードを12枚入れるものと24枚入れるもの"
+    },
+    {
+      "name": "PlayStation.com（DualSense ワイヤレスコントローラー専用充電スタンド ダブル for PlayStation 5）",
+      "url": "https://www.playstation.com/ja-jp/local/official-products/olp-peripherals/olp-others/dualsense-wireless-controller-dual-charger-for-playstation-5/",
+      "used": "2台を同時に充電、PS5 本体の USB Type-C 端子から電気をとる（発売元はHORI）"
+    },
+    {
+      "name": "サイバーガジェット（CYBER・ダブル充電スタンド DualSense Edge／DualSense用）",
+      "url": "https://www.cybergadget.co.jp/products/4544859034718/",
+      "used": "2台を同時に充電、PS5 本体か市販の USB Type-C のACアダプターにつなぐ、ACアダプターとケーブルはつかない"
+    },
+    {
+      "name": "サンワサプライ（ゲームパッド3台とヘッドホンを縦に収納できるクランプ固定のスタンド）",
+      "url": "https://www.sanwa.co.jp/info/news/202404/jy-stn2/index.html",
+      "used": "机にクランプで留め、ゲームパッド3台とヘッドホンを縦に掛けるスタンドの例"
+    },
+    {
+      "name": "パンドウイット（LANケーブルの断線を左右する巻き方）",
+      "url": "https://www.panduit.co.jp/column/naruhodo/9567/",
+      "used": "結束バンドで強く締めない・少しすきまを残す、面ファスナーのテープは締めすぎにくい、同じ向きの巻き方はよじれやすく8の字巻きはねじれが少ない"
+    },
+    {
+      "name": "東晶貿易（ケーブルの巻き方）",
+      "url": "https://www.tosho-c3.jp/mametisiki/cable-gyakusou-8noji/",
+      "used": "8の字巻きと逆相巻きのやり方、無理な曲げや折りが断線の原因"
+    },
+    {
+      "name": "製品評価技術基盤機構（製品安全教育DVDハンドブック 配線の事故）",
+      "url": "https://www.nite.go.jp/jiko/chuikanki/kyouzai/haisen.html",
+      "used": "コードを束ねて使わない（熱が逃げず被覆がとけて発火のおそれ）、電源プラグを定期的に掃除する、プラグを持って抜く"
+    },
+    {
+      "name": "製品評価技術基盤機構（トラッキング現象によるコンセントの発火）",
+      "url": "https://www.nite.go.jp/jiko/chuikanki/poster/kaden/2022022401.html",
+      "used": "プラグのまわりのほこりや水分で火花が出て出火するトラッキング現象、コンセントとプラグを定期的に掃除する"
+    },
+    {
+      "name": "エレコム（熱がこもりにくい設計のケーブルボックス）",
+      "url": "https://www.elecom.co.jp/news/new/20211109-05/",
+      "used": "底面の排熱スリット、電源タップを箱に入れてほこりをためにくくする（2021年11月の発表）"
+    },
+    {
+      "name": "ソニー（ヘッドホンを使った後のお手入れ方法 オーバーヘッド型）",
+      "url": "https://support.sony.jp/electronics/support/articles/00352012",
+      "used": "やわらかい布でふく、汗や雨の水分をつけたままにしない（劣化やさびの原因）、シンナー・ベンジン・アルコールは使わない、キャリングケースにしまう"
+    },
+    {
+      "name": "ソニー（ヘッドホンを快適にご使用いただくために）",
+      "url": "https://www.sony.jp/support/headphone/attention.html",
+      "used": "コードを機器にきつく巻かない（断線の原因）、プラグを持って抜く"
+    }
+  ]
+}
