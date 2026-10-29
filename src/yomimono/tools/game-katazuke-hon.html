@@ -1,0 +1,48 @@
+<div class="fit" id="gkfit">
+<fieldset class="pick"><legend>棚の幅</legend>
+<label><input type="radio" name="gw" value="300"><span>30cm</span></label>
+<label><input type="radio" name="gw" value="400" checked><span>40cm</span></label>
+<label><input type="radio" name="gw" value="600"><span>60cm</span></label>
+<label><input type="radio" name="gw" value="900"><span>90cm</span></label>
+<label><input type="radio" name="gw" value="mm"><span>測った幅</span></label>
+</fieldset>
+<p class="fit-mm" data-for="gw" hidden><label>幅<input type="number" name="gwx" inputmode="decimal" min="20" max="3000" value="350">mm</label></p>
+<fieldset class="pick"><legend>ソフトのケース</legend>
+<label><input type="radio" name="gt" value="11" checked><span>Switch・Switch 2</span></label>
+<label><input type="radio" name="gt" value="14"><span>PS4・PS5</span></label>
+<label><input type="radio" name="gt" value="mm"><span>測った厚さ</span></label>
+</fieldset>
+<p class="fit-mm" data-for="gt" hidden><label>厚さ<input type="number" name="gtx" inputmode="decimal" min="3" max="60" value="12">mm</label></p>
+<fieldset class="pick"><legend>段の数</legend>
+<label><input type="radio" name="gk" value="1" checked><span>1段</span></label>
+<label><input type="radio" name="gk" value="2"><span>2段</span></label>
+<label><input type="radio" name="gk" value="3"><span>3段</span></label>
+<label><input type="radio" name="gk" value="4"><span>4段</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 30" role="img" aria-label="1段を前から見たところ。棚の幅に、立てたケースの厚さを並べ、あまりを白く残した"></svg><figcaption>1段を前から見たところ（細い四角がケース1本、白い所があまり）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('gkfit');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'mmの数字を入れてください。';return 0;}
+function pick(n,m,lo,hi,t){var s=v(n);f.querySelector('.fit-mm[data-for="'+n+'"]').hidden=s!=='mm';return s==='mm'?num(m,lo,hi,t):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+// 前から見た絵：棚の幅を横長の四角にして、ケースの厚さの細い四角を左からすきまなく並べる。あまりは白のまま
+function draw(svg,W,t,n){clear(svg);var h=Math.max(W*0.22,t*3);svg.setAttribute('viewBox',(-W*0.01)+' '+(-W*0.01)+' '+(W*1.02)+' '+(h+W*0.02));el(svg,'rect',{x:0,y:0,width:W,height:h,'class':'fit-w'});for(var i=0;i<n;i++)el(svg,'rect',{x:i*t,y:h*0.08,width:t,height:h*0.92,'class':'fit-c '+C[i%3]});}
+function run(){bad='';
+var W=pick('gw','gwx',20,3000,'棚の幅'),t=pick('gt','gtx',3,60,'ケースの厚さ'),k=+v('gk'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 1段に何本：棚の幅 ÷ ケースの厚さ の小数を切り捨てる。割り切れるときに計算の誤差で1本へらないよう、ごく小さな数を足してから切り捨てる
+var n=Math.floor(W/t+1e-9),rest=Math.round((W-n*t)*10)/10,ans;
+if(!n)ans='この幅には、このケースは立てて並びません。';
+else{ans='1段に'+n+'本並びます。';if(k>1)ans+=k+'段で'+(n*k)+'本です。';ans+='すきまなく並べたときの数で、右に'+rest+'mmあまります。';}
+f.querySelector('.fit-ans').textContent=ans;draw(svg,W,t,n);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
