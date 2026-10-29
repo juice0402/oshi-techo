@@ -1,0 +1,63 @@
+<div class="fit" id="pckankyou">
+<fieldset class="pick"><legend>作品</legend>
+<label><input type="radio" name="gw" value="touken" checked><span>刀剣乱舞ONLINE</span></label>
+<label><input type="radio" name="gw" value="uma"><span>ウマ娘（DMM GAMES版）</span></label>
+<label><input type="radio" name="gw" value="mcb"><span>マイクラ統合版</span></label>
+<label><input type="radio" name="gw" value="mcj"><span>マイクラJava版</span></label>
+<label><input type="radio" name="gw" value="dq11"><span>ドラクエXI S（Steam）</span></label>
+</fieldset>
+<fieldset class="pick"><legend>自分のPCのメモリ（実装RAM）</legend>
+<label><input type="radio" name="gm" value="4"><span>4GB</span></label>
+<label><input type="radio" name="gm" value="8" checked><span>8GB</span></label>
+<label><input type="radio" name="gm" value="16"><span>16GB</span></label>
+<label><input type="radio" name="gm" value="32"><span>32GB</span></label>
+<label><input type="radio" name="gm" value="x"><span>入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="gm" hidden><label>メモリ<input type="number" name="gmx" inputmode="decimal" min="1" max="256" step="0.1" value="12">GB</label></p>
+<fieldset class="pick"><legend>ドライブの空き容量</legend>
+<label><input type="radio" name="gd" value="10"><span>10GB</span></label>
+<label><input type="radio" name="gd" value="30" checked><span>30GB</span></label>
+<label><input type="radio" name="gd" value="100"><span>100GB</span></label>
+<label><input type="radio" name="gd" value="x"><span>入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="gd" hidden><label>空き容量<input type="number" name="gdx" inputmode="decimal" min="0" max="10000" step="0.1" value="50">GB</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs"><figure><svg class="fit-a" viewBox="0 0 100 20" role="img" aria-label="入れたメモリの量の帯と、公式の表のメモリの数字の位置"></svg><figcaption>メモリ（帯が入れた数字、細い線が表の数字）</figcaption></figure><figure><svg class="fit-b" viewBox="0 0 100 20" role="img" aria-label="入れた空き容量の帯と、公式の表の空き容量の数字の位置"></svg><figcaption>空き容量（帯が入れた数字、細い線が表の数字）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('pckankyou');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+// 公式の表の数字だけ（2026-10-29 に確かめた）。[最低, 推奨]。表が1つだけのものは one。数字のないものは null
+var W={touken:{m:[4,8],d:null},uma:{one:1,m:[8],d:[20]},mcb:{m:[4,8],d:[4,8]},mcj:{m:[8,16],ig:12,d:[2,4]},dq11:{m:[8,8],d:[40,40]}};
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'GBの数字を入れてください。';return 0;}
+function pick(n,m,lo,hi,t){var s=v(n),p=f.querySelector('.fit-mm[data-for="'+n+'"]');p.hidden=s!=='x';return s==='x'?num(m,lo,hi,t):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+// 1つの数字を表の数字とくらべた文
+function say(t,x,r,one){
+if(one)return x>=r[0]?t+'は公式の動作環境（'+r[0]+'GB以上）に届いています。':t+'は公式の動作環境（'+r[0]+'GB以上）にあと'+r1(r[0]-x)+'GB足りません。';
+if(x>=r[1])return r[0]===r[1]?t+'は最低も推奨も'+r[0]+'GBで、届いています。':t+'は最低（'+r[0]+'GB）と推奨（'+r[1]+'GB）の両方に届いています。';
+if(r[0]===r[1])return t+'は最低も推奨も'+r[0]+'GBで、あと'+r1(r[0]-x)+'GB足りません。';
+if(x>=r[0])return t+'は最低（'+r[0]+'GB）に届き、推奨（'+r[1]+'GB）にはあと'+r1(r[1]-x)+'GBです。';
+return t+'は最低（'+r[0]+'GB）にあと'+r1(r[0]-x)+'GB足りません。';}
+// 帯の絵：入れた数字の帯と、表の数字の位置に細い線
+function draw(svg,x,r){clear(svg);var W2=100,H=14,top=r?Math.max.apply(null,r):0,mx=Math.max(x,top)*1.25||1,s=W2/mx;svg.setAttribute('viewBox','-1 -1 102 '+(H+2));el(svg,'rect',{x:0,y:0,width:W2,height:H,'class':'fit-w'});el(svg,'rect',{x:0,y:0,width:x*s,height:H,'class':'fit-c fit-p'});if(r)for(var i=0;i<r.length;i++)el(svg,'path',{d:'M'+(r[i]*s)+' 0V'+H,'class':'fg-pin'});}
+function run(){bad='';
+var g=W[v('gw')],m=pick('gm','gmx',1,256,'メモリ'),d=pick('gd','gdx',0,10000,'空き容量');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(f.querySelector('.fit-a'));clear(f.querySelector('.fit-b'));return;}
+var a;
+// Java版は、CPUに入ったグラフィックだと最低が12GB（別のグラフィックなら8GB）
+if(g.ig&&m>=g.m[0]&&m<g.ig)a='メモリは、グラフィックが別についていれば最低（'+g.m[0]+'GB）に届きます。CPUに入ったグラフィックなら最低は'+g.ig+'GBで、あと'+r1(g.ig-m)+'GBです。推奨（'+g.m[1]+'GB）にはあと'+r1(g.m[1]-m)+'GBです。';
+else a=say('メモリ',m,g.m,g.one);
+a+=g.d?say('空き容量',d,g.d,g.one):'公式の表に空き容量の数字はありません。';
+a+='CPUとグラフィックの名前はくらべていません。公式の表と見くらべてください。';
+f.querySelector('.fit-ans').textContent=a;
+draw(f.querySelector('.fit-a'),m,g.m);draw(f.querySelector('.fit-b'),d,g.d);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

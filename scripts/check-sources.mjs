@@ -39,8 +39,18 @@ const open = async (u) => {
 
 const bad = [];
 const blocked = [];
-for (const s of list.values()) {
-  const why = await open(s.url);
+// 1件ずつだと資料がふえて10分をこえるので、4件ずつ同時に開く（結果の並びは資料の順のまま）
+const items = [...list.values()];
+const whys = new Array(items.length);
+let next = 0;
+await Promise.all(Array.from({ length: 4 }, async () => {
+  while (next < items.length) {
+    const i = next++;
+    whys[i] = await open(items[i].url);
+  }
+}));
+for (const [i, s] of items.entries()) {
+  const why = whys[i];
   // gh: false は、GitHub からだと断られる資料（WebFetch で中身を確かめた）。知らせるだけで止めない
   if (why && s.gh === false) {
     blocked.push(`- [${s.name}](${s.url})：${why}`);
