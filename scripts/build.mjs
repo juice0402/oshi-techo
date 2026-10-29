@@ -661,7 +661,7 @@ ${gotouchiWorks.length || seasonPages.length ? `<p class="fl">特集　${[...(go
 <link rel="preconnect" href="https://thumbnail.image.rakuten.co.jp">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
-${production && !noindex ? `<link rel="canonical" href="${esc(url)}">` : `<meta name="robots" content="${production && noindex === 'follow' ? 'noindex,follow' : 'noindex,nofollow'}">`}
+${production && !noindex ? `<link rel="canonical" href="${esc(url)}">\n<meta name="robots" content="max-image-preview:large">` : `<meta name="robots" content="${production && noindex === 'follow' ? 'noindex,follow' : 'noindex,nofollow'}">`}
 ${verify}
 <meta property="og:site_name" content="${esc(settings.siteName)}">
 <meta property="og:title" content="${esc(title)}">
@@ -1243,13 +1243,14 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
 }
 
 // 一覧のページの構造化データ（ご当地・季節の特集。商品の Product・Offer は入れない）
-const collectionLd = ({ name, description, url, parts = [] }) => ({
+const collectionLd = ({ name, description, url, parts = [], image = null }) => ({
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
   name,
   description,
   url,
   inLanguage: 'ja',
+  ...(image ? { primaryImageOfPage: image.ld } : {}),
   ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
 });
 // ---- 季節の特集（/作品/季節/ と /季節/） ----
@@ -1419,6 +1420,21 @@ for (const x of seasonLater) {
   }
 }
 
+// ページの顔の絵（検索のサムネイルの候補。Google は og:image と構造化データの primaryImageOfPage を見て選ぶ。サイト共通の表紙の絵は選ばれにくい）
+// src/art/a2-<名前>-<hash8>.webp（ページに出す 1200×600）と a2-<名前>-og-<hash8>.jpg（og:image と構造化データ 1200×630）の組。どちらかがなければ出さない
+const ART_FILES = existsSync('src/art') ? readdirSync('src/art') : [];
+function pageArt(name, alt) {
+  const hero = ART_FILES.find((f) => new RegExp(`^a2-${name}-[0-9a-f]{8}\\.webp$`).test(f));
+  const og = ART_FILES.find((f) => new RegExp(`^a2-${name}-og-[0-9a-f]{8}\\.jpg$`).test(f));
+  if (!hero || !og) return null;
+  return {
+    html: `<p class="yomi-hero"><img src="/art/${hero}" width="1200" height="600" alt="${esc(alt)}" decoding="async" fetchpriority="high"></p>`,
+    og: `/art/${og}`,
+    ld: { '@type': 'ImageObject', url: `${SITE}/art/${og}`, width: 1200, height: 630 },
+  };
+}
+const GOTOUCHI_ART = pageArt('gotouchi', settings.gotouchiArtAlt ?? '');
+
 // ---- ご当地グッズ（/作品/gotouchi/ と /gotouchi/） ----
 // 作品ごとのページは「ご当地{作品}一覧」：地方の見出し（h2）の中に都道府県の見出し（h3）。北から南の順、都道府県の中は新しい順で30件まで
 const MAX_PER_PREF = 30;
@@ -1470,8 +1486,10 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     title: title(places),
     description,
     h1,
-    extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${part}`, url: `${SITE}${path}#${p.id}` })) })],
+    extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, image: GOTOUCHI_ART, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${part}`, url: `${SITE}${path}#${p.id}` })) })],
+    ...(GOTOUCHI_ART ? { ogImage: GOTOUCHI_ART.og } : {}),
     body:
+      (GOTOUCHI_ART?.html ?? '') +
       top +
       toc +
       areas
@@ -1550,9 +1568,11 @@ if (gotouchiWorks.length) {
     description,
     h1: 'ご当地グッズ一覧',
     extraLd: [
-      collectionLd({ name: 'ご当地グッズ一覧', description, url: `${SITE}/gotouchi/` }),
+      collectionLd({ name: 'ご当地グッズ一覧', description, url: `${SITE}/gotouchi/`, image: GOTOUCHI_ART }),
     ],
+    ...(GOTOUCHI_ART ? { ogImage: GOTOUCHI_ART.og } : {}),
     body:
+      (GOTOUCHI_ART?.html ?? '') +
       gotouchiWorks
         .map(
           (w, i) =>
@@ -2166,7 +2186,7 @@ if (birthdays.length)
 // SNSで共有したときの画像（1200×630）
 files.set('og.png', readFileSync('src/og.png'));
 // サイトの絵（Canva で作った絵を WebP にしたもの。見た目の案の CSS が background で使う）
-if (existsSync('src/art')) for (const f of readdirSync('src/art')) if (/\.(webp|svg)$/.test(f)) files.set(`art/${f}`, readFileSync(join('src/art', f)));
+if (existsSync('src/art')) for (const f of readdirSync('src/art')) if (/\.(webp|svg|jpg)$/.test(f)) files.set(`art/${f}`, readFileSync(join('src/art', f)));
 // 読みものの絵（Canva で作った絵を WebP にしたもの。記事の上と一覧・共有の画像）
 for (const f of readdirSync('src/yomimono/img')) files.set(`yomimono/img/${f}`, readFileSync(join('src/yomimono/img', f)));
 

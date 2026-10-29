@@ -357,7 +357,10 @@ for (const f of html) {
   // 読みものの記事は、その記事の絵（src/yomimono/img/<記事>-og.jpg。中身から作った目印つき）
   const ogArticle = s.match(/<meta property="og:image" content="[^"]*\/yomimono\/img\/([a-z0-9-]+-og\.jpg)\?v=([0-9a-f]{8})">/);
   const ogArticleOk = ogArticle && (await import('node:crypto')).createHash('sha256').update(readFileSync(join('src/yomimono/img', ogArticle[1]))).digest('hex').slice(0, 8) === ogArticle[2];
-  ok((s.includes(`<meta property="og:image" content="${settings.siteUrl}og.png?v=${ogV}">`) || ogArticleOk) && s.includes('<meta name="twitter:card" content="summary_large_image">'), `${f}：SNSで共有したときの画像の指定がある（画像の中身から作った目印つき）`);
+  // ページの顔の絵（/art/a2-<名前>-og-<hash8>.jpg）：ファイル名の目印が中身から作ったものと合う
+  const ogArt = s.match(/<meta property="og:image" content="https:\/\/nyuka-techo\.com\/art\/(a2-[a-z0-9-]+-og-([0-9a-f]{8})\.jpg)">/);
+  const ogArtOk = ogArt && existsSync(join('src/art', ogArt[1])) && (await import('node:crypto')).createHash('sha256').update(readFileSync(join('src/art', ogArt[1]))).digest('hex').slice(0, 8) === ogArt[2];
+  ok((s.includes(`<meta property="og:image" content="${settings.siteUrl}og.png?v=${ogV}">`) || ogArticleOk || ogArtOk) && s.includes('<meta name="twitter:card" content="summary_large_image">'), `${f}：SNSで共有したときの画像の指定がある（画像の中身から作った目印つき）`);
   ok(!/<span class="ph"><img [^>]*alt=""/.test(s), `${f}：商品の画像に商品名がついている`);
   if (f === join('dist', 'koushiki', 'index.html') || /^dist\/(yomimono\/[a-z0-9-]+\/shiryou|[a-z0-9-]+\/kaikata)\/index\.html$/.test(f.split('\\').join('/'))) {
     // 読みものの「調べた資料」と買い方メモのページも、楽天以外へのリンクがあるので広告を出さない
@@ -490,6 +493,19 @@ if (process.env.DATA_LATEST) {
     ok(toc.indexOf('#p-hokkaido') >= 0 && toc.indexOf('#p-hokkaido') < toc.indexOf('#p-tokyo') && toc.indexOf('#p-tokyo') < toc.indexOf('#p-yamanashi') && toc.indexOf('#p-yamanashi') < toc.indexOf('#p-okinawa') && !toc.includes('#p-kyoto'), 'ご当地：都道府県の目次（見つかった都道府県だけ・北から南）');
     ok(sn.includes('<section class="gp" id="p-yamanashi"><h3>山梨</h3>') && !sn.includes('id="p-shizuoka"'), 'ご当地：富士急ハイランドは山梨');
     ok(col?.name === 'ご当地スヌーピー一覧' && col.hasPart?.some((x) => x['@type'] === 'WebPageElement' && x.url.endsWith('/snoopy/gotouchi/#p-tokyo')) && !JSON.stringify(ld).includes('"Product"'), 'ご当地：構造化データ（CollectionPage と都道府県の節。商品は入れない）');
+    // ページの顔の絵（検索のサムネイルの候補）：ページの上の絵・og:image・構造化データの primaryImageOfPage が同じ絵の組
+    ok(
+      /<p class="yomi-hero"><img src="\/art\/a2-gotouchi-[0-9a-f]{8}\.webp" width="1200" height="600" alt="[^"]+"/.test(sn) &&
+        /<meta property="og:image" content="https:\/\/nyuka-techo\.com\/art\/a2-gotouchi-og-[0-9a-f]{8}\.jpg">/.test(sn) &&
+        /\/art\/a2-gotouchi-og-[0-9a-f]{8}\.jpg$/.test(col?.primaryImageOfPage?.url ?? '') &&
+        col.primaryImageOfPage.width === 1200 &&
+        readFileSync('dist/gotouchi/index.html', 'utf8').includes('<p class="yomi-hero"><img src="/art/a2-gotouchi-'),
+      'ご当地：ページの顔の絵（上の絵・og:image・構造化データの primaryImageOfPage）',
+    );
+    ok(
+      readdirSync('dist/art').some((f) => /^a2-gotouchi-og-[0-9a-f]{8}\.jpg$/.test(f)) && readdirSync('dist/art').some((f) => /^a2-gotouchi-[0-9a-f]{8}\.webp$/.test(f)),
+      'ご当地：絵のファイル（webp と og の jpg）が /art/ にある',
+    );
     ok(readFileSync('dist/gotouchi/index.html', 'utf8').includes('<title>ご当地グッズ一覧｜') && readFileSync('dist/gotouchi/index.html', 'utf8').includes('<a href="/snoopy/gotouchi/">ご当地スヌーピー一覧</a>'), 'ご当地：/gotouchi/ の名前と作品ごとの一覧へのリンク');
   }
   {
@@ -662,6 +678,7 @@ const top = readFileSync('dist/index.html', 'utf8');
 if (process.env.SITE_MODE === 'production') {
   ok(!top.includes('noindex'), '本番は検索に載る設定');
   ok(top.includes('<link rel="canonical" href="https://nyuka-techo.com/">'), '本番は正規URL（canonical）が nyuka-techo.com');
+  ok(top.includes('<meta name="robots" content="max-image-preview:large">'), '本番の検索に出すページは、大きい画像のプレビューを許す（max-image-preview:large）');
   ok(readFileSync('dist/robots.txt', 'utf8').includes('Sitemap: https://nyuka-techo.com/sitemap.xml'), 'robots.txt にサイトマップの場所がある');
   ok(readFileSync('dist/robots.txt', 'utf8').includes('Disallow: /search/'), 'robots.txt で検索の結果を回らないようにしている');
   if (settings.indexNowKey) ok(files.includes(join('dist', `${settings.indexNowKey}.txt`)), 'IndexNow のキーのファイルがある');
