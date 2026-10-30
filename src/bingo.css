@@ -4,11 +4,9 @@
 .bg-card{position:relative;width:100%;max-width:380px;margin:0 auto;aspect-ratio:1/1}
 /* 額はマスの台紙の上に重ねる（まん中はすき通しの絵。押すのは下のマス） */
 .bg-frame{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;pointer-events:none}
-/* マスの台紙は額の窓に合わせてカードの半分（10/31 しょーくん「文字と額が被りすぎ」）。窓が片寄った額だけ台紙をずらす */
+/* マスの台紙はカードのまん中に、カードの55%（10/31 しょーくん「文字と額が被りすぎ」「ちょっとは被ってもいいから、ど真ん中はキープ」）。飾りが窓に大きく出る額（9月・誕生日）は52%でまん中 */
 .bg-in{position:absolute;inset:22.5%}
-.bg-frame[src*="bingo-frame-8-"]~.bg-in{inset:21.5% 30.5% 23.5% 14.5%}
-.bg-frame[src*="bingo-frame-9-"]~.bg-in{inset:18% 23% 30% 25%}
-.bg-frame[src*="bingo-frame-birthday-"]~.bg-in{inset:17% 22% 31% 26%}
+.bg-frame[src*="bingo-frame-9-"]~.bg-in,.bg-frame[src*="bingo-frame-birthday-"]~.bg-in{inset:24%}
 .bg-g{list-style:none;margin:0;padding:4px;box-sizing:border-box;height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:4px;border:1px solid var(--line);background:var(--lav2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1.2' fill='%23E6D6EA'/%3E%3C/svg%3E") 0 0/12px 12px}
 .bg-c{position:relative;min-width:0;min-height:0;container-type:size;border:1.5px dashed #D9C6DE;border-radius:10px;background:#fff;background:rgba(255,255,255,.6)}
 .bg-a,.bg-c.st-mid{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--ink);text-decoration:none;overflow:hidden}
