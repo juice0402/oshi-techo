@@ -456,6 +456,8 @@ for (const f of html) {
   ok(/catch \(e\)/.test(bsrc) && /process\.exit\(0\);\s*$/.test(bsrc), '入荷ビンゴ：記録の更新は失敗しても公開を止めない');
   const js = readFileSync('src/bingo.js', 'utf8');
   ok(!/fetch\(|XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage/.test(js) && (js.match(/'oshi-bingo'/g) ?? []).length >= 2 && /try \{\s*S = window\.localStorage/.test(js), '入荷ビンゴ：端末の localStorage（oshi-bingo）にだけ残し、どこにも送らない');
+  // ③ 画像で保存：canvas で描く。共有（ファイル）かダウンロードだけで、どこにも送らない。Canva の絵・商品の画像は描かない
+  ok(/toDataURL\('image\/png'\)/.test(js) && js.includes('navigator.share') && js.includes('l.download = name') && js.includes("'oshi-bingo-' + ") && js.includes("'推しグッズ入荷手帳'") && js.includes("'nyuka-techo.com'") && js.includes("textContent = '画像で保存'") && !/drawImage|new Image|\.webp|https?:\/\/(?!www\.w3\.org\/)/.test(js), '入荷ビンゴ：画像で保存は canvas で描き（絵・商品の画像なし）、共有かダウンロードだけ');
   const bcss = readFileSync('src/bingo.css', 'utf8');
   ok(!/radial-gradient|linear-gradient|border-radius:\s*999px|rotate\(|→/.test(bcss) && /prefers-reduced-motion/.test(bcss), '入荷ビンゴ：ドットは SVG の模様（グラデーションなし）・はんこは傾けない・動きを減らす設定では動かさない');
   if (process.env.DATA_LATEST) {

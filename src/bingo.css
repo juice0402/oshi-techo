@@ -46,3 +46,6 @@
 .bg-mini i.mo{border:0;background:var(--berry)}
 .bg-mini i.mm{border:0;background:#E6D6EA}
 @media (min-width:900px){.bg-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0 28px;align-items:start}.bg-list .bg-wrap{display:block}.bg-list .bg-card{margin:0 auto}.bg-list .bg-log{flex-direction:row;font-size:13px;margin:12px 0 0}.bg-list section.bingo+section.bingo{margin-top:0}}
+/* 画像で保存（③）：ほかのボタンと同じ「ペンで書いたリスト」（ベリー色の点線の下線の文字） */
+.bg-sv{margin:4px 0 0}
+.bg-sv button{min-height:44px;padding:0;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:5px}
