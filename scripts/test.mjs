@@ -467,7 +467,21 @@ for (const f of html) {
     ok(sec.includes('<p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/9 タオル</span><span>10/12 キーホルダー</span>') && !/件/.test(sec), '入荷ビンゴ：見つけた日の記録は日付の順（件数は出さない）');
     const imgs = [...sec.matchAll(/<img [^>]*>/g)].map((m) => m[0]);
     ok(imgs.length === 9 && imgs.every((t) => /src="\/art\/bingo-[a-z0-9-]+-[0-9a-f]{8}\.webp"/.test(t) && /width="\d+" height="\d+"/.test(t) && t.includes('loading="lazy"')) && imgs.every((t) => files.includes(join('dist', t.match(/src="\/([^"]+)"/)[1]))), '入荷ビンゴ：絵は中身の目印つきの名前・大きさ・lazy');
-    ok(sec.includes('src="/art/bingo-frame-11-'), '入荷ビンゴ：額は月の絵がなければ11月の額');
+    const frameOf = (name) => (existsSync(`src/art/bingo/${name}.webp`) ? name : 'frame-11');
+    ok(sec.includes(`src="/art/bingo-${frameOf('frame-10')}-`), '入荷ビンゴ：額は今月（10月）の絵（なければ11月の額）');
+    ok(sec.includes('<p class="more"><a href="/bingo/">前の月とわたしの推しのカード</a></p></section>'), '入荷ビンゴ：推しキャラのページのカードの下に /bingo/ への1行');
+    // /bingo/（推しの入荷ビンゴ（今月））
+    const bp = readFileSync('dist/bingo/index.html', 'utf8');
+    const bsecs = [...bp.matchAll(/<section class="bingo"[^>]*>/g)].map((x) => x[0]);
+    ok(bp.includes('<title>推しの入荷ビンゴ（今月）｜') && bp.includes('<h1 class="tape">推しの入荷ビンゴ（今月）</h1>') && readFileSync('dist/sitemap.xml', 'utf8').includes('/bingo/</loc>') && readFileSync('dist/about/index.html', 'utf8').includes('<a href="/bingo/">推しの入荷ビンゴ</a>'), '入荷ビンゴ：/bingo/ の名前・サイトマップ・ページの下の目次');
+    ok(bsecs.length >= 1 && bsecs.length <= 3 && bsecs.every((t) => t.includes(' data-plain')) && bp.includes('<div class="bg-list" id="bgmy" hidden></div>') && bp.includes('<p class="bg-hint">推しキャラのページで「わたしの推し」を選ぶと、ここに並びます</p>') && !/件/.test(bp.match(/<main[\s\S]*<\/main>/)[0]), '入荷ビンゴ：わたしの推しがいないときは、印が多い推しのカード3枚まで（袋なし）と1行。件数は出さない');
+    const bcounts = bsecs.map((t) => Object.keys(JSON.parse(readFileSync('dist/bingo/data.json', 'utf8')).months['2026-10'][t.match(/data-k="([^"]+)"/)[1]] ?? {}).length);
+    ok(bcounts.every((n, i) => n > 0 && (i === 0 || bcounts[i - 1] >= n)), '入荷ビンゴ：/bingo/ のカードは今月の印が多い順');
+    const cfg = JSON.parse(bp.match(/<script type="application\/json" id="bgcfg">([^<]*)<\/script>/)[1]);
+    ok(cfg.now === '2026-10' && Object.keys(cfg.frames).length === 13 && Object.values(cfg.frames).every((u) => files.includes(join('dist', u.slice(1)))) && cfg.kinds.length === 9 && cfg.kinds[4] === null && cfg.oshi['chiikawa/hachiware'][0] === 'ハチワレ' && !/https?:|円/.test(JSON.stringify(cfg).replace(cfg.ring, '')), '入荷ビンゴ：/bingo/ がカードを作る材料（12か月と誕生日の額・種類・推しの名前だけ）');
+    for (let mo = 1; mo <= 12; mo++) if (mo !== 11) ok(existsSync(`src/art/bingo/frame-${mo}.webp`) || mo >= 6, `入荷ビンゴ：${mo}月の額の絵がある`);
+    const pjs = readFileSync('src/bingo-page.js', 'utf8');
+    ok(!/XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage|setItem/.test(pjs) && (pjs.match(/fetch\(/g) ?? []).length === 1 && pjs.includes("fetch('/bingo/data.json')") && pjs.includes("getItem('ot-my')") && bp.includes('window.otBingo'), '入荷ビンゴ：/bingo/ はわたしの推し（ot-my）を読むだけで、同じサイトの記録のほかは読まず、どこにも送らない');
     ok(!/<a class="bg-a"/.test(sec), '入荷ビンゴ：しおりがないページでは、シールをリンクにしない');
     ok(hw.includes("'oshi-bingo'") && hw.includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('oshi-bingo'), '入荷ビンゴ：CSS と動きは推しキャラのページだけに入れる');
   }
@@ -541,6 +555,8 @@ if (process.env.DATA_LATEST) {
     ok(/<title>福袋2027一覧｜[^<]*などのキャラクターの福袋・ハッピーバッグ｜推しグッズ入荷手帳<\/title>/.test(hub) && hub.includes('<h1 class="tape">福袋2027</h1>') && ldOf(hub).some((x) => x['@type'] === 'CollectionPage' && x.name === '福袋2027'), '福袋：/fukubukuro/ の名前・見出し・構造化データ');
     ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
     const hw11 = rd('chiikawa/hachiware/index.html');
+    const fr11 = (h) => h.match(/<img class="bg-frame" src="\/art\/bingo-([a-z0-9-]+)-[0-9a-f]{8}\.webp"/)?.[1];
+    ok(fr11(hw11) === 'frame-11' && fr11(rd('sanrio/hellokitty/index.html')) === (existsSync('src/art/bingo/frame-birthday.webp') ? 'frame-birthday' : 'frame-11') && rd('bingo/index.html').includes('"now":"2026-11"'), '入荷ビンゴ：月をかえると額が切りかわり、誕生日の月の推し（ハローキティ 11/1）は誕生日の額');
     ok(hw11.includes('<h2>ハチワレの11月の入荷ビンゴ</h2>') && hw11.includes('<p class="bg-log">今月はまだ印がありません</p>') && !hw11.includes('class="bg-c st-on"') && hw11.includes('data-m="2026-11"'), '入荷ビンゴ：月が変わると新しいカード（印がないときは1行だけ）');
     rmSync(out, { recursive: true, force: true });
   }
