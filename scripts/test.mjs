@@ -224,6 +224,26 @@ const html = files.filter((f) => f.endsWith('.html'));
     ok(it('任天堂ライセンス商品 Switch2 ハードケース カービィ'), 'Switch 2 のケースの棚：ライセンス商品のキャラ柄は載せる');
     ok(!it('Nintendo Switch 有機ELモデル ハードケース'), 'Switch 2 のケースの棚：前の Switch だけの物は外す');
   }
+  // 棚のまざりもの（10/30）：クッションの棚にいす、足置きの棚にフットレスト付きのいす、祭壇のバルーンに赤ちゃん・子ども向けのセット
+  const shelfOf = (slug, id) => arts.find((a) => a.slug === slug)?.shelves.find((x) => x.id === id);
+  const keeps = (sh, name) => judge({ code: 'x', url: 'u', img: 'i', price: 1000, name }, { match: sh.match, exclude: sh.exclude, excludeRe: sh.excludeRe ?? [] }, settings).keep;
+  const cu = shelfOf('kyuukei', 'cushion');
+  if (cu) {
+    ok(keeps(cu, '椅子 クッション 座布団 厚手 洗える'), '休けいのクッションの棚：いすのクッションは載せる');
+    ok(!keeps(cu, 'ダイニングチェア 2脚セット クッション座面 背もたれ'), '休けいのクッションの棚：いすそのものは外す');
+    ok(!keeps(cu, '折りたたみ椅子 クッション 座面高40cm'), '休けいのクッションの棚：折りたたみのいすは外す');
+    ok(!keeps(cu, '敷布団 シングル クッション性'), '休けいのクッションの棚：布団は外す（座布団は載せる）');
+  }
+  const ft = shelfOf('kyuukei', 'foot');
+  if (ft) {
+    ok(keeps(ft, 'フットレスト デスク 足置き 高さ調整'), '休けいの足置きの棚：足置き台は載せる');
+    ok(!keeps(ft, 'ゲーミングチェア フットレスト付 リクライニング'), '休けいの足置きの棚：フットレスト付きのいすは外す');
+  }
+  const bl = shelfOf('saidan', 'balloon');
+  if (bl) {
+    ok(keeps(bl, '数字バルーン 誕生日 飾り付け 90cm ゴールド'), '祭壇のバルーンの棚：数字のバルーンは載せる');
+    ok(!keeps(bl, '誕生日 飾り付け バルーン ハーフバースデー 100日祝'), '祭壇のバルーンの棚：赤ちゃんのお祝いのセットは外す');
+  }
 }
 // 買い方メモ（/<作品>/kaikata/。src/kaikata/<作品>.json）：楽天の商品と広告を出さない、作品のトップからつなぐ、終わった予定は出さない
 {
