@@ -215,6 +215,8 @@ main.sheet .toc h2{margin:10px 0 4px}
 .fg-steps{list-style:none;margin:14px 0;padding:0;display:grid;gap:12px}.fg-steps li{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start}.fg-steps svg{width:72px;height:auto}.fg-steps b{display:block;font-size:15px}.fg-steps p{margin:2px 0 0!important;font-size:15px!important;line-height:1.7!important}
 .yomi-body table{width:100%;margin:12px 0;border-collapse:collapse;font-size:14px;line-height:1.5}.yomi-body th,.yomi-body td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.yomi-body thead th{background:var(--lav2);border-bottom:0}
 .yomi-body td:first-child,.yomi-body th:first-child{white-space:nowrap}
+/* 1列目に長い商品の名前が入る表（祭壇のライト）は折り返す。スマホで横にはみ出さない */
+.yomi-body table.nm-wrap td:first-child,.yomi-body table.nm-wrap th:first-child{white-space:normal}
 .fit{margin:12px 0 18px}.fit fieldset{margin:0 0 6px;padding:0;border:0}.fit legend{padding:0;font-size:13px;color:var(--sub)}
 .pick{display:flex;flex-wrap:wrap;gap:0 2px}.pick label{position:relative}.pick input{position:absolute;opacity:0;width:1px;height:1px}
 .pick span{display:block;padding:11px 12px;line-height:22px;color:var(--ink);cursor:pointer;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:4px}
