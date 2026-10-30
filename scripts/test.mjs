@@ -308,7 +308,24 @@ for (const c of noItemWorks) {
     }
   }
 }
-ok(!files.some((f) => f.endsWith('.json')), 'データファイルを公開していない');
+// 入荷ビンゴの記録（dist/bingo/data.json）だけは公開する。中身は月・推しキャラ・種類・見つけた日だけ
+ok(!files.some((f) => f.endsWith('.json') && f !== join('dist', 'bingo', 'data.json')), 'データファイルを公開していない（入荷ビンゴの記録のほか）');
+{
+  const { KINDS: BK } = await import('./lib/bingo.mjs');
+  const raw = existsSync('dist/bingo/data.json') ? readFileSync('dist/bingo/data.json', 'utf8') : '';
+  const d = raw ? JSON.parse(raw) : {};
+  const kinds = new Set(BK.map((x) => x.k));
+  const shapeOk =
+    d.v === 1 &&
+    /^\d{4}-\d{2}$/.test(d.now) &&
+    Object.keys(d).sort().join() === 'months,now,v' &&
+    Object.entries(d.months ?? {}).every(
+      ([m, cards]) =>
+        /^\d{4}-\d{2}$/.test(m) &&
+        Object.entries(cards).every(([k, card]) => /^[a-z0-9-]+\/[a-z0-9-]+$/.test(k) && Object.entries(card).every(([kind, day]) => kinds.has(kind) && /^\d{4}-\d{2}-\d{2}$/.test(day) && day.startsWith(m))),
+    );
+  ok(raw && shapeOk && !/https?:|円|\.jpg|\.png|\.webp/.test(raw), '入荷ビンゴ：公開する記録は月・推しキャラ・種類・見つけた日だけ（商品名・値段・URL・画像なし）');
+}
 // もっと見るのリンクに件数は出さない（「これだけしかない」と思われないように）
 ok(!html.some((f) => /<p class="more"><a [^>]*>[^<]*（\d+件）/.test(readFileSync(f, 'utf8'))), 'もっと見るのリンクに件数を出していない');
 
@@ -407,6 +424,56 @@ for (const f of html) {
   }
 }
 
+// 入荷ビンゴ（推しキャラのページのカード。scripts/lib/bingo.mjs・src/bingo.js・src/bingo.css）
+{
+  const { kindsOf, mergeBingo } = await import('./lib/bingo.mjs');
+  const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+  ok(
+    eq(kindsOf('マグカップ'), ['mug']) && eq(kindsOf('ﾏｸﾞｶｯﾌﾟ'), ['mug']) && eq(kindsOf('冷蔵庫マグネット'), []) && eq(kindsOf('サングラス'), []) && eq(kindsOf('マグネット マグ'), ['mug']) &&
+      eq(kindsOf('ぬいぐるみキーホルダー'), ['nui', 'key']) && eq(kindsOf('缶バッチ'), ['badge']) && eq(kindsOf('アクリルスタンド'), ['acsta']) && eq(kindsOf('巾着'), ['pouch']) &&
+      eq(kindsOf('ハンカチ'), ['towel']) && eq(kindsOf('ステッカー'), ['sticker']) && eq(kindsOf('ボールペン'), []),
+    '入荷ビンゴ：種類の言葉（マグネット・サングラスはマグにしない。1つの商品が2つの種類に当たってもよい）',
+  );
+  const hit = (n) => n.includes('ハチワレ');
+  const oshis = [{ key: 'chiikawa/hachiware', c: 'chiikawa', hit }];
+  const its = [
+    { c: 'chiikawa', name: 'ハチワレ ぬいぐるみ', first: '2026-11-05T01:00:00.000Z', price: 1, url: 'https://x/' },
+    { c: 'chiikawa', name: 'ハチワレ ぬいぐるみ S', first: '2026-10-31T15:30:00.000Z' },
+    { c: 'chiikawa', name: 'ハチワレ タオル', first: '2026-11-20T01:00:00.000Z' },
+    { c: 'chiikawa', name: 'うさぎ ポーチ', first: '2026-11-02T01:00:00.000Z' },
+    { c: 'sanrio', name: 'ハチワレ シール', first: '2026-11-02T01:00:00.000Z' },
+  ];
+  const before = { v: 1, months: { '2025-10': { 'chiikawa/hachiware': { nui: '2025-10-01' } }, '2026-11': { 'chiikawa/hachiware': { towel: '2026-11-10', mug: '2026-11-04' } } } };
+  const r = mergeBingo(before, its, oshis, '2026-11-21T00:00:00.000Z');
+  ok(
+    eq(r, { v: 1, months: { '2026-11': { 'chiikawa/hachiware': { nui: '2026-11-01', mug: '2026-11-04', towel: '2026-11-10' } } } }) && before.months['2026-11']['chiikawa/hachiware'].towel === '2026-11-10',
+    '入荷ビンゴ：記録は日本時間の月ごと・いちばん早い日だけ残し、消さない。ほかの作品・推しは数えない。13か月より古い月は消す',
+  );
+  ok(eq(mergeBingo(null, its, oshis, '2026-11-21T00:00:00.000Z').months['2026-11']['chiikawa/hachiware'], { nui: '2026-11-01', towel: '2026-11-20' }), '入荷ビンゴ：記録がないときも、いま載っている商品から今月ぶんが埋まる');
+  const wf = readFileSync('.github/workflows/update.yml', 'utf8');
+  ok(wf.indexOf('node scripts/fetch-yomimono.mjs') < wf.indexOf('node scripts/bingo.mjs') && wf.indexOf('node scripts/bingo.mjs') < wf.indexOf('node scripts/build.mjs') && /run: bash scripts\/quiet\.sh node scripts\/bingo\.mjs/.test(wf), '入荷ビンゴ：更新では「集める」のあと・「作る」の前に記録を足す（出力は非公開のメモだけ）');
+  const bsrc = readFileSync('scripts/bingo.mjs', 'utf8');
+  ok(/catch \(e\)/.test(bsrc) && /process\.exit\(0\);\s*$/.test(bsrc), '入荷ビンゴ：記録の更新は失敗しても公開を止めない');
+  const js = readFileSync('src/bingo.js', 'utf8');
+  ok(!/fetch\(|XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage/.test(js) && (js.match(/'oshi-bingo'/g) ?? []).length >= 2 && /try \{\s*S = window\.localStorage/.test(js), '入荷ビンゴ：端末の localStorage（oshi-bingo）にだけ残し、どこにも送らない');
+  const bcss = readFileSync('src/bingo.css', 'utf8');
+  ok(!/radial-gradient|linear-gradient|border-radius:\s*999px|rotate\(|→/.test(bcss) && /prefers-reduced-motion/.test(bcss), '入荷ビンゴ：ドットは SVG の模様（グラデーションなし）・はんこは傾けない・動きを減らす設定では動かさない');
+  if (process.env.DATA_LATEST) {
+    const hw = readFileSync('dist/chiikawa/hachiware/index.html', 'utf8');
+    const sec = hw.match(/<section class="bingo"[\s\S]*?<\/section>/)?.[0] ?? '';
+    ok(/<ul class="grid" data-pool>[\s\S]*?<\/ul><section class="bingo" data-k="chiikawa\/hachiware" data-m="2026-10"><h2>ハチワレの10月の入荷ビンゴ<\/h2><div class="bg-wrap">/.test(hw), '入荷ビンゴ：推しキャラのページの最初の商品の並びのすぐあとに、見出し（説明の行を重ねない）');
+    ok((sec.match(/<li class="bg-c /g) ?? []).length === 9 && sec.indexOf('data-k="nui"') < sec.indexOf('st-mid') && sec.indexOf('st-mid') < sec.indexOf('data-k="pouch"') && /data-k="sticker"[^]*<\/ol>/.test(sec), '入荷ビンゴ：3×3 でまん中は「来た」');
+    ok(sec.includes('<li class="bg-c st-on" data-k="nui"><span class="bg-a"><span class="bg-pic"><img src="/art/bingo-nui-') && sec.includes('<small class="bg-dt">10/3</small><small class="bg-nm">ぬいぐるみ</small>') && sec.includes('<li class="bg-c st-none" data-k="mug">') && sec.includes('<b class="bg-han">来た</b>'), '入荷ビンゴ：印のあるマスは日付と名前、ないマスは名前だけ（記録と、いま載っている商品から）');
+    ok(sec.includes('<p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/9 タオル</span><span>10/12 キーホルダー</span>') && !/件/.test(sec), '入荷ビンゴ：見つけた日の記録は日付の順（件数は出さない）');
+    const imgs = [...sec.matchAll(/<img [^>]*>/g)].map((m) => m[0]);
+    ok(imgs.length === 9 && imgs.every((t) => /src="\/art\/bingo-[a-z0-9-]+-[0-9a-f]{8}\.webp"/.test(t) && /width="\d+" height="\d+"/.test(t) && t.includes('loading="lazy"')) && imgs.every((t) => files.includes(join('dist', t.match(/src="\/([^"]+)"/)[1]))), '入荷ビンゴ：絵は中身の目印つきの名前・大きさ・lazy');
+    ok(sec.includes('src="/art/bingo-frame-11-'), '入荷ビンゴ：額は月の絵がなければ11月の額');
+    ok(!/<a class="bg-a"/.test(sec), '入荷ビンゴ：しおりがないページでは、シールをリンクにしない');
+    ok(hw.includes("'oshi-bingo'") && hw.includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('oshi-bingo'), '入荷ビンゴ：CSS と動きは推しキャラのページだけに入れる');
+  }
+  ok(readFileSync('dist/privacy/index.html', 'utf8').includes('入荷ビンゴ'), '入荷ビンゴ：プライバシーポリシーに、端末に残すものを1行');
+}
+
 // 楽天の商品を出すページには、楽天以外へのリンクを置かない（楽天の規約 第8条4項）
 for (const f of html) {
   const s = readFileSync(f, 'utf8');
@@ -473,6 +540,8 @@ if (process.env.DATA_LATEST) {
     ok(sr.includes('<title>サンリオの福袋2027一覧｜楽天市場で買えるハッピーバッグ｜推しグッズ入荷手帳</title>') && sr.includes('<h1 class="tape">サンリオの福袋2027</h1>'), '福袋：予約受付中のものがない日の名前');
     ok(/<title>福袋2027一覧｜[^<]*などのキャラクターの福袋・ハッピーバッグ｜推しグッズ入荷手帳<\/title>/.test(hub) && hub.includes('<h1 class="tape">福袋2027</h1>') && ldOf(hub).some((x) => x['@type'] === 'CollectionPage' && x.name === '福袋2027'), '福袋：/fukubukuro/ の名前・見出し・構造化データ');
     ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
+    const hw11 = rd('chiikawa/hachiware/index.html');
+    ok(hw11.includes('<h2>ハチワレの11月の入荷ビンゴ</h2>') && hw11.includes('<p class="bg-log">今月はまだ印がありません</p>') && !hw11.includes('class="bg-c st-on"') && hw11.includes('data-m="2026-11"'), '入荷ビンゴ：月が変わると新しいカード（印がないときは1行だけ）');
     rmSync(out, { recursive: true, force: true });
   }
   {

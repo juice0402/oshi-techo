@@ -81,6 +81,9 @@ jobs:
           RAKUTEN_ACCESS_KEY: ${{ secrets.RAKUTEN_ACCESS_KEY }}
           RAKUTEN_AFFILIATE_ID: ${{ secrets.RAKUTEN_AFFILIATE_ID }}
 
+      - name: 入荷ビンゴの記録を足す
+        run: bash scripts/quiet.sh node scripts/bingo.mjs
+
       - name: ページを作る
         run: bash scripts/quiet.sh node scripts/build.mjs
 
