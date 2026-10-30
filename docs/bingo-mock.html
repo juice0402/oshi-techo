@@ -1,0 +1,77 @@
+<!doctype html><html lang="ja"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>入荷ビンゴの見本（10/30）</title>
+<!-- しょーくんに見せた見本。決まったのは「A のシールのマスを、B の額の中に」。本番では src/themes/a-techo.css の色を使い、radial-gradient は使わない（ドットは SVG の模様で）。「ビンゴ」のはんこは傾けない。絵は /bingo-art/ を src/art/bingo/ に読みかえる -->
+<style>:root{--paper:#fff;--ink:#4E3657;--sub:#7E6A86;--line:#EFE3F1;--berry:#B23F78;--pink:#FBD3E2;--lav:#E3D9FB;--lav2:#FAF5FB}body{font-family:sans-serif;color:var(--ink);max-width:980px;margin:0 auto;padding:12px}</style>
+<style>
+.bg-wrap{display:block}
+.bg-card{position:relative;max-width:350px;margin:0 auto}
+.bg-g{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);position:relative}
+.bg-c{position:relative;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.bg-c small{display:block;font-size:12px;line-height:1.25}
+.bg-dt{color:var(--berry);font-weight:700}
+.bg-nm{color:var(--sub)}
+.bg-log{display:flex;flex-wrap:wrap;gap:2px 14px;margin:12px 0 0;font-size:13px}
+.bg-more{margin:6px 0 0;font-size:13px}
+.bg-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.bg-lines path{fill:none;stroke:var(--berry);stroke-width:5;stroke-linecap:round;opacity:.6;stroke-dasharray:420;stroke-dashoffset:420;animation:bgdraw .55s ease-out forwards}
+@keyframes bgdraw{to{stroke-dashoffset:0}}
+.bg-bingo{position:absolute;right:-6px;top:-14px;padding:6px 12px;border:2.5px solid var(--berry);color:var(--berry);background:var(--paper);font-size:18px;letter-spacing:.15em;transform:rotate(-8deg);animation:bgpress .35s ease-out}
+@keyframes bgpress{from{transform:rotate(-8deg) scale(1.6);opacity:0}to{transform:rotate(-8deg) scale(1);opacity:1}}
+@keyframes bgpop{0%{transform:scale(.3)}60%{transform:scale(1.14)}100%{transform:scale(1)}}
+.pop{animation:bgpop .42s cubic-bezier(.3,1.4,.5,1)}
+@media (min-width:640px){.bg-wrap{display:grid;grid-template-columns:350px 1fr;gap:28px;align-items:center}.bg-card{margin:0}.bg-log{flex-direction:column;font-size:14px}}
+/* A シール帳 */
+.bg-A .bg-g{background:var(--lav2);background-image:radial-gradient(var(--line) 1.2px,transparent 1.3px);background-size:12px 12px;border:1px solid var(--line);padding:6px;gap:6px}
+.bg-A .bg-c{aspect-ratio:auto;padding:6px 0 4px;border:1.5px dashed #D9C6DE;border-radius:14px;background:rgba(255,255,255,.55)}
+.bg-A .bg-pic{display:block;width:76%;aspect-ratio:1/1}
+.bg-A .bg-pic img{width:100%;height:100%;display:block;border-radius:12px;mix-blend-mode:multiply}
+.bg-A .st-none .bg-pic img{filter:grayscale(1);opacity:.22}
+.bg-A .st-none .bg-nm{color:#B7A9BC}
+.bg-A .bg-cover{position:absolute;inset:0;border:0;padding:0;background:var(--lav2);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:var(--berry);font:inherit;font-size:13px;font-weight:700}
+.bg-A .bg-fukuro{width:58%;}
+.bg-A .bg-cover:active .bg-fukuro{transform:scale(.92)}
+.bg-A .st-mid .bg-ring{width:62%;color:var(--berry);opacity:.9}
+.bg-A .st-mid .bg-han{position:absolute;top:34%;color:var(--berry);font-size:16px}
+/* B スクラッチ */
+.bg-B .bg-card{background:url(/bingo-art/frame.webp) center/100% 100% no-repeat;aspect-ratio:1/1;padding:15.5% 15.5% 15.5% 15.5%}
+.bg-B .bg-g{gap:0}
+.bg-B .bg-c{border-right:1.5px dotted #CDBAD3;border-bottom:1.5px dotted #CDBAD3}
+.bg-B .bg-c:nth-child(3n){border-right:0}.bg-B .bg-c:nth-child(n+7){border-bottom:0}
+.bg-B .bg-st{position:relative;display:grid;place-items:center;width:64%;aspect-ratio:1/1;color:var(--berry)}
+.bg-B .bg-st svg{position:absolute;inset:0;width:100%;height:100%}
+.bg-B .bg-st b{font-size:15px;color:var(--berry)}
+.bg-B .bg-nm{margin-top:2px;font-size:11px}
+.bg-B .bg-nm.off{font-size:13px;color:#B7A9BC}
+.bg-B .bg-scr{position:absolute;inset:3px;width:calc(100% - 6px);height:calc(100% - 6px);touch-action:none;cursor:pointer}
+.bg-B .bg-lines{inset:15.5%;width:69%;height:69%}
+</style>
+<body>
+<h1>A シール帳</h1><section class="bingo bg-A"><h2>ハチワレの10月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><ol class="bg-g"><li class="bg-c st-open" data-i="0"><span class="bg-pic"><img src="/bingo-art/nui.webp" alt="" width="120" height="120"></span><small class="bg-dt">10/3</small><small class="bg-nm">ぬいぐるみ</small></li><li class="bg-c st-open" data-i="1"><span class="bg-pic"><img src="/bingo-art/acsta.webp" alt="" width="120" height="120"></span><small class="bg-dt">10/2</small><small class="bg-nm">アクスタ</small></li><li class="bg-c st-new" data-i="2"><span class="bg-pic"><img src="/bingo-art/badge.webp" alt="" width="120" height="120"></span><small class="bg-dt">10/29</small><small class="bg-nm">缶バッジ</small><button type="button" class="bg-cover" aria-label="缶バッジをあける"><svg class="bg-fukuro" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 18l6-6 6 6 6-6 6 6 6-6 6 6 6-6 6 6 4-4v56c0 3-2 5-5 5H17c-3 0-5-2-5-5V14z" fill="#FBD3E2" stroke="#B23F78" stroke-width="1.6"/><path d="M12 30h56" stroke="#B23F78" stroke-width="1.2" stroke-dasharray="3 3"/><path d="M40 44c-4-5-11-2-9 4 1 4 9 9 9 9s8-5 9-9c2-6-5-9-9-4z" fill="#B23F78"/></svg><span>あける</span></button></li><li class="bg-c st-open" data-i="3"><span class="bg-pic"><img src="/bingo-art/key.webp" alt="" width="120" height="120"></span><small class="bg-dt">10/12</small><small class="bg-nm">キーホルダー</small></li><li class="bg-c st-mid" data-i="4"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b class="bg-han">来た</b><small class="bg-dt">10/30</small></li><li class="bg-c st-none" data-i="5"><span class="bg-pic"><img src="/bingo-art/pouch.webp" alt="" width="120" height="120"></span><small class="bg-nm">ポーチ</small></li><li class="bg-c st-none" data-i="6"><span class="bg-pic"><img src="/bingo-art/mug.webp" alt="" width="120" height="120"></span><small class="bg-nm">マグ</small></li><li class="bg-c st-new" data-i="7"><span class="bg-pic"><img src="/bingo-art/towel.webp" alt="" width="120" height="120"></span><small class="bg-dt">10/30</small><small class="bg-nm">タオル</small><button type="button" class="bg-cover" aria-label="タオルをあける"><svg class="bg-fukuro" viewBox="0 0 80 80" aria-hidden="true"><path d="M14 18l6-6 6 6 6-6 6 6 6-6 6 6 6-6 6 6 4-4v56c0 3-2 5-5 5H17c-3 0-5-2-5-5V14z" fill="#FBD3E2" stroke="#B23F78" stroke-width="1.6"/><path d="M12 30h56" stroke="#B23F78" stroke-width="1.2" stroke-dasharray="3 3"/><path d="M40 44c-4-5-11-2-9 4 1 4 9 9 9 9s8-5 9-9c2-6-5-9-9-4z" fill="#B23F78"/></svg><span>あける</span></button></li><li class="bg-c st-none" data-i="8"><span class="bg-pic"><img src="/bingo-art/sticker.webp" alt="" width="120" height="120"></span><small class="bg-nm">シール</small></li></ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg><b class="bg-bingo" hidden>ビンゴ</b></div><div class="bg-side"><p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/12 キーホルダー</span><span>10/29 缶バッジ</span><span>10/30 タオル</span></p><p class="bg-more"><a href="/bingo/">前の月とわたしの推しのカード</a></p></div></div></section>
+<h1>B スクラッチ（額だけ使う）</h1><section class="bingo bg-B"><h2>ハチワレの10月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><ol class="bg-g"><li class="bg-c st-open" data-i="0"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>10/3</b></span><small class="bg-nm">ぬいぐるみ</small></li><li class="bg-c st-open" data-i="1"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>10/2</b></span><small class="bg-nm">アクスタ</small></li><li class="bg-c st-new" data-i="2"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>10/29</b></span><small class="bg-nm">缶バッジ</small><canvas class="bg-scr" aria-label="けずる"></canvas></li><li class="bg-c st-open" data-i="3"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>10/12</b></span><small class="bg-nm">キーホルダー</small></li><li class="bg-c st-mid" data-i="4"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>来た</b></span><small class="bg-dt">10/30</small></li><li class="bg-c st-none" data-i="5"><small class="bg-nm off">ポーチ</small></li><li class="bg-c st-none" data-i="6"><small class="bg-nm off">マグ</small></li><li class="bg-c st-new" data-i="7"><span class="bg-st"><svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg><b>10/30</b></span><small class="bg-nm">タオル</small><canvas class="bg-scr" aria-label="けずる"></canvas></li><li class="bg-c st-none" data-i="8"><small class="bg-nm off">シール</small></li></ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg><b class="bg-bingo" hidden>ビンゴ</b></div><div class="bg-side"><p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/12 キーホルダー</span><span>10/29 缶バッジ</span><span>10/30 タオル</span></p><p class="bg-more"><a href="/bingo/">前の月とわたしの推しのカード</a></p></div></div></section>
+<script>
+(function(){
+var LINES=[[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
+document.querySelectorAll('.bingo').forEach(function(sec){
+  var cells=[].slice.call(sec.querySelectorAll('.bg-c')),svg=sec.querySelector('.bg-lines'),stamp=sec.querySelector('.bg-bingo');
+  var on=function(i){var c=cells[i];return !c.classList.contains('st-none')&&!c.querySelector('.bg-cover,.bg-scr');};
+  var done={};
+  function check(){LINES.forEach(function(l,n){if(done[n]||!l.every(on))return;done[n]=1;
+    var p=function(i){return [50+100*(i%3),50+100*Math.floor(i/3)]},a=p(l[0]),b=p(l[2]);
+    var dx=(b[0]-a[0])*.12,dy=(b[1]-a[1])*.12,w=document.createElementNS('http://www.w3.org/2000/svg','path');
+    w.setAttribute('d','M'+(a[0]-dx)+' '+(a[1]-dy+2)+'C'+(a[0]+(b[0]-a[0])/3)+' '+(a[1]+(b[1]-a[1])/3-3)+' '+(a[0]+2*(b[0]-a[0])/3)+' '+(a[1]+2*(b[1]-a[1])/3+3)+' '+(b[0]+dx)+' '+(b[1]+dy-1));
+    svg.appendChild(w);stamp.hidden=false;});}
+  var first=true;check();first=false;
+  sec.querySelectorAll('.bg-cover').forEach(function(btn){btn.addEventListener('click',function(){var c=btn.closest('.bg-c');btn.remove();var p=c.querySelector('.bg-pic');p.classList.add('pop');setTimeout(check,250);});});
+  sec.querySelectorAll('.bg-scr').forEach(function(cv){
+    var r=cv.getBoundingClientRect(),dpr=2;cv.width=r.width*dpr;cv.height=r.height*dpr;var x=cv.getContext('2d');
+    x.fillStyle='#CFCAD8';x.fillRect(0,0,cv.width,cv.height);
+    for(var i=0;i<900;i++){x.fillStyle=Math.random()<.5?'#E4E1EA':'#B9B3C6';x.fillRect(Math.random()*cv.width,Math.random()*cv.height,2,2);}
+    x.fillStyle='#6F6680';x.font='bold '+(13*dpr)+'px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('けずる',cv.width/2,cv.height/2);
+    var down=false,cnt=0;
+    function sc(e){if(!down)return;var b=cv.getBoundingClientRect();x.globalCompositeOperation='destination-out';x.beginPath();x.arc((e.clientX-b.left)*dpr,(e.clientY-b.top)*dpr,13*dpr,0,7);x.fill();
+      if(++cnt%6==0){var d=x.getImageData(0,0,cv.width,cv.height).data,z=0;for(var i=3;i<d.length;i+=16)if(!d[i])z++;if(z/(d.length/16)>.45){var c=cv.closest('.bg-c');cv.remove();c.querySelector('.bg-st').classList.add('pop');setTimeout(check,250);down=false;}}}
+    cv.addEventListener('pointerdown',function(e){down=true;sc(e)});cv.addEventListener('pointermove',sc);addEventListener('pointerup',function(){down=false});
+  });
+});})();
+</script>
+</body></html>
