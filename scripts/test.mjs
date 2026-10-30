@@ -460,6 +460,10 @@ for (const f of html) {
   ok(/toDataURL\('image\/png'\)/.test(js) && js.includes('navigator.share') && js.includes('l.download = name') && js.includes("'oshi-bingo-' + ") && js.includes("'推しグッズ入荷手帳'") && js.includes("'nyuka-techo.com'") && js.includes("textContent = '画像で保存'") && !/drawImage|new Image|\.webp|https?:\/\/(?!www\.w3\.org\/)/.test(js), '入荷ビンゴ：画像で保存は canvas で描き（絵・商品の画像なし）、共有かダウンロードだけ');
   const bcss = readFileSync('src/bingo.css', 'utf8');
   ok(!/radial-gradient|linear-gradient|border-radius:\s*999px|rotate\(|→/.test(bcss) && /prefers-reduced-motion/.test(bcss), '入荷ビンゴ：ドットは SVG の模様（グラデーションなし）・はんこは傾けない・動きを減らす設定では動かさない');
+  // 額はマスの台紙の上（まん中と外側がすき通しの WebP。押すのは下のマス、はんこは額の上）
+  const frames = readdirSync('src/art/bingo').filter((f) => /^frame-.+\.webp$/.test(f));
+  const clear = (f) => { const b = readFileSync(join('src/art/bingo', f)); return b.toString('latin1', 12, 16) === 'VP8X' && (b[20] & 0x10) !== 0; };
+  ok(frames.length >= 13 && frames.every(clear) && /\.bg-frame\{[^}]*z-index:1[^}]*pointer-events:none/.test(bcss) && /\.bg-bingo\{[^}]*z-index:2/.test(bcss), '入荷ビンゴ：額はすき通しでマスの台紙の上に重ね、マスは押せる（はんこは額の上）');
   if (process.env.DATA_LATEST) {
     const hw = readFileSync('dist/chiikawa/hachiware/index.html', 'utf8');
     const sec = hw.match(/<section class="bingo"[\s\S]*?<\/section>/)?.[0] ?? '';

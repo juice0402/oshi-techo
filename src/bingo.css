@@ -2,7 +2,8 @@
 /* ドットは SVG の模様（グラデーションは使わない）。はんこは傾けない。動くのは押したマスとそのカードの中だけ */
 .bg-wrap{display:block}
 .bg-card{position:relative;width:100%;max-width:380px;margin:0 auto;aspect-ratio:1/1}
-.bg-frame{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 額はマスの台紙の上に重ねる（まん中はすき通しの絵。押すのは下のマス） */
+.bg-frame{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;pointer-events:none}
 .bg-in{position:absolute;inset:19%}
 .bg-g{list-style:none;margin:0;padding:4px;box-sizing:border-box;height:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:4px;border:1px solid var(--line);background:var(--lav2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='1.2' fill='%23E6D6EA'/%3E%3C/svg%3E") 0 0/12px 12px}
 .bg-c{position:relative;min-width:0;min-height:0;border:1.5px dashed #D9C6DE;border-radius:10px;background:#fff;background:rgba(255,255,255,.6)}
@@ -25,7 +26,7 @@
 .bg-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .bg-lines path{fill:none;stroke:var(--berry);stroke-width:5;stroke-linecap:round;opacity:.6}
 .bg-lines path.draw{stroke-dasharray:420;stroke-dashoffset:420;animation:bgdraw .55s ease-out forwards}
-.bg-bingo{position:absolute;right:3%;top:3%;padding:5px 11px;border:2.5px solid var(--berry);border-radius:4px;color:var(--berry);background:var(--paper);font-size:17px;line-height:1.2;letter-spacing:.15em}
+.bg-bingo{position:absolute;z-index:2;right:3%;top:3%;padding:5px 11px;border:2.5px solid var(--berry);border-radius:4px;color:var(--berry);background:var(--paper);font-size:17px;line-height:1.2;letter-spacing:.15em}
 .bg-bingo.press{animation:bgpress .35s ease-out}
 .bg-pop{animation:bgpop .42s cubic-bezier(.3,1.4,.5,1)}
 @keyframes bgdraw{to{stroke-dashoffset:0}}
