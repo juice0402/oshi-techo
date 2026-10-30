@@ -315,6 +315,8 @@ function section(title, list, { limit, more, moreLabel, eager = false, cat = fal
 
 // 価格を確かめた時刻。ページのいちばん下にまとめて小さく出す（page() が目印を見て1行にする）
 const priceAt = () => '<!--asof-->';
+// 右の柱（data-stick）が画面より高いときは、ついてくるのをやめる（max-height で切らない）
+const STICK_JS = `<script>(function(){var s=document.querySelectorAll('[data-stick]');function f(){s.forEach(function(e){e.classList.toggle('nost',e.offsetHeight+(parseFloat(getComputedStyle(e).top)||0)+16>innerHeight);});}f();addEventListener('resize',f);})();</script>`;
 const booksAt = () => '<!--asof-books-->';
 
 const newest = (list) => (list.length ? jstDate(new Date(list.map((i) => i.first).sort().at(-1))) : '');
@@ -680,7 +682,8 @@ function pageKind(path) {
   }
   return 'page';
 }
-function page({ path, title, description, h1, lead = '', body, tab = '', corner = '', crumbs = [], lastmod = '', extraLd = [], noindex = false, deco = '', decoParts = [], mainClass = '', ads = true, count = null, ogImage = '', extraCss = '', extraJs = '' }) {
+// intro：パソコン（幅1100px以上）で上の部分だけ2列にするとき。side（右に置く顔の絵）がないときは rest を h1 の下に1列で出す
+function page({ path, title, description, h1, lead = '', body, tab = '', corner = '', crumbs = [], lastmod = '', extraLd = [], noindex = false, deco = '', decoParts = [], mainClass = '', ads = true, count = null, ogImage = '', extraCss = '', extraJs = '', intro = null }) {
   if (count !== null && !noindex && !indexable(path, count)) noindex = 'follow';
   const url = `${SITE}${path}`;
   const link = (t) => `<a href="${t.href}"${t.key === tab ? ' aria-current="page"' : ''}>${esc(t.label)}</a>`;
@@ -768,9 +771,9 @@ ${cornerNav}
 <nav class="tabs" aria-label="作品">${tabs}</nav>
 </header>
 <main class="sheet wrap${mainClass ? ` ${mainClass}` : ''}">
-${crumbHtml}
+${intro?.side ? '<div class="gtop"><div class="gtop-a">' : ''}${crumbHtml}
 ${deco ? `<div class="h1w"><h1 class="tape">${esc(h1)}</h1><span class="stk stk-2" aria-hidden="true"></span></div><span class="stk stk-1" aria-hidden="true"></span><span class="stk stk-3" aria-hidden="true"></span>` : `<h1 class="tape">${esc(h1)}</h1>`}
-${lead ? `<p class="lead">${esc(lead)}</p>` : ''}
+${lead ? `<p class="lead">${esc(lead)}</p>` : ''}${intro?.side ? `</div>${intro.side}<div class="gtop-b">${intro.rest}</div></div>` : (intro?.rest ?? '')}
 ${body.replaceAll('<!--asof-->', '').replaceAll('<!--asof-books-->', '')}${body.includes('<!--asof-->') ? `<p class="asof end">${jstMonthDayTime(meta.fetchedAt)} 時点の価格</p>` : ''}${body.includes('<!--asof-books-->') ? `<p class="asof end">${jstMonthDayTime(books.fetchedAt)} 時点の情報</p>` : ''}
 </main>
 <footer class="ft wrap">
@@ -784,7 +787,7 @@ ${bannerTemplates}
 <script>(function(){var n=Date.now(),t=new Date(n+324e5).toISOString().slice(0,10);document.querySelectorAll('[data-dl]').forEach(function(e){var d=Math.round((Date.parse(e.getAttribute('data-dl'))-Date.parse(t))/864e5);if(d<0)e.remove();else if(d<=7)e.textContent+=d===0?'（今日まで）':'（あと'+d+'日）';});document.querySelectorAll('[data-until]').forEach(function(e){if(Date.parse(e.getAttribute('data-until'))<n)e.remove();});})();</script>
 <script>(function(){var a=document.querySelector('.tabs [aria-current]');if(a&&a.scrollIntoView)a.scrollIntoView({block:'nearest',inline:'center'});})();</script>
 ${MY_JS}
-${extraJs}${ads ? `<script>(function(){var t=document.querySelectorAll('template.bnt');if(!t.length)return;var n=t[Math.floor(Math.random()*t.length)];document.getElementById('bn').appendChild(n.content.cloneNode(true));})();</script>` : ''}
+${extraJs}${body.includes(' data-stick') ? STICK_JS : ''}${ads ? `<script>(function(){var t=document.querySelectorAll('template.bnt');if(!t.length)return;var n=t[Math.floor(Math.random()*t.length)];document.getElementById('bn').appendChild(n.content.cloneNode(true));})();</script>` : ''}
 </body>
 </html>
 `;
@@ -1298,11 +1301,11 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
     body:
       myButton(path, o.name) +
       shioriNav(list.slice(0, settings.listItems)) +
-      `<ul class="grid" data-pool>${list
+      `<div class="spread"><ul class="grid" data-pool>${list
         .slice(0, settings.topItems)
         .map((it, j) => cell(it, j < 4, { cat: true }))
         .join('')}</ul>` +
-      bingoHtml(c, o, label, list.slice(0, settings.listItems)) +
+      `<div class="side" data-stick>${bingoHtml(c, o, label, list.slice(0, settings.listItems))}</div></div>` +
       priceAt() +
       // 一覧にないランキングのグッズだけ（一覧のカードには、ランキングの印がつく）
       rankSection('楽天のランキングに入っているもの', ranked.filter((r) => !inList.has(r.code)), settings.topItems) +
@@ -1609,10 +1612,9 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     h1,
     extraLd: [collectionLd({ name: h1, description, url: `${SITE}${path}`, image: GOTOUCHI_ART, parts: prefList.map((p) => ({ name: `${p.pref}のご当地${part}`, url: `${SITE}${path}#${p.id}` })) })],
     ...(GOTOUCHI_ART ? { ogImage: GOTOUCHI_ART.og } : {}),
+    // パソコンは上の部分だけ2列（左に h1・読みもの・地方のリスト、右に顔の絵）
+    intro: { side: GOTOUCHI_ART?.html ?? '', rest: top + toc },
     body:
-      (GOTOUCHI_ART?.html ?? '') +
-      top +
-      toc +
       areas
         .map(
           (a) =>
@@ -1692,8 +1694,8 @@ if (gotouchiWorks.length) {
       collectionLd({ name: 'ご当地グッズ一覧', description, url: `${SITE}/gotouchi/`, image: GOTOUCHI_ART }),
     ],
     ...(GOTOUCHI_ART ? { ogImage: GOTOUCHI_ART.og } : {}),
+    intro: { side: GOTOUCHI_ART?.html ?? '', rest: '' },
     body:
-      (GOTOUCHI_ART?.html ?? '') +
       gotouchiWorks
         .map(
           (w, i) =>
@@ -2033,7 +2035,8 @@ for (const a of yomiArticles) {
     description: a.description,
     h1: a.title,
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推し活の読みもの', path: '/yomimono/' }, { name: a.title, path }],
-    body: `<article class="yomi-body">${hero}${toc}${html}${a.sources ? `<p class="more"><a href="${path}shiryou/">この記事を書くときに調べた資料</a></p>` : ''}<p class="yomi-date">${dates}。商品の棚は楽天市場から1日2回集めています</p></article>${shelves ? '<!--asof-->' : ''}`,
+    // パソコン（幅1100px以上）は、もくじを右の柱にして本文と2列（見開き）。もくじのない記事は1列のまま
+    body: `<article class="yomi-body${toc ? ' spread' : ''}">${hero}${toc.replace('<nav class="toc"', '<nav class="toc" data-stick')}<div class="yb">${html}${a.sources ? `<p class="more"><a href="${path}shiryou/">この記事を書くときに調べた資料</a></p>` : ''}<p class="yomi-date">${dates}。商品の棚は楽天市場から1日2回集めています</p></div></article>${shelves ? '<!--asof-->' : ''}`,
     ads: true,
     lastmod: a.updated || a.published,
     ogImage: `/yomimono/img/${a.hero}-og.jpg?v=${createHash('sha256').update(readFileSync(`src/yomimono/img/${a.hero}-og.jpg`)).digest('hex').slice(0, 8)}`,
