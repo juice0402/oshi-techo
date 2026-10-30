@@ -1,0 +1,15 @@
+{
+ "v": 1,
+ "months": {
+  "2025-08": {
+   "chiikawa/hachiware": { "nui": "2025-08-02" }
+  },
+  "2026-09": {
+   "chiikawa/hachiware": { "nui": "2026-09-20" }
+  },
+  "2026-10": {
+   "chiikawa/hachiware": { "nui": "2026-10-03", "acsta": "2026-10-02", "badge": "2026-10-16", "key": "2026-10-12", "towel": "2026-10-09" },
+   "sanrio/kitty": { "sticker": "2026-10-05" }
+  }
+ }
+}
