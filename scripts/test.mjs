@@ -479,7 +479,8 @@ for (const f of html) {
     ok(bcounts.every((n, i) => n > 0 && (i === 0 || bcounts[i - 1] >= n)), '入荷ビンゴ：/bingo/ のカードは今月の印が多い順');
     const cfg = JSON.parse(bp.match(/<script type="application\/json" id="bgcfg">([^<]*)<\/script>/)[1]);
     ok(cfg.now === '2026-10' && Object.keys(cfg.frames).length === 13 && Object.values(cfg.frames).every((u) => files.includes(join('dist', u.slice(1)))) && cfg.kinds.length === 9 && cfg.kinds[4] === null && cfg.oshi['chiikawa/hachiware'][0] === 'ハチワレ' && !/https?:|円/.test(JSON.stringify(cfg).replace(cfg.ring, '')), '入荷ビンゴ：/bingo/ がカードを作る材料（12か月と誕生日の額・種類・推しの名前だけ）');
-    for (let mo = 1; mo <= 12; mo++) if (mo !== 11) ok(existsSync(`src/art/bingo/frame-${mo}.webp`) || mo >= 6, `入荷ビンゴ：${mo}月の額の絵がある`);
+    for (let mo = 1; mo <= 12; mo++) if (mo !== 11) ok(existsSync(`src/art/bingo/frame-${mo}.webp`), `入荷ビンゴ：${mo}月の額の絵がある`);
+    ok(existsSync('src/art/bingo/frame-birthday.webp'), '入荷ビンゴ：誕生日の額の絵がある');
     const pjs = readFileSync('src/bingo-page.js', 'utf8');
     ok(!/XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage|setItem/.test(pjs) && (pjs.match(/fetch\(/g) ?? []).length === 1 && pjs.includes("fetch('/bingo/data.json')") && pjs.includes("getItem('ot-my')") && bp.includes('window.otBingo'), '入荷ビンゴ：/bingo/ はわたしの推し（ot-my）を読むだけで、同じサイトの記録のほかは読まず、どこにも送らない');
     ok(!/<a class="bg-a"/.test(sec), '入荷ビンゴ：しおりがないページでは、シールをリンクにしない');
