@@ -670,6 +670,7 @@ function pageKind(path) {
   }
   return 'page';
 }
+// intro：パソコン（幅1100px以上）で上の部分だけ2列にするとき。side（右に置く顔の絵）がないときは rest を h1 の下に1列で出す
 function page({ path, title, description, h1, lead = '', body, tab = '', corner = '', crumbs = [], lastmod = '', extraLd = [], noindex = false, deco = '', decoParts = [], mainClass = '', ads = true, count = null, ogImage = '', extraCss = '', extraJs = '', intro = null }) {
   if (count !== null && !noindex && !indexable(path, count)) noindex = 'follow';
   const url = `${SITE}${path}`;
@@ -758,9 +759,9 @@ ${cornerNav}
 <nav class="tabs" aria-label="作品">${tabs}</nav>
 </header>
 <main class="sheet wrap${mainClass ? ` ${mainClass}` : ''}">
-${intro ? '<div class="gtop"><div class="gtop-a">' : ''}${crumbHtml}
+${intro?.side ? '<div class="gtop"><div class="gtop-a">' : ''}${crumbHtml}
 ${deco ? `<div class="h1w"><h1 class="tape">${esc(h1)}</h1><span class="stk stk-2" aria-hidden="true"></span></div><span class="stk stk-1" aria-hidden="true"></span><span class="stk stk-3" aria-hidden="true"></span>` : `<h1 class="tape">${esc(h1)}</h1>`}
-${lead ? `<p class="lead">${esc(lead)}</p>` : ''}${intro ? `</div>${intro.side}<div class="gtop-b">${intro.rest}</div></div>` : ''}
+${lead ? `<p class="lead">${esc(lead)}</p>` : ''}${intro?.side ? `</div>${intro.side}<div class="gtop-b">${intro.rest}</div></div>` : (intro?.rest ?? '')}
 ${body.replaceAll('<!--asof-->', '').replaceAll('<!--asof-books-->', '')}${body.includes('<!--asof-->') ? `<p class="asof end">${jstMonthDayTime(meta.fetchedAt)} 時点の価格</p>` : ''}${body.includes('<!--asof-books-->') ? `<p class="asof end">${jstMonthDayTime(books.fetchedAt)} 時点の情報</p>` : ''}
 </main>
 <footer class="ft wrap">
