@@ -459,14 +459,12 @@ const bingoImg = (name) => bingoArt.get(name)?.path ?? '';
 const RING_SVG =
   '<svg class="bg-ring" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5c15 0 27 11.5 27 26.5S47.5 59 32.5 59 5 47 5.5 32 17 5 32 5z" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M32 10.5c12 0 21.5 9 21.5 21s-9.5 21.5-21.5 21.5S10.5 43.5 10.5 31.5 20 10.5 32 10.5z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
 const bingoMd = (d) => `${Number(d.slice(5, 7))}/${Number(d.slice(8, 10))}`;
-// list：そのページの商品（しおりのある種類だけ、開いたシールをしおりへのリンクにする）
-function bingoHtml(c, o, label, list) {
-  const key = `${c.slug}/${o.slug}`;
-  const card = bingo.months[bingoMonth]?.[key] ?? {};
+// 額：推しの誕生日の月は誕生日の額、ほかは月の額（なければ11月の額）
+const bingoFrame = (o, m) => (o.birthday && Number(o.birthday.slice(0, 2)) === m && bingoImg('frame-birthday')) || bingoImg(`frame-${m}`) || bingoImg('frame-11');
+// 1枚のカード。/bingo/ のページの JS（src/bingo-page.js）も同じ形で作るので、形を変えたらそちらも合わせる
+// shiori：開いたシールをリンクにする種類（しおりのあるページだけ）。plain：袋にしない（/bingo/ のわたしの推しがいないとき）。more：カードの下の1行
+function bingoCardHtml({ key, label, frame, card, shiori = new Set(), plain = false, more = '' }) {
   const m = Number(bingoMonth.slice(5, 7));
-  const cats = CATEGORIES.filter((k) => list.filter((i) => i.cat === k.slug).length >= 3).map((k) => k.slug);
-  const shiori = new Set(cats.length >= 2 ? cats : []);
-  const frame = (o.birthday && Number(o.birthday.slice(0, 2)) === m && bingoImg('frame-birthday')) || bingoImg(`frame-${m}`) || bingoImg('frame-11');
   const cells = CELLS.map((k) => {
     if (!k) return `<li class="bg-c st-mid"><span class="bg-st">${RING_SVG}<b class="bg-han">来た</b></span><small class="bg-dt bg-came"></small></li>`;
     const x = KINDS.find((y) => y.k === k);
@@ -479,7 +477,20 @@ function bingoHtml(c, o, label, list) {
     .sort((a, b) => card[a.k].localeCompare(card[b.k]) || KINDS.indexOf(a) - KINDS.indexOf(b))
     .map((x) => `<span>${bingoMd(card[x.k])} ${esc(x.name)}</span>`)
     .join('');
-  return `<section class="bingo" data-k="${esc(key)}" data-m="${bingoMonth}"><h2>${esc(label)}の${m}月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><img class="bg-frame" src="/${frame}" alt="" width="800" height="800" loading="lazy" decoding="async"><div class="bg-in"><ol class="bg-g">${cells}</ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg></div><b class="bg-bingo" hidden>ビンゴ</b></div><p class="bg-log">${log || '今月はまだ印がありません'}</p></div></section>`;
+  return `<section class="bingo" data-k="${esc(key)}" data-m="${bingoMonth}"${plain ? ' data-plain' : ''}><h2>${esc(label)}の${m}月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><img class="bg-frame" src="/${frame}" alt="" width="800" height="800" loading="lazy" decoding="async"><div class="bg-in"><ol class="bg-g">${cells}</ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg></div><b class="bg-bingo" hidden>ビンゴ</b></div><p class="bg-log">${log || '今月はまだ印がありません'}</p></div>${more}</section>`;
+}
+// 推しキャラのページのカード。list：そのページの商品（しおりのある種類だけ、開いたシールをしおりへのリンクにする）
+function bingoHtml(c, o, label, list) {
+  const key = `${c.slug}/${o.slug}`;
+  const cats = CATEGORIES.filter((k) => list.filter((i) => i.cat === k.slug).length >= 3).map((k) => k.slug);
+  return bingoCardHtml({
+    key,
+    label,
+    frame: bingoFrame(o, Number(bingoMonth.slice(5, 7))),
+    card: bingo.months[bingoMonth]?.[key] ?? {},
+    shiori: new Set(cats.length >= 2 ? cats : []),
+    more: '<p class="more"><a href="/bingo/">前の月とわたしの推しのカード</a></p>',
+  });
 }
 const minify = (s) =>
   s
@@ -490,6 +501,7 @@ const minify = (s) =>
     .join('\n');
 const BINGO_CSS = minify(readFileSync('src/bingo.css', 'utf8')).replace(/\n/g, '');
 const BINGO_JS = `<script>${minify(readFileSync('src/bingo.js', 'utf8'))}</script>`;
+const BINGO_PAGE_JS = `<script>${minify(readFileSync('src/bingo-page.js', 'utf8'))}</script>`;
 
 // ---- 季節の特集（期間中だけ。商品名に季節の言葉が入っているもの） ----
 const seasonActive = activeSeasons(seasons, today);
@@ -717,7 +729,7 @@ function page({ path, title, description, h1, lead = '', body, tab = '', corner 
   const tocHtml = `${tocGroups()}
 ${calChars.some((c) => c.corner === (cn || 'chara')) ? `<p class="fl">発売日カレンダー　${calChars.filter((c) => c.corner === (cn || 'chara')).map((c) => `<a href="/${c.slug}/hatsubai/">${esc(c.name)}</a>`).join('／')}</p>` : ''}
 ${gotouchiWorks.length || seasonPages.length ? `<p class="fl">特集　${[...(gotouchiWorks.length ? ['<a href="/gotouchi/">ご当地グッズ</a>'] : []), ...seasonPages.map(({ s }) => `<a href="/${s.slug}/">${esc(s.name)}</a>`)].join('／')}</p>` : ''}
-<p>${yomiArticles.length ? '<a href="/yomimono/">推し活の読みもの</a>／' : ''}<a href="/koushiki/">公式の最新情報</a>／<a href="/calendar/">推し活カレンダー</a>／${birthdays.length ? '<a href="/tanjoubi/">推しキャラの誕生日</a>／' : ''}<a href="/about/">このサイトについて</a>／<a href="/terms/">利用規約</a>／<a href="/privacy/">プライバシーポリシー</a></p>`;
+<p>${yomiArticles.length ? '<a href="/yomimono/">推し活の読みもの</a>／' : ''}<a href="/koushiki/">公式の最新情報</a>／<a href="/calendar/">推し活カレンダー</a>／${oshiPages.length ? '<a href="/bingo/">推しの入荷ビンゴ</a>／' : ''}${birthdays.length ? '<a href="/tanjoubi/">推しキャラの誕生日</a>／' : ''}<a href="/about/">このサイトについて</a>／<a href="/terms/">利用規約</a>／<a href="/privacy/">プライバシーポリシー</a></p>`;
   const html = `<!doctype html>
 <html lang="ja" data-pg="${pageKind(path)}">
 <head>
@@ -1322,6 +1334,46 @@ const collectionLd = ({ name, description, url, parts = [], image = null }) => (
   ...(image ? { primaryImageOfPage: image.ld } : {}),
   ...(parts.length ? { hasPart: parts.map((x) => ({ '@type': 'WebPageElement', name: x.name, url: x.url })) } : {}),
 });
+// ---- 推しの入荷ビンゴ（/bingo/。わたしの推しのカードと前の月までの記録。docs/shikumi.md の「入荷ビンゴ」） ----
+// わたしの推し（端末の ot-my）は src/bingo-page.js がブラウザの中でカードにする（記録は /bingo/data.json）。
+// わたしの推しがいないとき（JS が動かないときも）は、今月いちばん印が多い推しのカードを3枚まで（袋にしない）と1行
+if (oshiPages.length) {
+  const m = Number(bingoMonth.slice(5, 7));
+  const marks = (p) => Object.keys(bingo.months[bingoMonth]?.[`${p.c.slug}/${p.o.slug}`] ?? {}).length;
+  const pick = oshiPages
+    .map((p, i) => ({ p, i, n: marks(p) }))
+    .filter((x) => x.n > 0)
+    .sort((a, b) => b.n - a.n || a.i - b.i)
+    .slice(0, 3)
+    .map(({ p }) => bingoCardHtml({ key: `${p.c.slug}/${p.o.slug}`, label: p.label, frame: bingoFrame(p.o, m), card: bingo.months[bingoMonth][`${p.c.slug}/${p.o.slug}`], plain: true, more: `<p class="more"><a href="/${p.c.slug}/${p.o.slug}/">${esc(p.label)}のグッズの新着へ</a></p>` }))
+    .join('');
+  // ブラウザでカードを作るための材料（絵の場所・種類の名前・推しの名前と誕生日の月）。商品の情報は入れない
+  const cfg = {
+    now: bingoMonth,
+    ring: RING_SVG,
+    kinds: CELLS.map((k) => (k ? { k, n: KINDS.find((y) => y.k === k).name, img: `/${bingoImg(k)}` } : null)),
+    frames: Object.fromEntries([...Array.from({ length: 12 }, (_, i) => [String(i + 1), `/${bingoImg(`frame-${i + 1}`) || bingoImg('frame-11')}`]), ['b', `/${bingoImg('frame-birthday') || bingoImg('frame-11')}`]]),
+    oshi: Object.fromEntries(oshiPages.map((p) => [`${p.c.slug}/${p.o.slug}`, [p.label, p.o.birthday ? Number(p.o.birthday.slice(0, 2)) : 0]])),
+  };
+  page({
+    path: '/bingo/',
+    crumbs: [{ name: 'トップ', path: '/' }, { name: '推しの入荷ビンゴ（今月）', path: '/bingo/' }],
+    title: `推しの入荷ビンゴ（今月）｜${settings.siteName}`,
+    description: sentence(
+      `推しキャラごとに、サイトが新しいグッズを見つけた日にシールが貼られる3×3のビンゴです`,
+      `${m}月のカードと、前の月までにそろった列を、わたしの推しごとに見られます`,
+    ),
+    h1: '推しの入荷ビンゴ（今月）',
+    body:
+      '<div class="bg-list" id="bgmy" hidden></div>' +
+      `<div class="bg-pick">${pick ? `<div class="bg-list">${pick}</div>` : ''}<p class="bg-hint">推しキャラのページで「わたしの推し」を選ぶと、ここに並びます</p></div>` +
+      `<script type="application/json" id="bgcfg">${JSON.stringify(cfg).replace(/</g, '\\u003c')}</script>`,
+    lastmod: today,
+    extraCss: BINGO_CSS,
+    extraJs: BINGO_JS + BINGO_PAGE_JS,
+  });
+}
+
 // ---- 季節の特集（/作品/季節/ と /季節/） ----
 // 作品ごとの特集のページ（期間中）。others：ほかの作品の特集（いちばん下のリンク）
 // seasons.json の seo があれば、名前・説明文・見出しをそれで作る（福袋：「{作品}の福袋{年}一覧」。検索の「福袋 2027」「ハッピーバッグ」に合わせた）
