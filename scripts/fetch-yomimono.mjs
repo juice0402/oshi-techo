@@ -10,6 +10,8 @@ const settings = readJson('config/settings.json');
 const articles = readJson('config/yomimono.json', []);
 const OUT = 'data/yomimono.json';
 const KEEP = 12; // 棚ごとに残す数（ページに出すのは8つまで。売り切れなどで減っても棚が空かないように）
+const SHOW = 8; // ページに出す数（build.mjs の YOMI_SHELF_MAX と同じ）
+const SHOP_MAX = 2; // 同じお店は1つの棚に2つまで（色ちがい・サイズちがいで棚がうまらないように）。8つに足りない棚だけ、3つ目からでうめる
 const note = (level, msg) => {
   console.log(msg);
   if (process.env.GITHUB_ACTIONS) console.log(`::${level} title=読みものの棚::${msg}`);
@@ -29,11 +31,15 @@ try {
       const seen = new Set();
       // お店ちがいの同じ商品は1回だけ（商品名のはじめ32文字が同じものは、レビューが多いほうを残す）
       const twins = new Set();
-      for (let page = 1; page <= (s.pages ?? 1) && seen.size < KEEP; page++) {
+      // picked：お店ごとに2つまでに入ったもの（レビューが多い順）。extra：3つ目から（picked のうしろに並べ、足りないときだけページに出る）
+      const picked = [];
+      const extra = [];
+      const perShop = new Map();
+      for (let page = 1; page <= (s.pages ?? 1) && (picked.length < SHOW || picked.length + extra.length < KEEP); page++) {
       calls++;
       const { items: found } = await searchPage({ keyword: s.keyword, page, sort: '-reviewCount', availability: '1', ngKeyword: '中古' });
       for (const it of found) {
-        if (seen.size >= KEEP) break;
+        if (picked.length >= KEEP) break;
         if (!judge(it, rule, settings).keep || seen.has(it.code)) continue;
         // head：棚の言葉が、商品名のはじめ（宣伝の【】＼／を除いて head 文字まで）にあるものだけ。言葉をたくさん並べた別の商品をよけるため
         if (s.head && !s.match.some((w) => cleanHead(it.name, s.head).includes(w))) continue;
@@ -41,11 +47,15 @@ try {
         if (twins.has(twin)) continue;
         twins.add(twin);
         seen.add(it.code);
-        items.push({ shelf: id, code: it.code, name: it.name, price: it.price, url: it.url, img: it.img, shop: it.shop, avail: it.avail, reviews: it.reviews, rating: it.rating, postage: it.postage, gift: it.gift });
+        const n = (perShop.get(it.shop) ?? 0) + 1;
+        perShop.set(it.shop, n);
+        (n <= SHOP_MAX ? picked : extra).push({ shelf: id, code: it.code, name: it.name, price: it.price, url: it.url, img: it.img, shop: it.shop, avail: it.avail, reviews: it.reviews, rating: it.rating, postage: it.postage, gift: it.gift });
       }
       if (found.length < 30) break;
       }
-      counts[id] = seen.size;
+      const rows = [...picked, ...extra].slice(0, KEEP);
+      items.push(...rows);
+      counts[id] = rows.length;
     }
   }
 } catch (e) {
