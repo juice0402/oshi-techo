@@ -732,7 +732,7 @@ function page({ path, title, description, h1, lead = '', body, tab = '', corner 
   const tocHtml = `${tocGroups()}
 ${calChars.some((c) => c.corner === (cn || 'chara')) ? `<p class="fl">発売日カレンダー　${calChars.filter((c) => c.corner === (cn || 'chara')).map((c) => `<a href="/${c.slug}/hatsubai/">${esc(c.name)}</a>`).join('／')}</p>` : ''}
 ${gotouchiWorks.length || seasonPages.length ? `<p class="fl">特集　${[...(gotouchiWorks.length ? ['<a href="/gotouchi/">ご当地グッズ</a>'] : []), ...seasonPages.map(({ s }) => `<a href="/${s.slug}/">${esc(s.name)}</a>`)].join('／')}</p>` : ''}
-<p>${yomiArticles.length ? '<a href="/yomimono/">推し活の読みもの</a>／' : ''}<a href="/koushiki/">公式の最新情報</a>／<a href="/calendar/">推し活カレンダー</a>／${oshiPages.length ? '<a href="/bingo/">推しの入荷ビンゴ</a>／' : ''}${birthdays.length ? '<a href="/tanjoubi/">推しキャラの誕生日</a>／' : ''}<a href="/about/">このサイトについて</a>／<a href="/terms/">利用規約</a>／<a href="/privacy/">プライバシーポリシー</a></p>`;
+<p>${yomiArticles.length ? '<a href="/yomimono/">推し活の読みもの</a>／' : ''}<a href="/koushiki/">公式の最新情報</a>／<a href="/calendar/">推し活カレンダー</a>／${oshiPages.length ? '<a href="/bingo/">推しの入荷ビンゴ</a>／' : ''}${birthdays.length ? '<a href="/tanjoubi/">推しキャラの誕生日</a>／' : ''}<a href="/about/">このサイトについて</a>／${settings.contact ? '<a href="/contact/">お問い合わせ</a>／' : ''}<a href="/terms/">利用規約</a>／<a href="/privacy/">プライバシーポリシー</a></p>`;
   const html = `<!doctype html>
 <html lang="ja" data-pg="${pageKind(path)}">
 <head>
@@ -2166,7 +2166,7 @@ page({
   path: '/about/',
   crumbs: [{ name: 'トップ', path: '/' }, { name: 'このサイトについて', path: '/about/' }],
   title: `このサイトについて｜${settings.siteName}`,
-  description: `${settings.siteName}の運営者と広告について。中古や転売の出品を外す決まりと、「相場より高め」「値下がり」の印のつけ方も書いています。`,
+  description: `${settings.siteName}の運営者・中身の作り方・広告・お問い合わせについて。中古や転売の出品を外す決まりと、「相場より高め」「値下がり」の印のつけ方も書いています。`,
   h1: 'このサイトについて',
   body: `<div class="text">
 <p>${esc(settings.siteName)}は、楽天市場のキャラクターグッズの新着を1日2回集めて並べる、個人の非公式サイトです。権利者・楽天とは関係ありません。</p>
@@ -2192,25 +2192,33 @@ page({
 <p>商品とバナーのリンクは楽天アフィリエイトの広告です。リンク先で買い物があると、運営者に紹介料が入ります。</p>
 <h2>表示している情報</h2>
 <p>商品の情報は、楽天ウェブサービスから取っています。価格や在庫は変わることがあるので、買う前に楽天市場のページで確かめてください。</p>
+<h2>中身の作り方</h2>
+<p>商品の情報は1日2回、楽天ウェブサービスから自動で集め、決まりどおりに並んでいるかをテストで確かめてから公開しています。作品と関係のない商品がまざっていないかは本番のデータで見なおし、外す言葉を足しています。</p>
+<p>推し活の読みものと買い方メモは、公式サイトやお店の案内、メーカーの説明などで確かめたことだけを書き、確かめた日と使った資料を載せています。読みものの資料のリンクが切れていないかは、週に1回自動で点検しています。</p>
 <h2>運営者</h2>
-<p>しょーくん</p>
-</div>`,
+<p>しょーくんが個人で運営しています。運営者も推し活をしていて、キャラクターグッズを集めています。</p>
+${settings.contact ? `<h2>お問い合わせ</h2>
+<p>載っている内容のまちがい、関係のない商品のまざり、リンク切れなどは、<a href="/contact/">お問い合わせ</a>から送れます。</p>
+` : ''}</div>`,
 });
 
 page({
   path: '/privacy/',
   crumbs: [{ name: 'トップ', path: '/' }, { name: 'プライバシーポリシー', path: '/privacy/' }],
   title: `プライバシーポリシー｜${settings.siteName}`,
-  description: `${settings.siteName}のプライバシーポリシーです。会員登録はなく、名前やメールアドレスは集めていません。「わたしの推し」は見ている端末のブラウザの中だけに保存します。`,
+  description: `${settings.siteName}のプライバシーポリシーです。会員登録はなく、名前やメールアドレスはお問い合わせで書いたときだけ受け取ります。「わたしの推し」は見ている端末のブラウザの中だけに保存します。`,
   h1: 'プライバシーポリシー',
   body: `<div class="text">
 <p>このサイトを使うと、このプライバシーポリシーと<a href="/terms/">利用規約</a>に同意したことになります。</p>
-<p>このサイトは、会員登録やお問い合わせフォームがなく、名前やメールアドレスなどを集めていません。</p>
+<p>このサイトには会員登録がありません。名前やメールアドレスを受け取るのは、お問い合わせのフォームに書いてもらったときだけです。</p>
 <h2>端末に保存するもの</h2>
 <p>「わたしの推し」に選んだ推しキャラと、前にこのサイトを見た時刻を、見ている端末のブラウザの中だけに保存します。サイトや楽天には送りません。ブラウザのデータを消すと消えます。</p>
 <p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。</p>
 <p>推しキャラのページの「入荷ビンゴ」は、開けたマスの種類と、その月に初めて来た日を、見ている端末のブラウザの中だけに保存します。</p>
-<h2>アクセス解析</h2>
+${settings.contact ? `<h2>お問い合わせ</h2>
+<p>お問い合わせは、Google フォーム（Google LLC のサービス）で受けつけています。受け取るのは、書いてもらったお名前・メールアドレス・内容と、どのサイトからのお問い合わせかだけです。お名前とメールアドレスは書かなくても送れます。</p>
+<p>受け取ったものは、返事をすることと、サイトの内容を直すことだけに使います。ほかの人に渡したり、公開したりはしません。フォームの入力のときには、<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google のプライバシーポリシー</a>も適用されます。</p>
+` : ''}<h2>アクセス解析</h2>
 <p>このサイトは、ページの見られ方を知るために、Cloudflare, Inc. の Cloudflare Web Analytics を使っています。Cookieは使わず、見たページ・参照元・ブラウザと端末の種類・国などを、個人がわからない形で集計します。</p>
 <h2>広告</h2>
 <p>このサイトは楽天アフィリエイトを利用しています。リンク先の楽天市場では、楽天グループのプライバシーポリシーにもとづいてCookieが使われます。</p>
@@ -2219,6 +2227,27 @@ page({
 <p>動画の小さな画像は YouTube のサーバーから読みこむため、そのときに IP アドレスなどの端末の情報が Google に送られます。YouTube API サービスの利用には、<a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube の利用規約</a>と<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google のプライバシーポリシー</a>が適用されます。</p>
 </div>`,
 });
+
+// ---- お問い合わせ（全サイト共通の Google フォーム。サイト名が入った事前入力の URL を config/settings.json の contact に入れる）
+// フッターからはこのページへ（商品のページに楽天以外へのリンクを置かないため、フォームへのリンクはこのページと「このサイトについて」以外に置かない）
+if (settings.contact) {
+  page({
+    path: '/contact/',
+    crumbs: [{ name: 'トップ', path: '/' }, { name: 'お問い合わせ', path: '/contact/' }],
+    title: `お問い合わせ｜${settings.siteName}`,
+    description: `${settings.siteName}へのお問い合わせのページです。載っている内容のまちがいや、関係のない商品のまざり、リンク切れなどを、Google フォームで送れます。`,
+    h1: 'お問い合わせ',
+    body: `<div class="text">
+<p>${esc(settings.siteName)}へのお問い合わせは、Google フォームで受けつけています。</p>
+<p class="more"><a href="${esc(settings.contact)}" target="_blank" rel="noopener">お問い合わせのフォームを開く</a></p>
+<p>載っている商品や読みもの・買い方メモの内容のまちがい、作品と関係のない商品のまざり、リンク切れ、権利者の方からのご連絡などを送れます。</p>
+<p>楽天市場で買った商品の注文・発送・在庫・返品のことは、このサイトではわかりません。買ったお店に、楽天市場の購入履歴から問い合わせてください。</p>
+<p>お名前とメールアドレスは書かなくても送れます。返事がほしいときだけ、メールアドレスを書いてください。すぐに返事ができないことがあります。</p>
+<p>受け取ったものの扱いは、<a href="/privacy/">プライバシーポリシー</a>に書いています。</p>
+</div>`,
+    noindex: 'follow',
+  });
+}
 
 // ---- 利用規約（YouTube API サービスの決まり III.A.1：このサイトを使うと YouTube 利用規約に同意したことになる） ----
 page({
