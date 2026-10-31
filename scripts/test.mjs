@@ -68,7 +68,7 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   const seasons = readJson('config/seasons.json');
   const topicsCfg = readJson('config/topics.json');
   const reserved = new Set(['new', 'yoyaku', 'nesage', 'sainyuka', 'hatsubai', 'yosan', 'gotouchi', 'ranking', 'otona', 'kids', 'kaikata', ...topicsCfg.map((t) => t.slug), ...CATEGORIES.map((k) => k.slug), ...seasons.map((x) => x.slug)]);
-  const rootPages = new Set(['search', 'koushiki', 'about', 'privacy', 'terms', 'tanjoubi', 'gotouchi', 'calendar', ...chars.map((c) => c.slug)]);
+  const rootPages = new Set(['search', 'koushiki', 'about', 'contact', 'privacy', 'terms', 'tanjoubi', 'gotouchi', 'calendar', ...chars.map((c) => c.slug)]);
   ok(seasons.every((x) => /^[a-z]+$/.test(x.slug) && !rootPages.has(x.slug) && /^\d\d-\d\d$/.test(x.from) && /^\d\d-\d\d$/.test(x.to) && x.words.length && x.label && (!x.event || /^\d\d-\d\d$/.test(x.event))), '季節の特集：場所・期間・言葉・イベントの日の設定がそろっている');
   for (const c of chars) {
     const slugs = (c.oshi ?? []).filter((o) => o.slug).map((o) => o.slug);
@@ -151,7 +151,7 @@ const html = files.filter((f) => f.endsWith('.html'));
   const slugs = chars.map((c) => c.slug);
   const dup = slugs.filter((x, i) => slugs.indexOf(x) !== i);
   ok(dup.length === 0, `作品の slug が重なっていない${dup.length ? `（${dup.join('・')}）` : ''}`);
-  const reserved = new Set(['search', 'koushiki', 'calendar', 'tanjoubi', 'gotouchi', 'about', 'terms', 'privacy', 'techo', ...cornerSlugs, ...readJson('config/seasons.json', []).map((x) => x.slug)]);
+  const reserved = new Set(['search', 'koushiki', 'calendar', 'tanjoubi', 'gotouchi', 'about', 'contact', 'terms', 'privacy', 'techo', ...cornerSlugs, ...readJson('config/seasons.json', []).map((x) => x.slug)]);
   const clash = slugs.filter((x) => reserved.has(x));
   ok(clash.length === 0, `作品の slug がコーナー・全体のページと重ならない${clash.length ? `（${clash.join('・')}）` : ''}`);
   ok(chars.every((c) => /^[a-z0-9-]+$/.test(c.slug) && (c.oshi ?? []).every((o) => !o.slug || /^[a-z0-9-]+$/.test(o.slug))), '作品と推しキャラの slug は英小文字・数字・ハイフンだけ');
@@ -737,6 +737,23 @@ if (process.env.DATA_LATEST) {
   ok(t.includes('<a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube 利用規約</a>に同意したことになります') && t.includes('この利用規約と<a href="/privacy/">プライバシーポリシー</a>に同意したことになります'), 'YouTube：利用規約に「YouTube 利用規約に同意したことになる」');
   const pv = readFileSync('dist/privacy/index.html', 'utf8');
   ok(pv.includes('YouTube API サービス') && pv.includes('https://policies.google.com/privacy') && pv.includes('保存しません'), 'YouTube：プライバシーポリシーに YouTube API サービスと Google のプライバシーポリシー');
+}
+
+// 運営者情報とお問い合わせ（2026-10-31 連絡 C-020）：全サイト共通の Google フォーム。サイト名が入った事前入力の URL をそのまま使う
+if (settings.contact) {
+  ok(/^https:\/\/docs\.google\.com\/forms\/d\/e\/[A-Za-z0-9_-]+\/viewform\?usp=pp_url&entry\.\d+=/.test(settings.contact) && decodeURIComponent(settings.contact.split('=').pop()) === settings.siteName, 'お問い合わせ：フォームの URL にサイト名が入っている（短縮していない）');
+  const ct = readFileSync('dist/contact/index.html', 'utf8');
+  const contactHref = settings.contact.replaceAll('&', '&amp;');
+  ok(ct.includes(`<a href="${contactHref}" target="_blank" rel="noopener">`) && ct.includes('<a href="/privacy/">プライバシーポリシー</a>') && !ct.includes('https://hb.afl.rakuten.co.jp/hgc/'), 'お問い合わせ：/contact/ にフォームとプライバシーポリシーへのリンクがあり、楽天の商品がない');
+  ok(ct.includes('<meta name="robots" content="noindex,follow">') || process.env.SITE_MODE !== 'production', 'お問い合わせ：/contact/ は検索に出さない');
+  const about = readFileSync('dist/about/index.html', 'utf8');
+  ok(about.includes('<h2>運営者</h2>') && about.includes('個人で運営しています') && about.includes('<h2>中身の作り方</h2>') && about.includes('<a href="/contact/">お問い合わせ</a>'), 'お問い合わせ：このサイトについてに運営者・中身の作り方・お問い合わせ');
+  const pvc = readFileSync('dist/privacy/index.html', 'utf8');
+  ok(pvc.includes('Google フォーム') && pvc.includes('返事をすることと、サイトの内容を直すことだけに使います') && !pvc.includes('お問い合わせフォームがなく'), 'お問い合わせ：プライバシーポリシーに受け取るものと使いみち');
+  const noFooter = html.filter((f) => !f.endsWith('404.html') && !readFileSync(f, 'utf8').includes('<a href="/contact/">お問い合わせ</a>'));
+  ok(noFooter.length === 0, `お問い合わせ：どのページのフッターからもたどれる${noFooter.length ? `（${noFooter.slice(0, 2).join('、')}）` : ''}`);
+  const formElsewhere = html.filter((f) => !/dist\/(contact|about)\/index\.html$/.test(f.split('\\').join('/')) && readFileSync(f, 'utf8').includes('docs.google.com/forms'));
+  ok(formElsewhere.length === 0, `お問い合わせ：フォームへのリンクは /contact/ と このサイトについて だけ${formElsewhere.length ? `（${formElsewhere.slice(0, 2).join('、')}）` : ''}`);
 }
 
 // サイト作りの原則（2026-10-22）：左はしの色の帯・丸いバッジ・えらんだものだけ色をぬる切りかえを使わない
