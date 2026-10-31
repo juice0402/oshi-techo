@@ -983,10 +983,18 @@ const yomiLinksFor = (slug, where) =>
 const yomiData = readJson(process.env.DATA_LATEST ? 'test/fixture-yomimono.json' : 'data/yomimono.json', { fetchedAt: '', items: [] });
 const YOMI_SHELF_MAX = 8;
 const yomiDate = (ymd) => `${Number(ymd.slice(0, 4))}年${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
+// 記事の都道府県の見出し（<h3 id="p-<ローマ字>">県</h3>）。ご当地の一覧とチェックの道具から、記事の同じ県へつなぐ（記事の HTML から読み、手で二重に持たない）
+const yomiPrefHeads = (slug) =>
+  [...readFileSync(`src/yomimono/${slug}.html`, 'utf8').matchAll(/<h3 id="(p-[a-z]+)">([^<]+)<\/h3>/g)].map((m) => ({ id: m[1], pref: m[2] }));
 function yomiBody(a) {
   let html = readFileSync(`src/yomimono/${a.slug}.html`, 'utf8');
   html = html.replace(/<!--fig:([a-z0-9-]+)-->/g, (_, n) => readFileSync(`src/yomimono/fig/${n}.html`, 'utf8').trim());
   html = html.replace(/<!--tool:([a-z0-9-]+)-->/g, (_, n) => readFileSync(`src/yomimono/tools/${n}.html`, 'utf8').trim());
+  // チェックの道具の <!--prefjump-->：売り場を書いた県の名前から、記事の県の見出しへ
+  html = html.replace('<!--prefjump-->', () => {
+    const heads = yomiPrefHeads(a.slug);
+    return heads.length ? `<div class="gtr gs-to"><p class="oc">売り場の節へ</p><ul class="chips">${heads.map((h) => `<li><a href="#${h.id}">${esc(h.pref)}</a></li>`).join('')}</ul></div>` : '';
+  });
   let shelves = 0;
   html = html.replace(/<!--shelf:([a-z0-9-]+)-->/g, (_, id) => {
     const sh = (a.shelves ?? []).find((x) => x.id === id);
@@ -1565,7 +1573,8 @@ const MAX_PER_PREF = 30;
 const MAX_TOC_OPEN = 15; // 都道府県がこれより多いと、目次を地方ごとにたたむ（最初は開いた形）
 // 都道府県ごとの一覧のページ。作品（/作品/gotouchi/）とキャラだけ（/作品/gotouchi/キャラ/）で同じ形
 // who：説明文と節の名前に使う名前（サンリオ・ハローキティ）。part：都道府県の節の名前（「北海道のご当地{part}」）。top：目次の上に置くもの
-function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [] }) {
+// prefLink：都道府県の id → 見出しのすぐ下に置く1行（読みものに同じ県の見出しがあるときだけ）
+function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [], prefLink = {} }) {
   const w = { items, newest: newestItems };
   const areas = AREAS.map((a) => {
     const prefs = a.prefs
@@ -1619,7 +1628,7 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
         .map(
           (a) =>
             `<section id="${a.slug}"><h2>${esc(a.name)}</h2>${a.prefs
-              .map((p) => `<section class="gp" id="${p.id}"><h3>${esc(p.pref)}</h3>${gridOnce(p.items.slice(0, MAX_PER_PREF))}</section>`)
+              .map((p) => `<section class="gp" id="${p.id}"><h3>${esc(p.pref)}</h3>${prefLink[p.id] ?? ''}${gridOnce(p.items.slice(0, MAX_PER_PREF))}</section>`)
               .join('')}</section>`,
         )
         .join('') +
@@ -1629,6 +1638,13 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     lastmod: newest(w.items),
   });
 }
+// 作品のご当地の一覧から、読みもの（linkFrom の gotouchi）の同じ県の見出しへ。文の形は目次の上の1行に合わせる
+const yomiPrefLinks = (c) =>
+  Object.fromEntries(
+    yomiArticles
+      .filter((a) => a.linkFrom?.work === c.slug && a.linkFrom.pages?.includes('gotouchi'))
+      .flatMap((a) => yomiPrefHeads(a.slug).map((h) => [h.id, `<p class="more"><a href="/yomimono/${a.slug}/#${h.id}">${esc(h.pref)}のご当地${esc(c.name)}はどこで売ってる？（読みもの）</a></p>`])),
+  );
 const placesNote = (places) => (places.length ? `（${places.join('・')}など）` : '');
 for (const w of gotouchiWorks) {
   const { c } = w;
@@ -1648,6 +1664,7 @@ for (const w of gotouchiWorks) {
     crumbs: [{ name: 'トップ', path: '/' }, { name: c.name, path: `/${c.slug}/` }, { name: h1, path }],
     top: yomiLinksFor(c.slug, 'gotouchi') + subs.map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}だけを見る</a></p>`).join(''),
     more: gotouchiWorks.filter((x) => x !== w).map((x) => [`/${x.c.slug}/gotouchi/`, `ご当地${x.c.name}一覧`]),
+    prefLink: yomiPrefLinks(c),
   });
 }
 for (const x of gotouchiSubs) {
