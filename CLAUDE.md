@@ -17,7 +17,7 @@
 - functions/：search/（探す。その場で楽天に聞く）、koushiki/（公式の YouTube の新しい動画）、_middleware.js（oshi-techo.pages.dev と www、なくしたページを 301）
 - そのほか scripts/：pages-secrets.mjs（楽天・YouTube のキーを Cloudflare の秘密の設定へ）、check-search.mjs（公開後に探すを試す）、indexnow.mjs、cleanup-deployments.mjs（本番以外で3日より古いデプロイを消す）
 - src/：見た目（base.css・themes/・deco/）、楽天のクレジットとバナー、icons/・og/・brand/、my.js（わたしの推し・しおり）
-- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）
+- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）
 
 ## ページ（くわしくは docs/shikumi.md）
 
