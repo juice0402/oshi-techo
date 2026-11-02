@@ -31,12 +31,12 @@ const PERK_CLASS = { 送料込み: 's', ラッピング対応: 'g' };
 export const perksOf = (it) => [it.postage === 0 && '送料込み', it.gift === 1 && 'ラッピング対応'].filter(Boolean);
 
 // 画像の説明（商品名）。【送料無料】のような飾りを外して、長すぎないようにする
-export const altOf = (name) =>
-  String(name)
-    .replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 80);
+// 商品名が全部かっこの中のとき（【ちいかわ ポーチ】など）は、かっこの記号だけ外す。説明は空にしない（空だと更新のテストが止まる）
+const altText = (s) => s.replace(/\s+/g, ' ').trim().slice(0, 80);
+export const altOf = (name) => {
+  const raw = String(name ?? '');
+  return altText(raw.replace(/【[^】]*】|［[^］]*］|\[[^\]]*\]/g, ' ')) || altText(raw.replace(/[【】［］[\]]/g, ' ')) || '商品の画像';
+};
 
 // 商品1つ分のカード。リンク先は楽天市場（アフィリエイトのURL）
 // size：楽天市場の画像は128px角、楽天ブックスは120px角。どちらも元の大きさより大きくしない
