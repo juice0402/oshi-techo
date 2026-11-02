@@ -1,0 +1,54 @@
+name: 見張り
+
+# 更新（update.yml）と読みものの資料の点検（check-sources.yml）が失敗したら、issue（ラベル mihari＝しょーくんに知らせるだけ）を作る。
+# 次に成功したら「直った」とコメントして閉じる。cancelled・注記だけの回は何もしない（scripts/mihari.mjs。2026-11-02）。
+# Claude の使用量は使わない。毎朝の Claude の「朝の確認」が issue を知らせる。issue に楽天のデータは書かない。
+# 手で試すときは Actions の画面の「Run workflow」（dry_run が true なら issue を作らず、作るはずの題と本文をログに出す。
+# run_id を入れると、その実行だけを見る。空なら、見張る workflow ごとにいちばん新しい実行）
+on:
+  workflow_run:
+    # 見張る workflow の name:（scripts/mihari.mjs の WATCH と同じものを並べる。name を変えたら、ここも変える）
+    workflows: [更新, 読みものの資料の点検]
+    types: [completed]
+    branches: [main]  # PR の資料の点検は見ない
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true なら issue を作らず、ログに出すだけ'
+        type: boolean
+        default: true
+      run_id:
+        description: '見る実行の番号（空なら、見張る workflow ごとにいちばん新しい実行）'
+        type: string
+        required: false
+
+permissions:
+  issues: write
+  contents: read
+  actions: read
+  checks: read  # 失敗の注記（check-runs の annotations）を読むため
+
+concurrency:
+  group: mihari-${{ github.event.workflow_run.workflow_id || 'manual' }}
+  cancel-in-progress: false
+
+jobs:
+  mihari:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: scripts/mihari.mjs
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: 見張る
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MIHARI_DRY_RUN: ${{ inputs.dry_run }}
+          MIHARI_RUN_ID: ${{ inputs.run_id }}
+        run: node scripts/mihari.mjs

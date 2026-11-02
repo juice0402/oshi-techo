@@ -189,3 +189,9 @@
 ## 広告の表示
 
 - 「広告　楽天アフィリエイトを利用しています」はページの一番下（しょーくんの判断。楽天の基本機能だけなら表示は任意）。楽天の商品提供などの企画に参加したら、最初の画面に戻す
+
+## 見張り（2026-11-02）
+
+- .github/workflows/mihari.yml（scripts/mihari.mjs）：main の更新（update.yml）と読みものの資料の点検（check-sources.yml）が終わるたびに動く。failure・timed_out なら issue（題「【見張り】更新が失敗した」など）を作り、次の成功で「直った」とコメントして閉じる。cancelled・注記だけの回・月の終わりの休みの回（update が動かない）は何もしない。SNSの画像（og.yml）は手で動かす道具なので見ない
+- issue のラベルは mihari（しょーくんに知らせるだけ。毎朝の Claude の「朝の確認」が知らせる）。同じ題の開いた issue があれば作らず、1日1回だけ「まだ続いている」。更新の失敗のくわしいことは非公開の oshi-techo-data の notes/update.log（issue に楽天のデータは書かない）
+- いじるとき：見張る workflow の name を変えたら mihari.yml の workflows: と scripts/mihari.mjs の WATCH もそろえる（scripts/mihari-test.mjs が見る。scripts/test.mjs から動く）。試すのは Actions の「見張り」→ Run workflow（dry_run が true なら書かない）

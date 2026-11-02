@@ -986,5 +986,12 @@ if (process.env.DATA_BOOKS) {
   ok(`https://${mw.CANONICAL_HOST}/` === settings.siteUrl && (await import('./lib/rakuten-core.mjs')).SITE_ORIGIN === `https://${mw.CANONICAL_HOST}`, '引っ越し：転送先・サイトのURL・楽天の Referer がそろっている');
 }
 
+// 見張り（scripts/mihari.mjs・.github/workflows/mihari.yml）の判定。GitHub に聞かない
+{
+  const r = spawnSync(process.execPath, ['scripts/mihari-test.mjs'], { encoding: 'utf8' });
+  const ngs = String(r.stdout ?? '').split('\n').filter((l) => l.startsWith('NG'));
+  ok(r.status === 0, `見張り：判定のテスト（scripts/mihari-test.mjs）${ngs.length ? ` ${ngs.join(' / ')}` : ''}`);
+}
+
 console.log(failed ? `\n${failed}件のNG` : '\nすべてOK');
 process.exit(failed ? 1 : 0);
