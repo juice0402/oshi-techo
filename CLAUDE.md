@@ -17,7 +17,7 @@
 - functions/：search/（探す。その場で楽天に聞く）、koushiki/（公式の YouTube の新しい動画）、_middleware.js（oshi-techo.pages.dev と www、なくしたページを 301）
 - そのほか scripts/：pages-secrets.mjs（楽天・YouTube のキーを Cloudflare の秘密の設定へ）、check-search.mjs（公開後に探すを試す）、indexnow.mjs、cleanup-deployments.mjs（本番以外で3日より古いデプロイを消す）
 - src/：見た目（base.css・themes/・deco/）、楽天のクレジットとバナー、icons/・og/・brand/、my.js（わたしの推し・しおり）
-- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）
+- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）、merge-ok.yml（マージの印。下の節）
 
 ## ページ（くわしくは docs/shikumi.md）
 
@@ -55,5 +55,11 @@ YouTube（/koushiki/）
 
 ## 進め方
 
-- ブランチ → プルリクエスト → 見本データのテスト → しょーくんに伝えてから main へ反映 → update.yml を手で動かして本番（本当のデータのテストはここ。失敗したら公開しない）→ oshi-techo-data の notes/update.log で結果を確かめる → claude/oshi-techo-spec.md に追記
+- ブランチ → プルリクエスト → 見本データのテスト → しょーくんに伝えてから main へ反映 → update.yml を手で動かして本番（merge-ok でマージしたときは GitHub が動かす）（本当のデータのテストはここ。失敗したら公開しない）→ oshi-techo-data の notes/update.log で結果を確かめる → claude/oshi-techo-spec.md に追記
 - 本当のデータで試すときは、oshi-techo-data の data/ をこのリポジトリの data/ に写して使う（.gitignore で入らない）。コミットや issue に商品名を書かない
+
+## マージの印（merge-ok.yml）
+
+- しょーくんの「マージして」のあと、司令塔が PR にラベル merge-ok を付ける → merge-ok.yml（scripts/merge-ok.mjs）が点検（プルリクエストの確認・資料を変える PR は読みものの資料の点検）の合格を待って squash でマージし（本文は「マージの印（merge-ok）で #番号 をマージ」）、更新（update.yml）を main で1回動かす。結果は見張りが見る。merge-ok の無い PR はさわらない
+- 本文の「#数字 のあとにマージ」の PR が開いているあいだは待つ。点検の失敗・main とのぶつかりは、PR にコメントして merge-blocked（司令塔が見る）
+- 試すのは Actions の「マージの印」→ Run workflow（dry_run が true ならマージしない。pr に番号を入れると、その PR だけ）。点検の workflow の name を変えたら merge-ok.yml の workflows: も（scripts/merge-ok-test.mjs が見る）
