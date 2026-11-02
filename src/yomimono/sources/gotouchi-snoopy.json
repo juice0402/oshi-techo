@@ -1,5 +1,5 @@
 {
-  "checked": "2026-10-29",
+  "checked": "2026-10-31",
   "items": [
     {
       "name": "ソニー・ミュージックグループ（ピーナッツの日本国内長期独占エージェント契約）",
@@ -9,7 +9,7 @@
     {
       "name": "スヌーピータウンショップ（店舗一覧）",
       "url": "https://town.snoopy.co.jp/shoplist",
-      "used": "2026年10月の店の一覧（14の都道府県に28店、スヌーピータウンミニ）、伊丹店が一覧にない"
+      "used": "2026年10月の店の一覧（14の都道府県に28店、スヌーピータウンミニ）。都道府県ごとの店：札幌・仙台・東京の7店・横浜みなとみらい・武蔵小杉・埼玉の2店・名古屋の2店・大阪の4店・兵庫の3店・京都四条河原町・岡山・広島パルコ・福岡パルコ・アミュプラザくまもと・鹿児島。伊丹店が一覧にない"
     },
     {
       "name": "財経新聞（スヌーピータウンショップ新宿店）",
@@ -39,7 +39,7 @@
     {
       "name": "SNOOPY茶屋（公式サイト）",
       "url": "https://www.snoopychaya.jp/",
-      "used": "スヌーピーと和のテーマショップ、店の場所、宮島店のオープンの予定（2026年10月31日）、京都・錦店・嵐山店・飛騨高山店の限定"
+      "used": "スヌーピーと和のテーマショップ、店の場所（由布院・京都の錦と嵐山・飛騨高山・SNOOPY Villageの中の伊勢・軽井沢・小樽・川越）、SNOOPY Village 宮島店のオープン（2026年10月31日）と宮島限定のタペストリー・ちりめんの小物、京都・錦店・嵐山店・飛騨高山店の限定"
     },
     {
       "name": "モノコム（ご当地SNOOPY）",
@@ -70,6 +70,71 @@
       "name": "CollectPeanuts.com（Peanuts Logos and Dating Items Guide）",
       "url": "https://collectpeanuts.com/2024/04/29/peanuts-logos-and-dating-items-guide/",
       "used": "2010年6月より前は United Feature Syndicate、そのあとは Peanuts Worldwide の表記。表記がないものはタグが取れたかライセンスを受けていないことがある"
+    },
+    {
+      "name": "スヌーピータウンショップ（2026年のご当地はソラマチから）",
+      "url": "https://town.snoopy.co.jp/blog/20260102.html",
+      "used": "2026年1月の案内：ソラマチ店の限定（桜）が2月中旬に発売"
+    },
+    {
+      "name": "スヌーピータウンショップ（ソラマチ店限定「ソラマチ花見」）",
+      "url": "https://town.snoopy.co.jp/item/original/solamachi2026.html",
+      "used": "ソラマチ店限定「ソラマチ花見」、2026年2月14日発売予定、隅田川の花見のテーマ"
+    },
+    {
+      "name": "スヌーピータウンショップ（東京駅一番街店限定「東京タワー」）",
+      "url": "https://town.snoopy.co.jp/item/original/tokyo_limited202603.html",
+      "used": "スヌーピータウンミニ東京駅一番街店限定の東京タワーのシリーズ、2026年3月7日発売予定、通販と取り置きは3月9日から"
+    },
+    {
+      "name": "スヌーピータウンショップ（9月の新しいアイテム）",
+      "url": "https://town.snoopy.co.jp/blog/20260904.html",
+      "used": "2026年9月の案内：東京駅一番街店限定「東京 駅弁」、9月19日発売、駅長の姿のスヌーピーときょうだいの旅"
+    },
+    {
+      "name": "スヌーピータウンショップ（大阪梅田店限定「梅田ローカルグルメ」）",
+      "url": "https://town.snoopy.co.jp/item/original/umeda_local_gourmet2026.html",
+      "used": "大阪梅田店限定「梅田ローカルグルメ」、2026年4月11日発売予定"
+    },
+    {
+      "name": "スヌーピータウンショップ（横浜みなとみらい店限定「YOKOHAMA's night view」）",
+      "url": "https://town.snoopy.co.jp/item/original/yokohama_night_view2026.html",
+      "used": "横浜みなとみらい店限定、2026年4月11日発売予定、横浜の夜のテーマ"
+    },
+    {
+      "name": "スヌーピータウンショップ（75周年とご当地限定）",
+      "url": "https://town.snoopy.co.jp/blog/20250307.html",
+      "used": "2025年3月の案内：横浜みなとみらい店の水兵さんのシリーズ、大阪梅田店のたこ焼きのシリーズ"
+    },
+    {
+      "name": "スヌーピータウンショップ（心斎橋と札幌のご当地アイテム）",
+      "url": "https://town.snoopy.co.jp/blog/261016.html",
+      "used": "2026年10月の案内：心斎橋パルコ店（屋台）と札幌店「北海道とスヌーピー」（とうもろこし・ラベンダー）が11月下旬に発売予定"
+    },
+    {
+      "name": "キャラ国 HARIMAYA CHARACTER SHOP（ご当地スヌーピーの一覧）",
+      "url": "https://www.charakoku.com/SHOP/139257/195099/list.html",
+      "used": "四国4県の根付とキーホルダー、キーホルダーは在庫切れ、はりま家は高知市"
+    },
+    {
+      "name": "TORCH Online Shop（スヌーピーの商品一覧）",
+      "url": "https://tohokucard.thebase.in/categories/2273448",
+      "used": "東北のお土産を作って売る店。県ごとのスヌーピー：青森（りんご・大間・ねぶた）・岩手（わんこそば・金色堂・河童・岩手山）・宮城（伊達政宗・ずんだ）・秋田（なまはげ）・福島（もも・赤べこ）"
+    },
+    {
+      "name": "TORCH Online Shop（スヌーピー青森 ステッカー ねぶた）",
+      "url": "https://tohokucard.thebase.in/items/73060654",
+      "used": "青森のシリーズはりんご・まぐろ・ねぶた"
+    },
+    {
+      "name": "TORCH Online Shop（スヌーピー岩手 刺繍キーホルダー わんこそば）",
+      "url": "https://tohokucard.thebase.in/items/87398446",
+      "used": "岩手の刺繍キーホルダーはわんこそばと金色堂、2026年10月は売り切れ"
+    },
+    {
+      "name": "アットプレス（スヌーピーミュージアム ふかふかミュージアム）",
+      "url": "https://www.atpress.ne.jp/news/574679",
+      "used": "2026年2月の発表：町田市のスヌーピーミュージアム、ショップの BROWN'S STORE で企画展にあわせたグッズ"
     }
   ]
 }

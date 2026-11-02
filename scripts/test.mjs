@@ -9,6 +9,7 @@ import { pathToFileURL } from 'node:url';
 import { judge } from './lib/filter.mjs';
 import { readJson } from './lib/util.mjs';
 import { loadWorks } from './lib/load-works.mjs';
+import { AREAS, prefId } from './lib/region.mjs';
 
 let failed = 0;
 const ok = (cond, msg) => {
@@ -652,6 +653,16 @@ if (process.env.DATA_LATEST) {
     ok(sn.includes(yl + '<nav class="gtoc"') && readFileSync('dist/snoopy/kaikata/index.html', 'utf8').includes(yl) && readFileSync('dist/snoopy/index.html', 'utf8').includes(yl) && !readFileSync('dist/chiikawa/gotouchi/index.html', 'utf8').includes('gotouchi-snoopy'), '読みもの：ご当地スヌーピーの記事へ、スヌーピーのご当地・買い方メモ・トップからつなぐ');
     const ys = readFileSync('dist/yomimono/gotouchi-snoopy/index.html', 'utf8');
     ok((ys.match(/<button type="button" data-p="[a-z]+" aria-pressed="false">/g) ?? []).length === 47 && (ys.match(/<rect class="fg-w" data-p="[a-z]+"/g) ?? []).length === 47 && ys.includes('<a href="/snoopy/gotouchi/">ご当地スヌーピー一覧</a>'), '読みもの：集めた都道府県のチェック（47のチェック欄と地図のマス）と一覧へのリンク');
+    // 都道府県ごとの買える場所（#46）：記事の県の見出し（地方の h2 の中の h3、id は一覧と同じ p-<ローマ字>）へ、一覧とチェックの道具からつなぐ
+    const heads = [...ys.matchAll(/<h3 id="(p-[a-z]+)">([^<]+)<\/h3>/g)].map((m) => m[1]);
+    const order = AREAS.flatMap((a) => a.prefs).map(prefId);
+    ok(heads.length >= 10 && heads.every((id) => order.includes(id)) && heads.every((id, i) => i === 0 || order.indexOf(heads[i - 1]) < order.indexOf(id)) && AREAS.some((a) => ys.includes(`<h2 id="${a.slug}">`)), `読みもの：ご当地スヌーピーの県の見出しは北から南・一覧と同じ id（${heads.length}県）`);
+    const listed = [...sn.matchAll(/<section class="gp" id="(p-[a-z]+)"><h3>[^<]+<\/h3>(<p class="more"><a href="\/yomimono\/gotouchi-snoopy\/#(p-[a-z]+)">)?/g)];
+    ok(listed.length > 0 && listed.every((m) => (heads.includes(m[1]) ? m[3] === m[1] : !m[2])) && listed.some((m) => m[2]) && listed.some((m) => !m[2]), 'ご当地スヌーピー一覧：記事に見出しのある県にだけ、記事の同じ県へのリンク（飛び先の id が記事にある）');
+    ok(!readFileSync('dist/sanrio/gotouchi/kitty/index.html', 'utf8').includes('/yomimono/gotouchi-snoopy/#') && !readFileSync('dist/chiikawa/gotouchi/index.html', 'utf8').includes('/yomimono/gotouchi-snoopy/#'), 'ご当地：ほかの作品とキティの一覧には、県のリンクを出さない');
+    const jump = ys.match(/<div class="gtr gs-to">([\s\S]*?)<\/div>/)?.[1] ?? '';
+    const jumpIds = [...jump.matchAll(/href="#(p-[a-z]+)"/g)].map((m) => m[1]);
+    ok(jumpIds.length === heads.length && jumpIds.every((id, i) => id === heads[i]) && ys.indexOf('class="gtr gs-to"') < ys.indexOf('class="fit-out"'), 'チェックの道具：売り場を書いた県の名前から、記事の県の見出しへ飛べる');
     ok(readFileSync('dist/privacy/index.html', 'utf8').includes('集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します'), '読みもの：プライバシーポリシーに、チェックをブラウザの中だけに残すことを書く');
   }
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
