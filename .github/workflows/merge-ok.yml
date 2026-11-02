@@ -1,0 +1,64 @@
+name: マージの印
+
+# ラベル merge-ok（しょーくんの OK。司令塔が、しょーくんの「マージして」のあとにだけ付ける）の PR を、
+# 点検が通ったら GitHub が squash でマージし、更新（update.yml）を main で1回動かす（scripts/merge-ok.mjs。2026-11-02）。
+# GITHUB_TOKEN のマージでは push で動く workflow が動かないため、いままで手で動かしていた更新を workflow_dispatch で動かす。
+# 更新の結果は見張り（mihari.yml）が見る。merge-ok の付いていない PR はさわらない。
+# 手で試すときは Actions の画面の「Run workflow」（dry_run が true ならマージせず、するはずのことをログに出す。pr に番号を入れると、その PR だけ見る）
+on:
+  pull_request:
+    types: [labeled]
+  workflow_run:
+    # PR の点検の workflow の name:（pr.yml・資料を変える PR の check-sources.yml）。点検が終わったら見直す（name を変えたら、ここも変える）
+    workflows: [プルリクエストの確認, 読みものの資料の点検]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'true ならマージせず、するはずのことをログに出すだけ'
+        type: boolean
+        default: true
+      pr:
+        description: 'PR の番号（空なら merge-ok の付いた PR を全部。その PR も merge-ok が無ければマージしない）'
+        type: number
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: write
+  checks: read
+  statuses: read
+
+jobs:
+  merge-ok:
+    name: merge-ok  # check-run の名前（scripts/merge-ok.mjs の SELF_CHECK。点検に数えない）
+    # merge-ok が付いたとき・PR の点検が終わったとき・手で動かしたときだけ（ほかのラベル・毎週の資料の点検では動かない）
+    if: >-
+      (github.event_name == 'pull_request' && github.event.label.name == 'merge-ok') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request') ||
+      github.event_name == 'workflow_dispatch'
+    # 同時に2つ動かさない（ジョブに付けるので、ほかのラベルの回は順番待ちに入らない）
+    concurrency:
+      group: merge-ok
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15  # ふだんは1分かからない。点検のない PR を10分待つときだけ長くなる
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}  # 判定はいつも main のもの（PR の中の書きかえで動きが変わらないように）
+          sparse-checkout: scripts/merge-ok.mjs
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: マージする
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MERGE_OK_DRY_RUN: ${{ inputs.dry_run }}
+          MERGE_OK_PR: ${{ inputs.pr }}
+        run: node scripts/merge-ok.mjs

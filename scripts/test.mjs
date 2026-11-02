@@ -993,5 +993,12 @@ if (process.env.DATA_BOOKS) {
   ok(r.status === 0, `見張り：判定のテスト（scripts/mihari-test.mjs）${ngs.length ? ` ${ngs.join(' / ')}` : ''}`);
 }
 
+// マージの印（scripts/merge-ok.mjs・.github/workflows/merge-ok.yml）の判定。GitHub に聞かない
+{
+  const r = spawnSync(process.execPath, ['scripts/merge-ok-test.mjs'], { encoding: 'utf8' });
+  const ngs = String(r.stdout ?? '').split('\n').filter((l) => l.startsWith('NG'));
+  ok(r.status === 0, `マージの印：判定のテスト（scripts/merge-ok-test.mjs）${ngs.length ? ` ${ngs.join(' / ')}` : ''}`);
+}
+
 console.log(failed ? `\n${failed}件のNG` : '\nすべてOK');
 process.exit(failed ? 1 : 0);
