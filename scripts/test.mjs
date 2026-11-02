@@ -110,7 +110,7 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
 // 予約の締切・発売の時期と、楽天の情報の印（送料込み・ラッピング対応・販売期間）
 {
   const { reservationInfo } = await import('./lib/classify.mjs');
-  const { marksFor } = await import('./lib/view.mjs');
+  const { marksFor, altOf } = await import('./lib/view.mjs');
   const { parseItems } = await import('./lib/rakuten-core.mjs');
   const at = '2026-10-22T03:00:00.000Z';
   const r = (name, extra = {}) => reservationInfo({ name, ...extra }, at);
@@ -127,6 +127,7 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   const [p] = parseItems({ Items: [{ itemCode: 'a:1', itemName: 'ちいかわ', postageFlag: 0, giftFlag: 1 }] });
   const [q] = parseItems({ Items: [{ itemCode: 'a:2', itemName: 'ちいかわ' }] });
   ok(p.postage === 0 && p.gift === 1 && q.postage === null && q.gift === null, '印：楽天の postageFlag・giftFlag を読む（ないときは「わからない」）');
+  ok(altOf('【送料無料】ちいかわ ポーチ') === 'ちいかわ ポーチ' && altOf('【ちいかわ ハチワレ キーホルダー】') === 'ちいかわ ハチワレ キーホルダー' && altOf('[ちいかわ][ハチワレ]') === 'ちいかわ ハチワレ' && altOf('') === '商品の画像', '画像の説明：飾りを外す。商品名が全部かっこの中でも空にしない');
 }
 
 // 2. 作ったページ
