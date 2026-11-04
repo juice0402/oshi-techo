@@ -5,6 +5,7 @@
 ## 読むもの
 
 - docs/shikumi.md：機能ごとのくわしい説明。その機能をさわるときに、その節だけ読む
+- docs/yomimono-neta.md：読みもののネタの山と書き方（予約タスク「読みもの書き」が上から1本ずつ書く）。docs/sodateru.md：育てる山（夜の作業が上から1つずつ取る）
 - claude.ai プロジェクト「ネット副業」の資料：claude/oshi-techo-spec.md（設計・PRごとの記録・決めた経緯）、claude/site-principles.md（見た目と文章の原則。見た目・文章を変えるとき）、claude/oshi-techo-keywords.md（Googleの検索候補。ページの名前や新しいページはこれに合わせる）
 
 ## しくみ（npmの部品は使わず、Node 22 だけで動く）
