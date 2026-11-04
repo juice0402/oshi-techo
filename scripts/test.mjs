@@ -252,7 +252,10 @@ const html = files.filter((f) => f.endsWith('.html'));
   const dir = 'src/kaikata';
   const KK_IDS = new Set(['shinsaku', 'yoyaku', 'kuji', 'saihan', 'miwake']);
   const ymd = /^\d{4}-\d{2}-\d{2}$/;
-  const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+  // build.mjs と同じく、記録を取った時刻（meta.fetchedAt）の日本の日付で見る（見本データでも build と同じ日になる）
+  const metaPath = process.env.DATA_META ?? 'data/meta.json';
+  const fetchedMs = existsSync(metaPath) ? Date.parse(JSON.parse(readFileSync(metaPath, 'utf8')).fetchedAt) : NaN;
+  const today = new Date((Number.isFinite(fetchedMs) ? fetchedMs : Date.now()) + 9 * 3600000).toISOString().slice(0, 10);
   for (const f of existsSync(dir) ? readdirSync(dir).filter((x) => x.endsWith('.json')) : []) {
     const slug = f.replace(/\.json$/, '');
     const k = readJson(`${dir}/${f}`);
