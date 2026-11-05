@@ -136,7 +136,7 @@ h1+section .grid,h1+.grid{margin-top:10px}
 .srt a{display:block;padding:4px 10px;font-size:13px}
 .menu{position:relative}.menu>summary{cursor:pointer;list-style:none;font-size:13px;padding:4px 6px}.menu>summary::-webkit-details-marker{display:none}.menu-in{position:absolute;right:0;top:calc(100% + 6px);z-index:30;width:min(calc(100vw - 32px),360px);max-height:70vh;overflow:auto;background:#fff;border:1px solid #ddd;padding:12px 14px;font-size:14px;line-height:1.9}.stoc .tgh,.menu-in .tgh{margin:8px 0 0;font-weight:700}.stoc .tg p,.menu-in .tg p{margin:0}
 /* パソコン（幅1100px以上）だけの見開き。スマホと幅1099px以下は変えない。.wrap の 980px はそのまま */
-/* 読みもの：本文の列と右の柱（もくじ）。推しキャラ：商品の一覧と右の柱（入荷ビンゴ）。ご当地：上の部分だけ2列。買い方メモ：文章を全角40字まで */
+/* 読みもの：本文の列と右の柱（もくじ）。推しキャラ：商品の一覧から下の列と右の柱（入荷ビンゴ。スマホではいちばん下）。ご当地：上の部分だけ2列。買い方メモ：文章を全角40字まで */
 @media (min-width:1100px){
 .spread{display:grid;grid-template-columns:minmax(0,1fr) 300px;column-gap:40px;align-items:start}
 .yomi-body.spread>*{grid-column:1}
