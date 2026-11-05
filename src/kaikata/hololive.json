@@ -1,0 +1,212 @@
+{
+  "published": "2026-11-05",
+  "checked": "2026-11-05",
+  "shops": [
+    {
+      "kind": "お店",
+      "name": "hololive production official shop in Harajuku",
+      "note": "原宿の東急プラザ表参道「オモカド」の公式ショップ。2026年4月24日に開店し、はじめの2日は事前予約制でした",
+      "url": "https://hololive.hololivepro.com/en/events/shopharajuku/",
+      "short": "原宿・東京駅・大阪梅田の公式ショップ"
+    },
+    {
+      "kind": "お店",
+      "name": "hololive production official shop in Tokyo Station",
+      "note": "東京駅の東京キャラクターストリートの公式ショップ。2026年11月13日に同じ通りの新しい区画へ移ります",
+      "url": "https://hololive.hololivepro.com/en/events/shoptyo",
+      "short": ""
+    },
+    {
+      "kind": "お店",
+      "name": "hololive production official shop in Osaka Umeda",
+      "note": "大阪梅田の阪急三番街 北館B1の公式ショップ。2025年6月27日に開店しました",
+      "url": "https://hololive.hololivepro.com/en/events/shopumeda/",
+      "short": ""
+    },
+    {
+      "kind": "通販",
+      "name": "hololive production OFFICIAL SHOP",
+      "note": "公式の通販。新着・再入荷・二次受注の欄があります",
+      "url": "https://shop.hololivepro.com/",
+      "short": "公式通販"
+    },
+    {
+      "kind": "事前注文",
+      "name": "holocart",
+      "note": "イベントの会場で受け取るグッズを先に注文するところ。受付はイベントごとの期間だけです",
+      "url": "https://cart.hololivepro.com/"
+    },
+    {
+      "kind": "お知らせ",
+      "name": "ホロライブプロダクションのX",
+      "note": "ホロライブプロダクションの公式アカウント",
+      "url": "https://x.com/hololivetv",
+      "gh": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "shinsaku",
+      "h": "新作の出かた",
+      "lines": [
+        "公式ショップは店ごとに、描き下ろしの絵柄の限定シリーズを出しています。原宿の店は2026年4月の開店と同じ日に「Harajuku Chibi style」を出しました",
+        "全国を回るポップアップの店もあります。2026年10月に東京で始まった「hololive production official pop up shop」は、名古屋・福岡・大阪・札幌を回り、会場ごとの限定品があると発表されています",
+        "コンビニとのコラボもあります。ローソンでは2026年3月と10月に、店で売るアクリルスタンドや缶バッジ、対象のお菓子を買うともらえるクリアファイルがありました",
+        "楽天ブックスで発売日が決まっているものは[[発売日カレンダー|hatsubai]]にまとめています"
+      ]
+    },
+    {
+      "id": "yoyaku",
+      "h": "予約と受注生産",
+      "lines": [
+        "公式通販には受注生産の商品があります。受注の期間が終わってから順に発送され、支払いが決まったあとはキャンセルできません",
+        "受注生産の商品は、ほかの商品と同じカートで買えないことがあります。予約の商品と在庫のある商品をいっしょに注文すると、予約の商品がそろってから送られます",
+        "大阪梅田の公式ショップは、記念のグッズや受注生産の商品を扱わないと案内しています",
+        "イベントの会場で受け取るグッズは、holocartで先に注文できます。2026年3月の「hololive SUPER EXPO 2026」では2月19日から26日までの受付で、受け取れるのはその日のチケットを持つ本人だけでした。注文のあとの変更やキャンセルはできません",
+        "同じイベントのグッズは、公式通販でも事前と事後に売られました。事後の受付は2026年3月6日から4月27日までで、発送は9月下旬の予定でした",
+        "楽天市場のお店の予約は[[予約受付中|yoyaku]]に並べています"
+      ]
+    },
+    {
+      "id": "kuji",
+      "h": "くじとランダムの商品",
+      "lines": [
+        "一番くじ「ホロライブ ちょこのっこコレクション 2026ver.」は、2026年5月21日から一番くじONLINEだけで売られました。1回900円で、はずれなしの33人のフィギュアです",
+        "2026年3月のローソンのコラボでは、12種から1枚が出るフォト風カードが385円、6種から1つが出るアクリルキーホルダーが1,100円でした",
+        "公式ショップで買った金額に応じてもらえる品は、種類を選べないものがあります。東京駅の店は2026年11月13日から、2,200円以上で12種のうち1枚のステッカーを先着で配ると案内しています"
+      ]
+    },
+    {
+      "id": "saihan",
+      "h": "再販",
+      "lines": [
+        "公式通販には再入荷の欄と二次受注の欄があります。売り切れた商品を、あとからもう一度受け付けることがあります",
+        "公式ショップの限定品は、はじめの期間のあとに再販されることがあります。在庫や入荷の時期についての問い合わせには答えないと案内されています",
+        "一番くじの「ちょこのっこコレクション 2026ver.」は、2026年6月23日から7月5日まで一番くじONLINEで受注の再販を受け付けました。届くのは2026年12月の予定です",
+        "楽天市場のお店で売り切れから戻ったものは[[再入荷|sainyuka]]に並べています"
+      ]
+    },
+    {
+      "id": "miwake",
+      "h": "公式の見分け方",
+      "lines": [
+        "2026年の公式の発表やグッズの記事では、「©COVER」の形の権利の表記がついていました。ホロライブプロダクションを運営するのはカバー株式会社です",
+        "公式通販は、カバーが2021年9月に開いたショップです",
+        "サインをまねて作ったグッズがフリマやオークションのサイトで売られた件で、カバーは裁判所を通じた手続きで相手を特定し、示談にしたと2026年1月に公表しました"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "from": "2026-11-06",
+      "to": "2026-11-23",
+      "until": "2026-11-23",
+      "text": "名古屋で「hololive production official pop up shop」が開かれます"
+    },
+    {
+      "from": "2026-11-13",
+      "until": "2026-11-13",
+      "text": "東京駅の公式ショップが新しい区画で再開し、限定シリーズ「hololive Station Classical Vol.1」が発売の予定です。11月9日から12日は移るために休みです"
+    },
+    {
+      "from": "2026-12-11",
+      "to": "2026-12-20",
+      "until": "2026-12-20",
+      "text": "福岡で「hololive production official pop up shop」が開かれます"
+    },
+    {
+      "from": "2027-01-09",
+      "to": "2027-01-17",
+      "until": "2027-01-17",
+      "text": "大阪で「hololive production official pop up shop」が開かれます"
+    },
+    {
+      "from": "2027-03-19",
+      "to": "2027-03-28",
+      "until": "2027-03-28",
+      "text": "札幌で「hololive production official pop up shop」が開かれます"
+    }
+  ],
+  "sources": [
+    {
+      "name": "ホロライブ（原宿の公式ショップの開店 2026年3月3日）",
+      "url": "https://hololive.hololivepro.com/en/news/20260303-01-376/",
+      "used": "原宿の店の開店の日と場所、はじめの2日の事前予約、Harajuku Chibi style、権利の表記"
+    },
+    {
+      "name": "ホロライブ（hololive production official shop in Harajuku）",
+      "url": "https://hololive.hololivepro.com/en/events/shopharajuku/",
+      "used": "限定品の再販、在庫の問い合わせ"
+    },
+    {
+      "name": "ホロライブ（hololive production official shop in Tokyo Station）",
+      "url": "https://hololive.hololivepro.com/en/events/shoptyo",
+      "used": "東京駅の店、11月13日の再開と限定シリーズ、買った金額でもらえる品"
+    },
+    {
+      "name": "ホロライブ（hololive production official shop in Osaka Umeda）",
+      "url": "https://hololive.hololivepro.com/en/events/shopumeda/",
+      "used": "大阪梅田の店の場所と開店の日、記念のグッズと受注生産を扱わないこと"
+    },
+    {
+      "name": "アニメ！アニメ！（東京駅の公式ショップの移転 2026年10月20日）",
+      "url": "https://animeanime.jp/release/prtimes/20261020/320958.html",
+      "used": "東京駅の店の休みと再開の日"
+    },
+    {
+      "name": "gamebiz（原宿の公式ショップ 2026年3月3日）",
+      "url": "https://gamebiz.jp/news/421932",
+      "used": "原宿の店の開店の日と場所"
+    },
+    {
+      "name": "hololive production OFFICIAL SHOP（受注生産の商品の例）",
+      "url": "https://shop.hololivepro.com/en/products/nekomataokayu_okayunyumur_productionlimited_hololiveofficialedition",
+      "used": "受注生産の商品のカート、予約と在庫の商品をいっしょに注文したときの発送、支払いのあとのキャンセル"
+    },
+    {
+      "name": "hololive production OFFICIAL SHOP（受注生産 さくらみこ 2nd LIVE）",
+      "url": "https://shop.hololivepro.com/products/sakuramiko_2ndlive_bloomingparade_madetoorder",
+      "used": "受注の期間のあとに順に発送すること、支払いが決まったあとのキャンセル"
+    },
+    {
+      "name": "hololive SUPER EXPO 2026（グッズ）",
+      "url": "https://hololivesuperexpo.hololivepro.com/2026/en/merch",
+      "used": "holocart の受付と受け取り、事後の通販の期間と発送"
+    },
+    {
+      "name": "ファミ通（公式オンラインショップの開店 2021年9月6日）",
+      "url": "https://www.famitsu.com/news/202109/06232792.html",
+      "used": "公式通販を開いた時期と運営の会社"
+    },
+    {
+      "name": "電撃オンライン（一番くじ ちょこのっこコレクション 2026年4月28日）",
+      "url": "https://dengekionline.com/article/202604/73449",
+      "used": "一番くじの発売の日と値段、一番くじONLINEだけで売ること"
+    },
+    {
+      "name": "インサイド（一番くじの受注再販 2026年6月19日）",
+      "url": "https://www.inside-games.jp/article/2026/06/19/183238.html",
+      "used": "一番くじの人数とはずれなし、受注の再販の期間と届く時期"
+    },
+    {
+      "name": "GAME Watch（ローソン×ホロライブ 2026年3月9日）",
+      "url": "https://game.watch.impress.co.jp/docs/news/2091672.html",
+      "used": "コンビニのコラボのグッズとランダムの商品の値段"
+    },
+    {
+      "name": "インサイド（ローソン×ホロライブ 2026年10月13日）",
+      "url": "https://www.inside-games.jp/article/2026/10/13/189146.html",
+      "used": "10月のコンビニのコラボ"
+    },
+    {
+      "name": "インサイド（ポップアップショップ 2026年9月11日）",
+      "url": "https://www.inside-games.jp/article/2026/09/11/187603.html",
+      "used": "ポップアップの会場と期間、会場ごとの限定品"
+    },
+    {
+      "name": "KAI-YOU（権利の侵害への対応 2026年1月21日）",
+      "url": "https://kai-you.net/article/94427",
+      "used": "サインをまねたグッズの件と示談"
+    }
+  ]
+}

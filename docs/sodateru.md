@@ -6,7 +6,7 @@
 推し手帳の夜の注意（どの項目にも）：このリポジトリは公開なので、楽天の商品名・値段・URL を issue・PR・コミット・ログに書かない。PR は見本データのテストだけ（楽天から取らない・プレビューなし）。マージのあと update.yml を手で動かし、本当のデータのテストと中身は oshi-techo-data の notes/update.log で確かめる。update.yml と重ねない。ブランチは git checkout -b <名前> origin/main で作る。
 
 ## 山
-### [ ] 買い方メモ：ホロライブ
+### [x] 買い方メモ：ホロライブ（#61）
 - やること：src/kaikata/hololive.json を作り、/hololive/kaikata/ を出す（ファイルを置くだけでページと作品のトップの「選び方」からのリンクができる）。shops・sections（shinsaku・yoyaku・kuji・saihan・miwake のうち確かめられたもの、3つ以上）・events（発表のある予定だけ）・sources
 - できあがりの条件：見本データでテストが通り、/hololive/kaikata/ に楽天の商品と広告が出ていない。説明文が125字をこえない（こえたら short を使う）。check-sources の点検が通る（X は gh: false）
 - 決まったこと（11/4 しょーくん「ホロライブ＋鬼滅の刃」）：ホロライブは発売日のページが検索で8位台に出ているので先に。11/4 にチャットで開いて確かめたこと（2026年11月）：公式の通販は hololive production OFFICIAL SHOP（https://shop.hololivepro.com/ 。新着・再入荷・二次受注の区分がある）。イベントの会場で受け取る事前注文は holocart（https://cart.hololivepro.com/ 。受付は期間ごと）。実店舗は原宿の hololive production official shop in Harajuku（https://hololive.hololivepro.com/en/news/20260303-01-376/ 。2026年4月24日開店、渋谷区神宮前の OMOKADO、はじめの2日は事前予約制だった）。受注生産の例（https://shop.hololivepro.com/products/sakuramiko_2ndlive_bloomingparade_madetoorder 。受注の期間のあとに順に発送・支払いが決まったあとはキャンセルできない）。公式X は https://twitter.com/hololivetv（ショップだけの X は公式サイトに出ていない）
