@@ -1309,11 +1309,11 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
     body:
       myButton(path, o.name) +
       shioriNav(list.slice(0, settings.listItems)) +
-      `<div class="spread"><ul class="grid" data-pool>${list
+      // 入荷ビンゴは、スマホではページのいちばん下、パソコン（1100px 以上）では右の柱（11/6 しょーくん「一番下にしておいて」）
+      `<div class="spread"><div class="flow"><ul class="grid" data-pool>${list
         .slice(0, settings.topItems)
         .map((it, j) => cell(it, j < 4, { cat: true }))
         .join('')}</ul>` +
-      `<div class="side" data-stick>${bingoHtml(c, o, label, list.slice(0, settings.listItems))}</div></div>` +
       priceAt() +
       // 一覧にないランキングのグッズだけ（一覧のカードには、ランキングの印がつく）
       rankSection('楽天のランキングに入っているもの', ranked.filter((r) => !inList.has(r.code)), settings.topItems) +
@@ -1326,7 +1326,8 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
         .map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}一覧</a></p>`)
         .join('') +
       (bd ? `<p class="more"><a href="/tanjoubi/">${esc(o.name)}の誕生日は${mdLabel(o.birthday)}</a></p>` : '') +
-      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p>`,
+      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p></div>` +
+      `<div class="side" data-stick>${bingoHtml(c, o, label, list.slice(0, settings.listItems))}</div></div>`,
     deco: bd && bd.days <= BIRTHDAY_DECO ? 'birthday' : '',
     lastmod: newest(list),
     extraCss: BINGO_CSS,
