@@ -14,7 +14,7 @@
 - 読むファイル：docs/shikumi.md の「買い方メモ」、src/kaikata/mofusand.json（形のひな形）、claude/oshi-kaikata-research-2026-10b.md（調べ方）
 - マージ：する
 
-### [ ] 買い方メモ：鬼滅の刃
+### [x] 買い方メモ：鬼滅の刃（#67）
 - やること：src/kaikata/kimetsu.json を作り、/kimetsu/kaikata/ を出す。shops・sections（shinsaku・yoyaku・kuji・saihan・miwake のうち確かめられたもの、3つ以上）・events（発表のある予定だけ）・sources
 - できあがりの条件：見本データでテストが通り、/kimetsu/kaikata/ に楽天の商品と広告が出ていない。説明文が125字をこえない（こえたら short を使う）。check-sources の点検が通る（X は gh: false）
 - 決まったこと（11/4 しょーくん「ホロライブ＋鬼滅の刃」）：11/4 にチャットで開いて確かめたこと（2026年11月）：公式サイトのグッズの案内 https://kimetsu.com/anime/goods/ とライセンス商品の一覧 https://kimetsu.com/anime/goods/license.html（通販へのリンクはない）。アニプレックスの公式の通販 アニプレックス オンライン（旧 ANIPLEX+）の鬼滅の刃の一覧 https://online.aniplex.co.jp/tXxFSojv（フィギュア・「ゆらふわ」・墨絵コレクション・無限城編の劇場のグッズなど）。ufotable Cafe の案内 https://www.ufotable.com/cafe/guide.html（店で売るグッズの一部は ufotable WEBSHOP でも買える）。公式X https://x.com/kimetsu_off（公式サイトに出ている）
