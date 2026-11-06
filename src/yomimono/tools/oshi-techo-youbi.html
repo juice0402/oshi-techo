@@ -29,8 +29,8 @@ if(!(d>=1&&d<=31)){ans.textContent='日は1〜31の数字で入れてくださ�
 if(d>last){ans.textContent=m===2&&d===29?'2027年はうるう年ではなく、2月は28日までです。':'2027年の'+m+'月は'+last+'日までです。';return;}
 var t=day(m,d),k=m+'-'+d,w=t.getDay();
 ans.textContent='2027年'+m+'月'+d+'日は'+W[w]+'曜日です。'+(H[k]?'祝日の「'+H[k]+'」と重なります。':(w===0||w===6)?'土日です。':'平日です。');
-if(off(t)){var r=run(t);if(r[2]>=2)sub.textContent='土日と祝日が続く'+r[2]+'連休（'+md(r[0])+'〜'+md(r[1])+'）の'+(Math.round((t-r[0])/864e5)+1)+'日目です。';}
-else if(off(add(t,1))){var r1=run(add(t,1));sub.textContent='次の日から'+r1[2]+'日の休み（'+md(r1[0])+'〜'+md(r1[1])+'）が続きます。';}
+if(off(t)){var r=run(t);if(r[2]>=3)sub.textContent='土日と祝日・休日が続く'+r[2]+'連休（'+md(r[0])+'〜'+md(r[1])+'）の'+(Math.round((t-r[0])/864e5)+1)+'日目です。';}
+else if(off(add(t,1))){var r1=run(add(t,1));sub.textContent='次の日から'+r1[2]+'日続く休み（'+md(r1[0])+'〜'+md(r1[1])+'）が続きます。';}
 else if(off(add(t,-1))){var r2=run(add(t,-1));sub.textContent='前の日までの'+r2[2]+'日（'+md(r2[0])+'〜'+md(r2[1])+'）が休みです。';}
 // その月の暦。1日の曜日まであけて、7日ずつ1行
 var c=1-new Date(Y,m-1,1).getDay();

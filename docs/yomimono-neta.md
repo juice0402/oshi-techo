@@ -43,7 +43,7 @@
 
 ## ネタの山
 書いたら「- [x] 題（PR #◯・日付）」。行の形：題［テーマ］— だれの何に答えるか・道具／資料
-- [x] 推し活手帳の作り方（2027年の手帳）（PR #NN・2026-11-06）
+- [x] 推し活手帳の作り方（2027年の手帳）（PR #66・2026-11-06）
 - [ ] 冬のライブ・イベントの寒さ対策［dekakeru］— 冬の待機列や屋外の会場で何をどれだけ持つか。道具：待つ時間と使い捨てカイロの持続時間から、いる数／資料：https://www.shouhiseikatu.metro.tokyo.lg.jp/anzen/test/documents/pocket_warmer_all.pdf（東京都のカイロの試験。持続時間と低温やけど）・https://www.caa.go.jp/policies/policy/consumer_safety/release/pdf/151118kouhyou_1.pdf（消費者庁。カイロの注意）・https://www.kobayashi.co.jp/seihin/kk_h/（メーカーの持続時間と注意の表示）。体のことは注意の表示どおりだけで、効きめは書かない。季節：1月までに
 - [ ] ライブ遠征の予算と持ちもの［dekakeru］— 遠くの公演へ行く人の予算の立て方と荷物。道具：交通・宿・チケット・グッズの予算の合計と1日あたり（数字は自分で入れる形）／資料：https://www.ana.co.jp/ja/jp/guide/boarding-procedures/baggage/domestic/（国内線の機内持ち込みの大きさと重さ）・JR や高速バスの手荷物の決まりは WebSearch で公式のページを探す。予算の数字の例は作らない（入れる形にする）
 - [ ] モバイルバッテリーの選び方［dekakeru］— ライブやイベントの日にスマホの電池が足りるか。道具：バッテリーの容量（mAh）とスマホの電池の容量から、充電できる回数のめやすと Wh／資料：https://www.mlit.go.jp/report/press/kouku10_hh_000310.html（2026年4月24日からの機内の決まり。持ちこみ2個まで・160Wh以下・機内で充電しない）・https://www.mlit.go.jp/report/press/content/001984061.pdf（Wh の式 mAh×V÷1,000）・https://www.nite.go.jp/jiko/chuikanki/press/2026fy/prs260715.html（事故の注意）・https://www.elecom.co.jp/pickup/mobile_battery/（充電回数は容量の約6割の考え方）・https://www.ankerjapan.com/blogs/magazine/how-to-choose-battery（電圧の変換で減る）
