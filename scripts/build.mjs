@@ -1447,7 +1447,7 @@ function bingoSummaryPage(ym) {
   const desc = [
     `${ymLabel(ym)}の入荷ビンゴのまとめです`,
     `印がついた推しキャラは${all.length}人${top[0] ? `で、いちばん多かったのは${top[0].who.label}の${top[0].n}マスでした` : 'でした'}`,
-    first ? `いちばん早いビンゴは${bingoDay(first.b)}の${first.who.label}です` : '',
+    first ? `いちばん早いビンゴは${bingoDay(first.b)}の${first.who.label}です` : 'ビンゴになった推しキャラはいませんでした',
     `作品ごと・種類ごとの印の数も表にしました`,
   ].filter(Boolean);
   // 全角120字に収まるまで、うしろの文から外す
