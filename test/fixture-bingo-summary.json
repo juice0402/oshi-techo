@@ -1,0 +1,16 @@
+{
+  "v": 1,
+  "months": {
+    "2025-08": {
+      "oshi": {
+        "chiikawa/hachiware": {
+          "n": 1,
+          "l": 0
+        }
+      },
+      "kinds": {
+        "nui": 1
+      }
+    }
+  }
+}
