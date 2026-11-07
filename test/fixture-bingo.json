@@ -9,7 +9,16 @@
   },
   "2026-10": {
    "chiikawa/hachiware": { "nui": "2026-10-03", "acsta": "2026-10-02", "badge": "2026-10-16", "key": "2026-10-12", "towel": "2026-10-09" },
-   "sanrio/kitty": { "sticker": "2026-10-05" }
+   "chiikawa/momonga": { "acsta": "2026-10-07" },
+   "chiikawa/usagi": { "nui": "2026-10-04", "badge": "2026-10-11" },
+   "pokemon/eevee": { "sticker": "2026-10-13" },
+   "pokemon/pikachu": { "nui": "2026-10-02", "key": "2026-10-10", "badge": "2026-10-25" },
+   "sanrio/cinnamoroll": { "nui": "2026-10-06", "acsta": "2026-10-06", "badge": "2026-10-22" },
+   "sanrio/kitty": { "sticker": "2026-10-05" },
+   "sanrio/kuromi": { "nui": "2026-10-01", "key": "2026-10-04", "mug": "2026-10-05", "sticker": "2026-10-20" },
+   "sanrio/mymelody": { "pouch": "2026-10-08", "towel": "2026-10-14" },
+   "sanrio/pompompurin": { "mug": "2026-10-18" },
+   "sumikko/shirokuma": { "towel": "2026-10-21", "pouch": "2026-10-27" }
   }
  }
 }

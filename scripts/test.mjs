@@ -431,7 +431,7 @@ for (const f of html) {
 
 // 入荷ビンゴ（推しキャラのページのカード。scripts/lib/bingo.mjs・src/bingo.js・src/bingo.css）
 {
-  const { kindsOf, mergeBingo } = await import('./lib/bingo.mjs');
+  const { kindsOf, mergeBingo, cardLines, summarizeMonth, mergeSummary } = await import('./lib/bingo.mjs');
   const eq = (a, b) => JSON.stringify(a) === JSON.stringify(b);
   ok(
     eq(kindsOf('マグカップ'), ['mug']) && eq(kindsOf('ﾏｸﾞｶｯﾌﾟ'), ['mug']) && eq(kindsOf('冷蔵庫マグネット'), []) && eq(kindsOf('サングラス'), []) && eq(kindsOf('マグネット マグ'), ['mug']) &&
@@ -455,6 +455,17 @@ for (const f of html) {
     '入荷ビンゴ：記録は日本時間の月ごと・いちばん早い日だけ残し、消さない。ほかの作品・推しは数えない。13か月より古い月は消す',
   );
   ok(eq(mergeBingo(null, its, oshis, '2026-11-21T00:00:00.000Z').months['2026-11']['chiikawa/hachiware'], { nui: '2026-11-01', towel: '2026-11-20' }), '入荷ビンゴ：記録がないときも、いま載っている商品から今月ぶんが埋まる');
+  // 先月のまとめ（/bingo/<年>-<月>/）に使う数
+  ok(eq(cardLines({ nui: '2026-10-03', acsta: '2026-10-02', badge: '2026-10-16', towel: '2026-10-09' }), { n: 2, first: '2026-10-09' }) && eq(cardLines({ nui: '2026-10-01' }), { n: 0, first: '' }), '入荷ビンゴ：そろった列の数と、いちばん早く列がそろった日（まん中はいつも埋まり）');
+  ok(
+    eq(summarizeMonth({ 'a/x': { nui: '2026-10-03', acsta: '2026-10-02', badge: '2026-10-16' }, 'a/y': { nui: '2026-10-05' }, 'a/z': {} }), { oshi: { 'a/x': { n: 3, l: 1, b: '2026-10-16' }, 'a/y': { n: 1, l: 0 } }, kinds: { nui: 2, acsta: 1, badge: 1 } }),
+    '入荷ビンゴ：まとめは推しごとの印のマス・そろった列・ビンゴの日と、種類ごとの人数だけ',
+  );
+  {
+    const sm = mergeSummary({ v: 1, months: { '2025-01': { oshi: { 'a/x': { n: 1, l: 0 } }, kinds: { nui: 1 } }, '2026-10': { oshi: {}, kinds: {} }, bad: 1 } }, { v: 1, months: { '2026-10': { 'a/y': { mug: '2026-10-09' } }, '2026-11': { 'a/x': { nui: '2026-11-01' } } } }, '2026-11-02T00:00:00.000Z');
+    ok(eq(Object.keys(sm.months), ['2025-01', '2026-10']) && sm.months['2025-01'].oshi['a/x'].n === 1 && eq(sm.months['2026-10'].oshi, { 'a/y': { n: 1, l: 0 } }), '入荷ビンゴ：まとめの記録は、記録から消えた古い月を残し、終わった月を作り直し、今の月は入れない');
+  }
+  ok(/writeJson\('data\/bingo-summary\.json'/.test(readFileSync('scripts/bingo.mjs', 'utf8')), '入荷ビンゴ：更新で終わった月のまとめを data/bingo-summary.json に残す（非公開の記録といっしょに戻る）');
   const wf = readFileSync('.github/workflows/update.yml', 'utf8');
   ok(wf.indexOf('node scripts/fetch-yomimono.mjs') < wf.indexOf('node scripts/bingo.mjs') && wf.indexOf('node scripts/bingo.mjs') < wf.indexOf('node scripts/build.mjs') && /run: bash scripts\/quiet\.sh node scripts\/bingo\.mjs/.test(wf), '入荷ビンゴ：更新では「集める」のあと・「作る」の前に記録を足す（出力は非公開のメモだけ）');
   const bsrc = readFileSync('scripts/bingo.mjs', 'utf8');
@@ -569,6 +580,24 @@ if (process.env.DATA_LATEST) {
     const hw11 = rd('chiikawa/hachiware/index.html');
     const fr11 = (h) => h.match(/<img class="bg-frame" src="\/art\/bingo-([a-z0-9-]+)-[0-9a-f]{8}\.webp"/)?.[1];
     ok(fr11(hw11) === 'frame-11' && fr11(rd('sanrio/hellokitty/index.html')) === (existsSync('src/art/bingo/frame-birthday.webp') ? 'frame-birthday' : 'frame-11') && rd('bingo/index.html').includes('"now":"2026-11"'), '入荷ビンゴ：月をかえると額が切りかわり、誕生日の月の推し（ハローキティ 11/1）は誕生日の額');
+    // 先月のまとめ（11月の見本で、10月のまとめのページができる）
+    {
+      const sum = rd('bingo/2026-10/index.html');
+      const main = sum.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
+      const desc = sum.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
+      const sm11 = rd('sitemap.xml');
+      ok(sum.includes('<title>2026年10月の入荷ビンゴのまとめ｜') && sum.includes('<h1 class="tape">2026年10月の入荷ビンゴのまとめ</h1>') && sm11.includes('/bingo/2026-10/</loc>') && (process.env.SITE_MODE !== 'production' || (!/<meta name="robots" content="noindex/.test(sum) && sum.includes('<link rel="canonical" href="https://nyuka-techo.com/bingo/2026-10/">'))), '先月のまとめ：11月になると /bingo/2026-10/ ができ、検索に出す（サイトマップに入る）');
+      ok(desc.length >= 80 && desc.length <= 120 && desc.includes('2026年10月') && /\d+人/.test(desc), `先月のまとめ：説明文はその月の数字を入れて80〜120字（${desc.length}字）`);
+      ok(main.includes('<h2>印が多かった推しキャラ</h2>') && main.includes('<h2>作品ごとの印</h2>') && main.includes('<h2>種類ごとの推しキャラの人数</h2>') && main.includes('いちばん早くビンゴになったのはクロミ（サンリオ）で、10月5日') && main.includes('<a href="/chiikawa/hachiware/">ハチワレ</a><span>ちいかわ・印6マス・そろった列3</span>'), '先月のまとめ：上位の推し（推しキャラのページへ）・作品・種類・いちばん早いビンゴ');
+      ok((main.match(/<table class="kk-book"><tbody>[\s\S]*?<\/tbody>/)?.[0].match(/<tr>/g) ?? []).length <= 10, '先月のまとめ：推しは上位10人まで');
+      ok(main && !/rakuten|円|https?:|<img|\bitem\b/.test(main), '先月のまとめ：まとめのページに商品の情報がない（楽天の商品・値段・画像なし）');
+      ok(main && !/件/.test(main), '先月のまとめ：件数（商品の数）が出ていない');
+      ok(!existsSync(join(out, 'bingo/2026-11/index.html')), '先月のまとめ：今の月のページは作らない');
+      const old = rd('bingo/2025-08/index.html');
+      ok(old && (process.env.SITE_MODE !== 'production' || /<meta name="robots" content="noindex,follow">/.test(old)) && !sm11.includes('/bingo/2025-08/'), '先月のまとめ：記録から消えた月もまとめから作り、印のある推しが10人より少ない月は noindex,follow でサイトマップから外す');
+      const bp11 = rd('bingo/index.html');
+      ok(/<section class="memo"><h2>前の月のまとめ<\/h2><ul><li><a href="\/bingo\/2026-10\/">2026年10月の入荷ビンゴのまとめ<\/a><\/li><li><a href="\/bingo\/2026-09\/">/.test(bp11), '先月のまとめ：/bingo/ の下のほうに前の月のまとめ（新しい月から）');
+    }
     ok(hw11.includes('<h2>ハチワレの11月の入荷ビンゴ</h2>') && hw11.includes('<p class="bg-log">今月はまだ印がありません</p>') && !hw11.includes('class="bg-c st-on"') && hw11.includes('data-m="2026-11"'), '入荷ビンゴ：月が変わると新しいカード（印がないときは1行だけ）');
     rmSync(out, { recursive: true, force: true });
   }
