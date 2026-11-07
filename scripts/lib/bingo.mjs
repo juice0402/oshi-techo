@@ -77,3 +77,46 @@ export function mergeBingo(record, items, oshis, nowIso) {
   out.months = months;
   return out;
 }
+
+// ---- 先月のまとめ（/bingo/<年>-<月>/。docs/shikumi.md の「入荷ビンゴ」） ----
+// 1枚のカードのそろった列の数と、いちばん早く列がそろった日（列の3マスのうち、いちばんおそい印の日。まん中はいつも埋まり）
+export function cardLines(card) {
+  let n = 0;
+  let first = '';
+  for (const l of LINES) {
+    const ks = l.map((i) => CELLS[i]).filter(Boolean);
+    if (!ks.every((k) => card[k])) continue;
+    n++;
+    const d = ks.map((k) => card[k]).sort().at(-1);
+    if (!first || d < first) first = d;
+  }
+  return { n, first };
+}
+
+// 終わった月の記録を、まとめに使う数だけにする：推しごとに 印のマスの数 n・そろった列 l・ビンゴの日 b（そろったときだけ）、種類ごとの推しの人数
+export function summarizeMonth(cards) {
+  const oshi = {};
+  const kinds = {};
+  for (const key of Object.keys(cards ?? {}).sort()) {
+    const card = cards[key];
+    const ks = CELLS.filter((k) => k && card[k]);
+    if (!ks.length) continue;
+    const { n, first } = cardLines(card);
+    oshi[key] = first ? { n: ks.length, l: n, b: first } : { n: ks.length, l: n };
+    for (const k of ks) kinds[k] = (kinds[k] ?? 0) + 1;
+  }
+  return { oshi, kinds: Object.fromEntries(CELLS.filter((k) => k && kinds[k]).map((k) => [k, kinds[k]])) };
+}
+
+// まとめの記録（data/bingo-summary.json）：{ v: 1, months: { "2026-10": { oshi: { "作品/推し": { n, l, b } }, kinds: { nui: 3 } } } }
+// 記録にある終わった月は作り直し、記録から消えた古い月（13か月より前）はそのまま残す。今の月は入れない
+export function mergeSummary(summary, record, nowIso) {
+  const now = jstMonth(nowIso);
+  const okMonth = (m, s) => /^\d{4}-\d{2}$/.test(m) && m < now && s && typeof s.oshi === 'object' && typeof s.kinds === 'object';
+  const out = Object.fromEntries(Object.entries(summary?.months ?? {}).filter(([m, s]) => okMonth(m, s)));
+  for (const [m, cards] of Object.entries(record?.months ?? {})) if (m < now) out[m] = summarizeMonth(cards);
+  return { v: 1, months: Object.fromEntries(Object.keys(out).sort().map((m) => [m, out[m]])) };
+}
+
+// 次の月の1日（"2026-10" → "2026-11-01"）。まとめのページの最終更新日
+export const nextMonthDay = (ym) => `${addMonths(ym, 1)}-01`;

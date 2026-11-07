@@ -12,7 +12,7 @@ import { cardHtml, marksFor, searchFormHtml, oshiChipsHtml, searchHref } from '.
 import { activeSeasons, seasonMatcher, nextBirthday, mdLabel } from './lib/season.mjs';
 import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
 import { buildIcs } from './lib/ics.mjs';
-import { KINDS, CELLS, mergeBingo } from './lib/bingo.mjs';
+import { KINDS, CELLS, mergeBingo, mergeSummary, nextMonthDay } from './lib/bingo.mjs';
 import { decoCss, DECO_STYLES } from '../src/deco/deco.mjs';
 
 const OUT = process.env.OUT_DIR || 'dist'; // 見本データのテストで、別の日付のページを作るときだけ OUT_DIR を使う
@@ -447,6 +447,24 @@ const bingo = mergeBingo(
   meta.fetchedAt,
 );
 const bingoMonth = today.slice(0, 7);
+// 終わった月のまとめ（data/bingo-summary.json。scripts/bingo.mjs が残す）に、いまの記録の終わった月を足す（記録から消えた古い月はまとめのまま）
+const BINGO_SUM_SRC = process.env.DATA_BINGO_SUMMARY ?? (process.env.DATA_LATEST ? 'test/fixture-bingo-summary.json' : 'data/bingo-summary.json');
+const bingoSummary = mergeSummary(
+  (() => {
+    try {
+      return readJson(BINGO_SUM_SRC, null);
+    } catch {
+      console.warn('入荷ビンゴのまとめの記録が読めないので、いまの記録の分だけで作りました');
+      return null;
+    }
+  })(),
+  bingo,
+  meta.fetchedAt,
+);
+// 先月のまとめのページを作る月（新しい月から）
+const bingoPast = Object.keys(bingoSummary.months).filter((m) => m < bingoMonth).sort().reverse();
+const ymLabel = (ym) => `${Number(ym.slice(0, 4))}年${Number(ym.slice(5, 7))}月`;
+const bingoDay = (d) => `${Number(d.slice(5, 7))}月${Number(d.slice(8, 10))}日`;
 // 絵は src/art/bingo/<名前>.webp。/art/ と同じく中身の目印つきの名前（長いキャッシュ）
 const bingoArt = new Map(
   (existsSync('src/art/bingo') ? readdirSync('src/art/bingo') : [])
@@ -1379,12 +1397,74 @@ if (oshiPages.length) {
     body:
       '<div class="bg-list" id="bgmy" hidden></div>' +
       `<div class="bg-pick">${pick ? `<div class="bg-list">${pick}</div>` : ''}<p class="bg-hint">推しキャラのページで「わたしの推し」を選ぶと、ここに並びます</p></div>` +
-      `<script type="application/json" id="bgcfg">${JSON.stringify(cfg).replace(/</g, '\\u003c')}</script>`,
+      `<script type="application/json" id="bgcfg">${JSON.stringify(cfg).replace(/</g, '\\u003c')}</script>` +
+      (bingoPast.length ? `<section class="memo"><h2>前の月のまとめ</h2><ul>${bingoPast.map((ym) => `<li><a href="/bingo/${ym}/">${ymLabel(ym)}の入荷ビンゴのまとめ</a></li>`).join('')}</ul></section>` : ''),
     lastmod: today,
     extraCss: BINGO_CSS,
     extraJs: BINGO_JS + BINGO_PAGE_JS,
   });
 }
+
+// ---- 入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/。docs/shikumi.md の「入荷ビンゴ」） ----
+// 記録の推し・種類・日付だけで作る（楽天の商品の情報・商品の件数は出さない）。印のある推しが10人より少ない月は検索に出さない。今の月は作らない
+const BINGO_SUM_MIN = 10;
+const BINGO_SUM_TOP = 10;
+function bingoSummaryPage(ym) {
+  const s = bingoSummary.months[ym];
+  const mo = Number(ym.slice(5, 7));
+  const oshiOf = new Map(allWorks.flatMap((c) => (c.oshi ?? []).filter((o) => o.slug).map((o) => [`${c.slug}/${o.slug}`, { c, o, label: o.full ?? o.name }])));
+  const all = Object.entries(s.oshi).map(([key, v]) => ({ key, ...v, who: oshiOf.get(key) }));
+  const known = all.filter((x) => x.who);
+  const byRank = (a, b) => b.n - a.n || b.l - a.l || (a.b ?? '9').localeCompare(b.b ?? '9') || a.key.localeCompare(b.key);
+  const top = [...known].sort(byRank).slice(0, BINGO_SUM_TOP);
+  const works = [...known.reduce((m, x) => m.set(x.who.c, (m.get(x.who.c) ?? 0) + x.n), new Map())].sort((a, b) => b[1] - a[1] || a[0].slug.localeCompare(b[0].slug)).slice(0, BINGO_SUM_TOP);
+  const kinds = KINDS.filter((x) => s.kinds[x.k]).sort((a, b) => s.kinds[b.k] - s.kinds[a.k]);
+  const first = known.filter((x) => x.b).sort((a, b) => a.b.localeCompare(b.b) || byRank(a, b))[0];
+  const oshiLink = (x) => (oshiPageSet.has(x.key) ? `<a href="/${x.key}/">${esc(x.who.label)}</a>` : esc(x.who.label));
+  const workLink = (c) => (chars.includes(c) ? `<a href="/${c.slug}/">${esc(c.name)}</a>` : esc(c.name));
+  const lines = [
+    `${mo}月に入荷ビンゴの印がついた推しキャラは${all.length}人`,
+    top[0] && `印のマスがいちばん多かったのは${oshiLink(top[0])}（${esc(top[0].who.c.name)}）の${top[0].n}マス`,
+    first ? `いちばん早くビンゴになったのは${oshiLink(first)}（${esc(first.who.c.name)}）で、${bingoDay(first.b)}` : `${mo}月はビンゴになった推しキャラがいませんでした`,
+    kinds[0] && `印がついた推しキャラがいちばん多い種類は${esc(kinds[0].name)}で、${s.kinds[kinds[0].k]}人`,
+  ].filter(Boolean);
+  const table = (h, rows) => (rows.length ? `<section><h2>${h}</h2><table class="kk-book"><tbody>${rows.join('')}</tbody></table></section>` : '');
+  const body =
+    `<section class="memo"><h2>${mo}月のまとめ</h2><ul>${lines.map((t) => `<li>${t}。</li>`).join('')}</ul><p class="asof">このサイトが${mo}月に初めて見つけたグッズの、推しキャラと種類と日付の記録から</p></section>` +
+    table(
+      '印が多かった推しキャラ',
+      top.map((x, i) => `<tr><th>${i + 1}</th><td>${oshiLink(x)}<span>${esc(x.who.c.name)}・印${x.n}マス・${x.l ? `そろった列${x.l}` : 'そろった列なし'}</span></td></tr>`),
+    ) +
+    table(
+      '作品ごとの印',
+      works.map(([c, n], i) => `<tr><th>${i + 1}</th><td>${workLink(c)}<span>印${n}マス</span></td></tr>`),
+    ) +
+    table(
+      '種類ごとの推しキャラの人数',
+      kinds.map((x) => `<tr><th>${esc(x.name)}</th><td>${s.kinds[x.k]}人</td></tr>`),
+    ) +
+    `<p class="more"><a href="/bingo/">今月の入荷ビンゴ</a></p>`;
+  const desc = [
+    `${ymLabel(ym)}の入荷ビンゴのまとめです`,
+    `印がついた推しキャラは${all.length}人${top[0] ? `で、いちばん多かったのは${top[0].who.label}の${top[0].n}マスでした` : 'でした'}`,
+    first ? `いちばん早いビンゴは${bingoDay(first.b)}の${first.who.label}です` : 'ビンゴになった推しキャラはいませんでした',
+    `作品ごと・種類ごとの印の数も表にしました`,
+  ].filter(Boolean);
+  // 全角120字に収まるまで、うしろの文から外す
+  while (desc.length > 2 && [...sentence(...desc)].length > 120) desc.pop();
+  const description = sentence(...desc);
+  page({
+    path: `/bingo/${ym}/`,
+    crumbs: [{ name: 'トップ', path: '/' }, { name: '推しの入荷ビンゴ（今月）', path: '/bingo/' }, { name: `${ymLabel(ym)}のまとめ`, path: `/bingo/${ym}/` }],
+    title: `${ymLabel(ym)}の入荷ビンゴのまとめ｜印が多かった推しキャラ｜${settings.siteName}`,
+    description,
+    h1: `${ymLabel(ym)}の入荷ビンゴのまとめ`,
+    body,
+    lastmod: nextMonthDay(ym),
+    noindex: all.length < BINGO_SUM_MIN ? 'follow' : false,
+  });
+}
+for (const ym of bingoPast) bingoSummaryPage(ym);
 
 // ---- 季節の特集（/作品/季節/ と /季節/） ----
 // 作品ごとの特集のページ（期間中）。others：ほかの作品の特集（いちばん下のリンク）
