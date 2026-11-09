@@ -203,6 +203,26 @@ const html = files.filter((f) => f.endsWith('.html'));
     if (a.sources) ok(s2.includes(`href="/yomimono/${a.slug}/shiryou/"`) && existsSync(`dist/yomimono/${a.slug}/shiryou/index.html`), `${p}：調べた資料のページがある`);
   }
 }
+// 読みもの一覧（/yomimono/）はテーマの h2（id つき）で分け、3つ以上なのでもくじが出る。記事は全部どこか1つに入り、記事のないテーマの見出しは出さない（#76）
+{
+  const arts = readJson('config/yomimono.json', []);
+  const p = 'dist/yomimono/index.html';
+  if (arts.length && existsSync(p)) {
+    const s2 = readFileSync(p, 'utf8');
+    const THEMES = { tsukuru: '作る・飾る・しまう', atsumeru: '買う・集める・送る', dekakeru: 'ライブ・お出かけ', gotouchi: 'ご当地', game: 'ゲーム', sonota: 'そのほか' };
+    ok(arts.every((a) => !a.theme || (a.theme in THEMES && a.theme !== 'sonota')), '読みもの：theme は決めた5つのどれか');
+    const heads = [...s2.matchAll(/<section class="yomi-th"><h2 id="([a-z]+)">([^<]+)<\/h2>/g)].map((m) => m[1]);
+    const used = Object.keys(THEMES).filter((t) => arts.some((a) => (t === 'sonota' ? !a.theme : a.theme === t)));
+    ok(heads.join() === used.join() && heads.every((t) => s2.includes(`<h2 id="${t}">${THEMES[t]}</h2>`)), `読みもの一覧：記事のあるテーマだけ、決めた順に見出しが出る（${heads.join('・')}）`);
+    ok(heads.length < 3 || heads.every((t) => s2.includes(`<li><a href="#${t}">${THEMES[t]}</a></li>`)), '読みもの一覧：テーマが3つ以上のときはもくじが出る');
+    const secs = Object.fromEntries([...s2.matchAll(/<section class="yomi-th"><h2 id="([a-z]+)">[\s\S]*?<\/section>/g)].map((m) => [m[1], m[0]]));
+    ok(arts.every((a) => (s2.match(new RegExp(`href="/yomimono/${a.slug}/"`, 'g')) ?? []).length === 1 && secs[a.theme || 'sonota']?.includes(`href="/yomimono/${a.slug}/"`)), '読みもの一覧：記事が全部、そのテーマの中に1回ずつ入っている');
+    ok(Object.entries(secs).every(([t, sec]) => {
+      const got = [...sec.matchAll(/href="\/yomimono\/([a-z0-9-]+)\/"/g)].map((m) => arts.find((a) => a.slug === m[1])?.published ?? '');
+      return got.every((d, i) => i === 0 || got[i - 1] >= d);
+    }), '読みもの一覧：テーマの中は新しい順');
+  }
+}
 // 読みもののコーナー（記事の corner）：そのコーナーのトップの下のほうに「◯◯の読みもの」の棚。読みものがないコーナーには出さない
 // 棚の excludeRe：キャラの名前があってライセンス・公式・任天堂のどれもない商品名は外す（Switch 2 のケースの記事）
 {

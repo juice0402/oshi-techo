@@ -39,7 +39,7 @@
 - 読むファイル：docs/shikumi.md の「読みもの」、build.mjs の linkFrom の所（「作品のページから読みものへの1行」）
 - マージ：する
 
-### [ ] 読みもの一覧（/yomimono/）をテーマで分ける
+### [x] 読みもの一覧（/yomimono/）をテーマで分ける（#76）
 - やること：config/yomimono.json の記事に theme を書けるようにし、/yomimono/ をテーマごとの h2（id つき。3つ以上なので目次が出る）に分けて、その中は新しい順に今の yomiList の形で並べる。テーマのない記事は最後の「そのほか」。サイトのトップとゲームのコーナーの読みものの棚は変えない。その時にある記事すべてに theme を書き、docs/yomimono-neta.md の「書き方」に theme の書き方を1行足す
 - できあがりの条件：見本データで /yomimono/ にテーマの見出しと目次が出て、記事が全部どこかに入っている。記事のないテーマの見出しは出ない。テストが通る。スマホ 390px とパソコン 1280px で、横にはみ出さない
 - 決まったこと（11/4 しょーくん OK）：テーマは5つ、この順。tsukuru「作る・飾る・しまう」／atsumeru「買う・集める・送る」／dekakeru「ライブ・お出かけ」／gotouchi「ご当地」／game「ゲーム」。今の13本は、tsukuru：itabag・kazari・uchiwa・nuikatsu・saidan・toreka-cheki、dekakeru：sougankyou・penlight、gotouchi：gotouchi-snoopy、game：switch2-case・game-katazuke・pc-game・kyuukei。このあとの記事は docs/yomimono-neta.md の山の行の［テーマ］のとおり
