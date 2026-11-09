@@ -1,0 +1,60 @@
+<div class="fit" id="skairo">
+<fieldset class="pick"><legend>外にいる時間（1日）</legend>
+<label><input type="radio" name="kt" value="3"><span>3時間</span></label>
+<label><input type="radio" name="kt" value="5"><span>5時間</span></label>
+<label><input type="radio" name="kt" value="8" checked><span>8時間</span></label>
+<label><input type="radio" name="kt" value="13"><span>13時間</span></label>
+<label><input type="radio" name="kt" value="x"><span>入れる</span></label>
+</fieldset>
+<p class="fit-mm" data-for="kt" hidden><label>外にいる時間<input type="number" name="ktx" inputmode="decimal" min="0.5" max="24" step="0.5" value="6.5">時間</label></p>
+<fieldset class="pick"><legend>体に当てるカイロの持続時間の表示</legend>
+<label><input type="radio" name="kb" value="10"><span>10時間</span></label>
+<label><input type="radio" name="kb" value="12" checked><span>12時間</span></label>
+<label><input type="radio" name="kb" value="16"><span>16時間</span></label>
+<label><input type="radio" name="kb" value="24"><span>24時間</span></label>
+<label><input type="radio" name="kb" value="x"><span>表示の時間</span></label>
+</fieldset>
+<p class="fit-mm" data-for="kb" hidden><label>持続時間<input type="number" name="kbx" inputmode="decimal" min="1" max="30" step="0.5" value="14">時間</label></p>
+<fieldset class="pick"><legend>くつ下用のカイロ</legend>
+<label><input type="radio" name="ks" value="0" checked><span>使わない</span></label>
+<label><input type="radio" name="ks" value="5"><span>5時間</span></label>
+<label><input type="radio" name="ks" value="8"><span>8時間</span></label>
+<label><input type="radio" name="ks" value="x"><span>表示の時間</span></label>
+</fieldset>
+<p class="fit-mm" data-for="ks" hidden><label>くつ下用の持続時間<input type="number" name="ksx" inputmode="decimal" min="1" max="20" step="0.5" value="6">時間</label></p>
+<fieldset class="pick"><legend>日数</legend>
+<label><input type="radio" name="kd" value="1" checked><span>1日</span></label>
+<label><input type="radio" name="kd" value="2"><span>2日</span></label>
+<label><input type="radio" name="kd" value="3"><span>3日</span></label>
+<label><input type="radio" name="kd" value="4"><span>4日</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 20" role="img" aria-label="1日に外にいる時間の帯を、カイロ1枚の持続時間ごとに色を変えて分けた。下の段はくつ下用"></svg><figcaption>1日に外にいる時間の帯（上が体のカイロ、下がくつ下用。色の変わり目が取りかえる所）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('skairo');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?e.value:'';}
+// 入れた数字が範囲の外や空のときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t,u){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+'の数字を入れてください。';return 0;}
+function pick(n,m,lo,hi,t,u){var s=v(n),p=f.querySelector('.fit-mm[data-for="'+n+'"]');p.hidden=s!=='x';return s==='x'?num(m,lo,hi,t,u):+s;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return Math.round(x*10)/10;}
+// 帯の絵：1日に外にいる時間を横の長さにして、カイロ1枚の持続時間ごとに色を変える。くつ下用は下の段
+function band(svg,y,T,h,H){var s=100/T;el(svg,'rect',{x:0,y:y,width:100,height:H,'class':'fit-w'});for(var i=0;i*h<T-1e-9;i++){var a=i*h,b=Math.min(T,(i+1)*h);el(svg,'rect',{x:a*s,y:y,width:(b-a)*s,height:H,'class':'fit-c '+C[i%3]});}}
+function run(){bad='';
+var T=pick('kt','ktx',0.5,24,'外にいる時間','時間'),h=pick('kb','kbx',1,30,'持続時間','時間'),hs=pick('ks','ksx',1,20,'くつ下用の持続時間','時間'),d=+v('kd'),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 1日の枚数 ＝ 外にいる時間 ÷ 持続時間 の小数を切り上げる。同じときに使うのは1枚（くつ下用は左右で1組）。割り切れるときに計算の誤差で1枚ふえないよう、ごく小さな数を引いてから切り上げる
+var n=Math.ceil(T/h-1e-9),ans='体に当てるカイロは1日'+n+'枚';
+ans+=d>1?'、'+d+'日で'+(n*d)+'枚です。':'です。';
+if(hs){var m=Math.ceil(T/hs-1e-9);ans+='くつ下用は1日'+m+'組・'+(m*2)+'枚';ans+=d>1?'、'+d+'日で'+(m*d)+'組・'+(m*d*2)+'枚です。':'です。';}
+ans+='表示の時間どおりに温かさが続いたとしたときのめやすです。';
+f.querySelector('.fit-ans').textContent=ans;
+clear(svg);var H=8;svg.setAttribute('viewBox','-1 -1 102 '+(hs?2*H+4:H+2));band(svg,0,T,h,H);if(hs)band(svg,H+2,T,hs,H);}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
