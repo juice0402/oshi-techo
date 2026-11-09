@@ -1238,7 +1238,10 @@
         "pages": 2
       }
     ],
-    "sources": "toreka-cheki"
+    "sources": "toreka-cheki",
+    "works": [
+      "pokemon"
+    ]
   },
   {
     "slug": "game-katazuke",
@@ -1878,7 +1881,14 @@
         "pages": 2
       }
     ],
-    "sources": "pc-game"
+    "sources": "pc-game",
+    "works": [
+      "minecraft",
+      "umamusume",
+      "nikke",
+      "touken-ranbu",
+      "dragonquest"
+    ]
   },
   {
     "slug": "saidan",

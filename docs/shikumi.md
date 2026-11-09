@@ -88,6 +88,7 @@
 ## 読みもの（2026-10-27）
 
 - /yomimono/（一覧）と /yomimono/<記事>/。記事のもとは config/yomimono.json（題名・説明文・日付・絵・棚）と src/yomimono/<記事>.html（本文）。本文の <!--fig:名前--> は src/yomimono/fig/、<!--tool:名前--> は src/yomimono/tools/、<!--shelf:棚--> は楽天市場の棚に置きかえる。h2 に id を書くと、3つ以上でもくじができる
+- 作品のページから読みものへ（2026-11-09 #74）：記事に works（関係する作品の slug の配列）を書くと、その作品のトップの入荷メモの下（linkFrom の行のあと）に「<作品名>の<記事の題>（読みもの）」の1行が出る。新しい順に3本まで（build.mjs の yomiWorksFor）。入れるのは本文にその作品の名前があり、その作品の人に役立つ記事だけ。linkFrom で top に出している作品は works に足さない。知らない slug はビルドが止まる
 - しょーくん「中身をちゃん肉厚にする方向で」「キャンバで挿絵や、手順とかなら図解を示してボリュームのある記事に」「痛バのバックや、記事の内容によっては手芸用品なども並べられるね」
 - 絵：記事の上に Canva の AI の絵を1枚（切り絵ふう。しょーくんが3案から選んだ）。キャラ・字・ロゴは入れない。作り方はあそびトークの docs/eyecatch.md と同じ（generate-image → 土台 DAHZGSoqXEo をコピー → ページの背景に入れる → 2000×1000 で書き出し → curl）。src/yomimono/img/<記事>.webp（1200×600）と <記事>-og.jpg（共有の画像 1200×630）。generate-image の prompt の形（2本目で使ったもの。aspectRatio は LANDSCAPE_2_1）：「Layered paper cut-out craft illustration with soft realistic paper shadows, pastel pink, lavender and sky blue paper on a clean white background, flat lay seen from the front: <記事の道具を英語で>. Neat, calm arrangement in one wide horizontal row with the objects in the middle band and generous white space around. No people, no characters, no faces, no animals, no text, no letters, no numbers, no logos, no stars, no clouds, no sparkles.」。webp は 2000×1000 を 1200×600 に縮め、og は高さ630に縮めて左右を切る
 - 図：SVG で描き、字は図の外の HTML に書く（テストで見張る）。色はテーマの色（.fg-p・.fg-l・.fg-s など）

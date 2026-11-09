@@ -998,6 +998,20 @@ const yomiLinksFor = (slug, where) =>
     .filter((a) => a.linkFrom?.work === slug && a.linkFrom.pages?.includes(where))
     .map((a) => `<p class="more"><a href="/yomimono/${a.slug}/">${esc(a.linkFrom.text)}</a></p>`)
     .join('');
+// 作品のトップの入荷メモの下（linkFrom の行のあと）に、記事の works にその作品がある読みものを新しい順に3本まで。文は「<作品名>の<記事の題>（読みもの）」
+const YOMI_WORKS_MAX = 3;
+{
+  const known = new Set(allWorks.map((c) => c.slug));
+  for (const a of yomiArticles) for (const w of a.works ?? []) if (!known.has(w)) throw new Error(`config/yomimono.json：${a.slug} の works に知らない作品 ${w}`);
+}
+const yomiWorksFor = (c) =>
+  yomiArticles
+    .map((a, i) => ({ a, i }))
+    .filter(({ a }) => a.works?.includes(c.slug) && !(a.linkFrom?.work === c.slug && a.linkFrom.pages?.includes('top')))
+    .sort((x, y) => (y.a.published ?? '').localeCompare(x.a.published ?? '') || y.i - x.i)
+    .slice(0, YOMI_WORKS_MAX)
+    .map(({ a }) => `<p class="more"><a href="/yomimono/${a.slug}/">${esc(c.name)}の${esc(a.title)}（読みもの）</a></p>`)
+    .join('');
 const yomiData = readJson(process.env.DATA_LATEST ? 'test/fixture-yomimono.json' : 'data/yomimono.json', { fetchedAt: '', items: [] });
 const YOMI_SHELF_MAX = 8;
 const yomiDate = (ymd) => `${Number(ymd.slice(0, 4))}年${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
@@ -1212,6 +1226,7 @@ for (const c of chars) {
       tagS(soonBooks(c), 'soon') +
       memoSection(c, L, Y) +
       yomiLinksFor(c.slug, 'top') +
+      yomiWorksFor(c) +
       `<p class="more"><a href="/koushiki/#${esc(c.slug)}">${esc(c.name)}の公式の動画とお知らせ</a></p>` +
       tsugiWorks(c),
     lastmod: newest(L.news.length ? L.news : L.all),
