@@ -31,7 +31,7 @@
 - 読むファイル：docs/shikumi.md の「入荷ビンゴ」、scripts/bingo.mjs、scripts/lib/bingo.mjs、build.mjs の /bingo/ の所
 - マージ：する
 
-### [ ] 作品のページから、関係する読みものへつなぐ
+### [x] 作品のページから、関係する読みものへつなぐ（#74）
 - やること：config/yomimono.json の記事に works（関係する作品の slug の配列）を書けるようにし、作品のトップの入荷メモの下に、その作品が works にある読みものを新しい順に3本まで、1本1行（今の linkFrom と同じ <p class="more"> の形）で出す。今ある linkFrom（work・pages・text）はそのまま動くようにする。今の13本のうち、本文にその作品の名前が出てくる記事に works を足す（例：pc-game は本文にある作品。gotouchi-snoopy は linkFrom があるので足さない）。docs/yomimono-neta.md の「書き方」と docs/shikumi.md の「読みもの」に works の書き方を1行足す
 - できあがりの条件：見本データで、works のある作品のトップに読みものの行が出て、works のない作品には出ない。test.mjs に1つ足して通る。スマホ 390px の作品のトップで、ほかの部分の見た目が変わっていない
 - 決まったこと（11/4 しょーくん OK）：読みものが自動で週2本ふえても、作品のページからたどれるようにするため。行の文は「<作品名>の<記事の題>」のように、記事の題をそのまま使う

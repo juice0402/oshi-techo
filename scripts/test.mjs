@@ -680,6 +680,21 @@ if (process.env.DATA_LATEST) {
   }
   ok(!readFileSync('dist/chiikawa/new/index.html', 'utf8').includes('gotouchi%2F'), 'ご当地：ご当地で探したものは、作品の新着には出さない');
   {
+    // 作品のトップの入荷メモの下に、記事の works にその作品がある読みもの（新しい順に3本まで）。works のない作品には出さない（#74）
+    const arts = readJson('config/yomimono.json', []);
+    const po = readFileSync('dist/pokemon/index.html', 'utf8');
+    const ch = readFileSync('dist/chiikawa/index.html', 'utf8');
+    const wl = (a) => `<p class="more"><a href="/yomimono/${a.slug}/">`;
+    const withWorks = arts.filter((a) => a.works?.length);
+    ok(po.includes('<p class="more"><a href="/yomimono/toreka-cheki/">ポケモンのトレカとチェキの収納（読みもの）</a></p>') && withWorks.every((a) => !ch.includes(wl(a))) && !arts.some((a) => a.works?.includes('chiikawa')), '読みもの：works のある作品のトップに読みものの行が出て、works のない作品には出ない');
+    const tops = readdirSync('dist').filter((d) => existsSync(`dist/${d}/index.html`) && existsSync(`dist/${d}/new/index.html`));
+    ok(tops.every((d) => {
+      const s = readFileSync(`dist/${d}/index.html`, 'utf8');
+      const mine = arts.filter((a) => a.works?.includes(d) && !(a.linkFrom?.work === d && a.linkFrom.pages?.includes('top')));
+      return mine.length <= 3 ? mine.every((a) => s.includes(wl(a))) : mine.filter((a) => s.includes(wl(a))).length === 3;
+    }), '読みもの：作品のトップの読みものの行は works のとおりで、3本まで');
+  }
+  {
     // 読みもの「ご当地スヌーピーの買える場所と集め方」へ、スヌーピーのご当地・買い方メモ・トップからつなぐ（#16）
     const yl = '<p class="more"><a href="/yomimono/gotouchi-snoopy/">ご当地スヌーピーはどこで売ってる？（読みもの）</a></p>';
     const sn = readFileSync('dist/snoopy/gotouchi/index.html', 'utf8');
