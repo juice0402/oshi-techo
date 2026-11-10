@@ -1045,6 +1045,24 @@ function yomiBody(a) {
   const toc = heads.length >= 3 ? `<nav class="toc" aria-label="もくじ"><h2>もくじ</h2><ol>${heads.map((m) => `<li><a href="#${m[1]}">${esc(m[2])}</a></li>`).join('')}</ol></nav>` : '';
   return { html, toc, shelves };
 }
+// 読みもの一覧（/yomimono/）のテーマ。記事の theme に書く。この順に h2 で分け、記事のないテーマは出さない。theme のない記事は最後の「そのほか」（#76）
+const YOMI_THEMES = [
+  { id: 'tsukuru', name: '作る・飾る・しまう' },
+  { id: 'atsumeru', name: '買う・集める・送る' },
+  { id: 'dekakeru', name: 'ライブ・お出かけ' },
+  { id: 'gotouchi', name: 'ご当地' },
+  { id: 'game', name: 'ゲーム' },
+];
+for (const a of yomiArticles) if (a.theme && !YOMI_THEMES.some((t) => t.id === a.theme)) throw new Error(`config/yomimono.json：${a.slug} の theme に知らないテーマ ${a.theme}`);
+function yomiByTheme() {
+  // 新しい順（同じ日は config/yomimono.json のあとに書いた記事が先）
+  const order = yomiArticles.map((a, i) => ({ a, i })).sort((x, y) => (y.a.published || '').localeCompare(x.a.published || '') || y.i - x.i).map((x) => x.a);
+  const groups = [...YOMI_THEMES, { id: 'sonota', name: 'そのほか' }]
+    .map((t) => ({ ...t, list: order.filter((a) => (t.id === 'sonota' ? !YOMI_THEMES.some((x) => x.id === a.theme) : a.theme === t.id)) }))
+    .filter((g) => g.list.length);
+  const toc = groups.length >= 3 ? `<nav class="toc" aria-label="もくじ"><h2>もくじ</h2><ol>${groups.map((g) => `<li><a href="#${g.id}">${esc(g.name)}</a></li>`).join('')}</ol></nav>` : '';
+  return toc + groups.map((g) => `<section class="yomi-th"><h2 id="${g.id}">${esc(g.name)}</h2>${yomiList(g.list)}</section>`).join('');
+}
 function yomiList(list) {
   return `<ul class="yomi-list">${list
     .map((a) => `<li><a href="/yomimono/${a.slug}/"><img src="/yomimono/img/${a.hero}.webp" width="1200" height="600" loading="lazy" decoding="async" alt=""><b>${esc(a.title)}</b><span>${esc(a.summary)}</span></a></li>`)
@@ -2190,7 +2208,7 @@ if (yomiArticles.length) {
     description: sentence(`推し活の道具の選び方や作り方を、図でまとめた読みものです`, `いまあるのは${joinTo(yomiArticles.slice(0, 3).map((a) => `「${a.title}」`))}${yomiArticles.length > 3 ? 'など' : ''}です`, '記事に合う商品は楽天市場から1日2回集めています'),
     h1: '推し活の読みもの',
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推し活の読みもの', path: '/yomimono/' }],
-    body: yomiList(yomiArticles),
+    body: yomiByTheme(),
     lastmod: yomiArticles.map((a) => a.updated || a.published).sort().at(-1),
   });
 }
