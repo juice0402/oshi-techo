@@ -69,7 +69,7 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   const seasons = readJson('config/seasons.json');
   const topicsCfg = readJson('config/topics.json');
   const reserved = new Set(['new', 'yoyaku', 'nesage', 'sainyuka', 'hatsubai', 'yosan', 'gotouchi', 'ranking', 'otona', 'kids', 'kaikata', ...topicsCfg.map((t) => t.slug), ...CATEGORIES.map((k) => k.slug), ...seasons.map((x) => x.slug)]);
-  const rootPages = new Set(['search', 'koushiki', 'about', 'contact', 'privacy', 'terms', 'tanjoubi', 'gotouchi', 'calendar', ...chars.map((c) => c.slug)]);
+  const rootPages = new Set(['search', 'koushiki', 'about', 'contact', 'privacy', 'terms', 'tanjoubi', 'gotouchi', 'calendar', 'yoyaku', ...chars.map((c) => c.slug)]);
   ok(seasons.every((x) => /^[a-z]+$/.test(x.slug) && !rootPages.has(x.slug) && /^\d\d-\d\d$/.test(x.from) && /^\d\d-\d\d$/.test(x.to) && x.words.length && x.label && (!x.event || /^\d\d-\d\d$/.test(x.event))), '季節の特集：場所・期間・言葉・イベントの日の設定がそろっている');
   for (const c of chars) {
     const slugs = (c.oshi ?? []).filter((o) => o.slug).map((o) => o.slug);
@@ -153,7 +153,7 @@ const html = files.filter((f) => f.endsWith('.html'));
   const slugs = chars.map((c) => c.slug);
   const dup = slugs.filter((x, i) => slugs.indexOf(x) !== i);
   ok(dup.length === 0, `作品の slug が重なっていない${dup.length ? `（${dup.join('・')}）` : ''}`);
-  const reserved = new Set(['search', 'koushiki', 'calendar', 'tanjoubi', 'gotouchi', 'about', 'contact', 'terms', 'privacy', 'techo', ...cornerSlugs, ...readJson('config/seasons.json', []).map((x) => x.slug)]);
+  const reserved = new Set(['search', 'koushiki', 'calendar', 'yoyaku', 'tanjoubi', 'gotouchi', 'about', 'contact', 'terms', 'privacy', 'techo', ...cornerSlugs, ...readJson('config/seasons.json', []).map((x) => x.slug)]);
   const clash = slugs.filter((x) => reserved.has(x));
   ok(clash.length === 0, `作品の slug がコーナー・全体のページと重ならない${clash.length ? `（${clash.join('・')}）` : ''}`);
   ok(chars.every((c) => /^[a-z0-9-]+$/.test(c.slug) && (c.oshi ?? []).every((o) => !o.slug || /^[a-z0-9-]+$/.test(o.slug))), '作品と推しキャラの slug は英小文字・数字・ハイフンだけ');
@@ -803,6 +803,35 @@ if (process.env.DATA_LATEST) {
   ok(!yy.includes('<p class="lead">') && yy.includes('<p class="asof">締切は商品名に書いてあるもの、販売期間と発売日は楽天の情報です</p>'), '予約受付中：説明は見出しの下ではなく下に');
   ok(topHtml.includes('<h2>予約受付中のグッズ</h2>') && topHtml.includes('<a href="/chiikawa/yoyaku/">ちいかわの予約受付中</a>') && !topHtml.includes('予約の締切が近いもの'), '予約受付中：トップに全作品の棚');
   ok((topHtml.match(/<span class="nm">ちいかわ ぬいぐるみ ハチワレ（予約）<\/span>/g) ?? []).length === 1, '予約受付中：トップの「もうすぐ発売」と同じものを2回出さない');
+  // わたしの推しの予約帳（#80）：推しキャラのページの「<呼び方>の予約受付中」の棚と、全作品の /yoyaku/
+  {
+    const gojo = readFileSync('dist/jujutsu/gojo/index.html', 'utf8');
+    const shelf = gojo.match(/<section class="shelf yk">[\s\S]*?<\/section>/)?.[0] ?? '';
+    const yp = readFileSync('dist/yoyaku/index.html', 'utf8');
+    const ym = yp.slice(yp.indexOf('<main'), yp.indexOf('</main>'));
+    const textOf = (h) => h.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
+    ok(shelf.includes('<h2>五条悟の予約受付中</h2>') && gojo.indexOf('<ul class="grid" data-pool>') < gojo.indexOf('<section class="shelf yk">') && (shelf.match(/<li /g) ?? []).length === 4, '予約帳：予約のある推しのページに、最初の並びのすぐあとの棚');
+    ok(['chiikawa/hachiware', 'sanrio/hellokitty'].every((x) => !readFileSync(`dist/${x}/index.html`, 'utf8').includes('class="shelf yk"')), '予約帳：予約が4件より少ない推しには棚を出さない');
+    const at = (w) => shelf.indexOf(w);
+    ok(at('缶バッジ 11月20日発売') < at('マグカップ 11月下旬発売') && at('マグカップ 11月下旬発売') < at('アクリルスタンド 12月10日発売') && at('アクリルスタンド 12月10日発売') < at('ポーチ 予約受付中') && at('缶バッジ') > 0, '予約帳：発売の順（日がわかるもの → その月の月までのもの → 発売の時期がわからないもの）で、販売期間の終わりで並べていない');
+    const heads = [...ym.matchAll(/<h2>([^<]+)<\/h2>/g)].map((m) => m[1]);
+    ok(ym.includes('<h1 class="tape">推しグッズの予約帳</h1>') && heads.join('・') === '11月発売・12月発売', `予約帳：/yoyaku/ は発売の月ごとの見出し（${heads.join('・')}）`);
+    const nov = ym.match(/<h2>11月発売<\/h2><ul class="grid">([\s\S]*?)<\/ul>/)?.[1] ?? '';
+    const lis = [...nov.matchAll(/<li [^>]*>/g)].map((m) => m[0]);
+    const firstPlain = lis.findIndex((l) => !l.includes('data-o='));
+    ok(lis.length && lis[0].includes('data-o="/jujutsu/gojo/"') && (firstPlain < 0 || lis.slice(firstPlain).every((l) => !l.includes('data-o='))), '予約帳：月の中では推しキャラに当たるものが先・カードに推しキャラのページの場所');
+    ok(ym.includes('<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>'), '予約帳：「わたしの推しだけ」はしぼりこみと同じチェック欄で、はじめは隠す（わたしの推しがいる端末だけ出す）');
+    const links = [...(shelf + ym).matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/') && !u.startsWith('https://hb.afl.rakuten.co.jp/'));
+    ok(links.length === 0, `予約帳：棚と予約帳に楽天以外へのリンクがない${links.length ? `（${links.slice(0, 2).join('、')}）` : ''}`);
+    ok(!/\d+\s*件/.test(textOf((shelf + ym).replace(/<span class="rv">[^<]*<\/span>/g, ''))), '予約帳：件数が出ていない（カードのレビューの数はのぞく）');
+    const own = [...(shelf + ym).matchAll(/<(h2|p)[^>]*>([\s\S]*?)<\/\1>/g)].map((m) => textOf(m[2])).join(' ');
+    ok(!/締切|残りわずか|今だけ|お早めに/.test(own), '予約帳：見出しと説明に「締切」「残りわずか」「今だけ」「お早めに」を書かない');
+    const cards = [...(shelf + ym).matchAll(/<li [^>]*>[\s\S]*?<\/li>/g)].map((m) => m[0]);
+    ok(cards.length > 0 && cards.every((c) => /^<li [^>]*data-y="[^"]+" data-yd="(\d{4}-\d\d(-\d\d)?)?"/.test(c) && c.includes('</a><button type="button" class="ykb" aria-pressed="false" hidden>予約した</button></li>')), '予約帳：予約受付中のカードに「予約した」のチェック（リンクの外。動くときだけ出す）');
+    const myJs = readFileSync('src/my.js', 'utf8');
+    ok(myJs.includes("S.setItem('ot-yoyaku'") && !/fetch\([^o]/.test(myJs) && myJs.includes('5184e6') && readFileSync('dist/privacy/index.html', 'utf8').includes('ot-yoyaku'), '予約帳：「予約した」は端末の ot-yoyaku だけに残し（60日で消す）、プライバシーポリシーに1行');
+    ok(topHtml.includes('<a href="/yoyaku/">推しグッズの予約帳（発売の月ごと）</a>') && readFileSync('dist/chiikawa/yoyaku/index.html', 'utf8').includes('<a href="/yoyaku/">全作品の予約帳（発売の月ごと）</a>'), '予約帳：トップの予約受付中の棚の下と、作品の予約受付中のいちばん下から /yoyaku/ へ');
+  }
 }
 // YouTube API サービスの決まり：取った情報をファイルに残さない（III.E.4）・ロゴ（III.F.2）・利用規約（III.A.1）
 {

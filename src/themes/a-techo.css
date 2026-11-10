@@ -125,7 +125,8 @@ main.sheet .idx+section h2,main.sheet .idx+.my+section h2,main.sheet .idx+.my[hi
 .myhome button{min-height:44px;margin-left:10px;padding:0;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:5px}
 .flt{margin:0 0 8px}
 .flt .chips{gap:0 10px}
-.flt button{min-height:44px;color:var(--ink);font-size:14px}
+.flt button,.ykb{min-height:44px;color:var(--ink);font-size:14px}
+.ykd .nm{text-decoration-color:var(--berry)}
 .fmax label{color:var(--ink);font-size:14px}
 .fmax input{color:var(--ink);background:#fff;border:1.5px solid var(--lav);border-radius:8px}
 .fmax input:focus{outline:2px solid var(--berry);outline-offset:1px}
