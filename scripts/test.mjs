@@ -893,6 +893,14 @@ if (process.env.SITE_MODE === 'production') {
   // 商品が少ないページ（noindex,follow）はサイトマップに入れない
   const thin = html.filter((f) => readFileSync(f, 'utf8').includes('<meta name="robots" content="noindex,follow">'));
   ok(thin.every((f) => !locs.includes(`${site}/${f.replace(/^dist\//, '').replace(/index\.html$/, '')}`)), `本番：商品が少ないページはサイトマップに入れない（${thin.length}ページ）`);
+  // 検索に出す商品の一覧は、コーナーのトップ・ご当地・福袋・発売日カレンダーだけ（2026-11-10 しょーくん A）
+  const listOut = locs.filter((u) => /^https:\/\/nyuka-techo\.com\/[^/]+\/(?:yosan|otona|kids|ranking|nesage|yoyaku|new|sainyuka)\/$/.test(u));
+  ok(listOut.length === 0, `本番：予算・大人向け・子ども向け・ランキング・値下がり・予約・新着・再入荷の一覧はサイトマップに入れない（入っていたもの：${listOut.slice(0, 3).join(' ') || 'なし'}）`);
+  const oshiOut = liveWorks.flatMap((c) => (c.oshi || []).map((o) => `${site}/${c.slug}/${o.slug}/`)).filter((u) => locs.includes(u));
+  ok(oshiOut.length === 0, `本番：推しキャラのページはサイトマップに入れない（入っていたもの：${oshiOut.slice(0, 3).join(' ') || 'なし'}）`);
+  const yosanFile = liveWorks.map((c) => `dist/${c.slug}/yosan/index.html`).find((f) => existsSync(f));
+  ok(!yosanFile || readFileSync(yosanFile, 'utf8').includes('<meta name="robots" content="noindex,follow">'), '本番：予算のページは noindex,follow（ページは見られる）');
+  ok(locs.includes(`${site}/gotouchi/`) && liveWorks.every((c) => locs.includes(`${site}/${c.slug}/`)), '本番：ご当地のまとめと作品のトップはサイトマップに入る');
   // 期間外の季節の特集（次は◯月◯日から）は検索に出さない
   const later = html.filter((f) => readFileSync(f, 'utf8').includes('<p class="next">次は'));
   ok(later.every((f) => thin.includes(f)), `本番：期間外の季節の特集は検索に出さない（${later.length}ページ）`);
