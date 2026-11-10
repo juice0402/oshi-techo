@@ -45,6 +45,27 @@ export const isAdult = (name) => {
   return !['nuigurumi', 'omocha', 'bunbougu'].includes(cat) && ADULT_TYPES.test(n);
 };
 
+// コラボグッズ：商品名に「コラボ」があるか、「×」「✕」の両側が言葉のもの（docs/shikumi.md の「コラボグッズ」）。
+// 「26×38cm」「H×W×D」「W60×D40」「×10枚」「約20×55cm」のようなサイズやセット数は外す。
+// 「限定」は数量限定・店舗限定まで入って広すぎるので見分けに使わない
+const COLLAB_WORD = /[\p{L}\p{N}ー]/u;
+export function isCollab(name) {
+  const n = normalize(name);
+  if (n.includes('コラボ')) return true;
+  for (let i = 0; i < n.length; i++) {
+    if (n[i] !== '×' && n[i] !== '✕') continue;
+    const left = n.slice(0, i).trimEnd();
+    const right = n.slice(i + 1).trimStart();
+    if (!left || !right || !COLLAB_WORD.test(left.at(-1)) || !COLLAB_WORD.test(right[0])) continue;
+    // 左が数字・cm・mm で終わる、左が H・W・D だけ
+    if (/(?:\p{N}|cm|mm)$/u.test(left) || /(?:^|[^a-z])[hwd]$/.test(left)) continue;
+    // 右が数字・「約」・H・W・D で始まる
+    if (/^(?:\p{N}|約|[hwd](?![a-z]))/u.test(right)) continue;
+    return true;
+  }
+  return false;
+}
+
 export function categoryOf(name) {
   const n = normalize(name);
   for (const c of CATEGORIES) {
