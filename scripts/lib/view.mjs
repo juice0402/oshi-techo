@@ -43,9 +43,9 @@ export const altOf = (name) => {
 // rank：ランキングの印。review・extra・perks：marksFor の印。until：過ぎたら消す時刻。dl：締切の日（あと何日かは見た人の日付で出す）
 // filt：しぼりこみ用の目印（値段と、送料込み s・ラッピング g・大人向け a・子ども向け k）。cat：種類（しおり用）。hidden：はじめは隠しておく（しぼりこんだときに出す）
 // sortv：並べかえ用の目印（値段 data-p・レビューの件数 data-r）
-export function cardHtml(it, { tag = '', note = '', high = false, eager = false, seen = '', shop = it.shop, go = '楽天市場で見る', size = 128, rank = '', review = '', extra = '', until = '', dl = '', perks = [], filt = '', hidden = false, cat = '', sortv = false } = {}) {
+export function cardHtml(it, { tag = '', note = '', high = false, eager = false, seen = '', shop = it.shop, go = '楽天市場で見る', size = 128, rank = '', review = '', extra = '', until = '', dl = '', perks = [], filt = '', hidden = false, cat = '', sortv = false, yk = null, op = '' } = {}) {
   return (
-    `<li${filt || sortv ? ` data-p="${Number(it.price) || 0}"` : ''}${sortv ? ` data-r="${Number(it.reviews) || 0}"` : ''}${filt ? ` data-f="${esc(filt)}"` : ''}${cat ? ` data-c="${esc(cat)}"` : ''}${hidden ? ' hidden' : ''}><a href="${esc(it.url)}" target="_blank" rel="sponsored nofollow noopener">` +
+    `<li${filt || sortv ? ` data-p="${Number(it.price) || 0}"` : ''}${sortv ? ` data-r="${Number(it.reviews) || 0}"` : ''}${filt ? ` data-f="${esc(filt)}"` : ''}${cat ? ` data-c="${esc(cat)}"` : ''}${yk ? ` data-y="${esc(yk.id)}" data-yd="${esc(yk.d)}"` : ''}${op ? ` data-o="${esc(op)}"` : ''}${hidden ? ' hidden' : ''}><a href="${esc(it.url)}" target="_blank" rel="sponsored nofollow noopener">` +
     `<span class="ph"><img src="${esc(it.img)}" width="${size}" height="${size}"${size === 128 ? '' : ` class="s${size}"`} loading="${eager ? 'eager' : 'lazy'}" decoding="async" alt="${esc(altOf(it.name))}" onerror="this.parentNode.classList.add('none');this.remove()"></span>` +
     (tag ? `<span class="tg">${esc(tag)}</span>` : '') +
     (rank ? `<span class="rk">${esc(rank)}</span>` : '') +
@@ -57,7 +57,10 @@ export function cardHtml(it, { tag = '', note = '', high = false, eager = false,
     (extra ? `<span class="nx"${until ? ` data-until="${esc(until)}"` : ''}>${esc(extra)}</span>` : '') +
     (high ? '<span class="hi">相場より高め</span>' : '') +
     (shop ? `<span class="sh">${esc(shop)}</span>` : '') +
-    `<span class="go">${esc(go)}</span></a></li>`
+    `<span class="go">${esc(go)}</span></a>` +
+    // 予約帳の「予約した」（押すと商品名にペンの線。記録は端末の ot-yoyaku だけ。動きは src/my.js）
+    (yk ? '<button type="button" class="ykb" aria-pressed="false" hidden>予約した</button>' : '') +
+    '</li>'
   );
 }
 

@@ -114,9 +114,14 @@ h1+section .grid,h1+.grid{margin-top:10px}
 .pk span+span::before{content:"・"}
 .flt{margin:4px 0 6px}
 .flt .chips{align-items:center}
-.flt button{position:relative;display:block;padding:4px 6px 4px 26px;font:inherit;font-size:13px;line-height:1.6;cursor:pointer;border:0;background:none}
-.flt button::before{content:"";position:absolute;left:2px;top:50%;width:18px;height:18px;margin-top:-10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 4.2 17.2 3.4 17.6 17 3.4 17.6Z' fill='%23fff' stroke='%2358405e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
-.flt button[aria-pressed=true]::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 4.2 17.2 3.4 17.6 17 3.4 17.6Z' fill='%23fff' stroke='%2358405e' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M5 10.5 8.8 14.6 18.5 2.5' fill='none' stroke='%23b23f78' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.flt button,.ykb{position:relative;display:block;padding:4px 6px 4px 26px;font:inherit;font-size:13px;line-height:1.6;cursor:pointer;border:0;background:none}
+.flt button::before,.ykb::before{content:"";position:absolute;left:2px;top:50%;width:18px;height:18px;margin-top:-10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 4.2 17.2 3.4 17.6 17 3.4 17.6Z' fill='%23fff' stroke='%2358405e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat center/contain}
+.flt button[aria-pressed=true]::before,.ykb[aria-pressed=true]::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3 4.2 17.2 3.4 17.6 17 3.4 17.6Z' fill='%23fff' stroke='%2358405e' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M5 10.5 8.8 14.6 18.5 2.5' fill='none' stroke='%23b23f78' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+/* 予約帳の「予約した」：しぼりこみと同じ手帳のチェック欄。押すと商品名にペンの線 */
+.grid li[data-y]{display:flex;flex-direction:column}
+.grid li[data-y]>a{height:auto;flex:1 0 auto}
+.ykb{align-self:flex-start;margin:2px 0 0}
+.ykd .nm{text-decoration:line-through;text-decoration-thickness:2px}
 .fmax label{display:flex;align-items:center;gap:4px;font-size:13px;padding:0 0 0 4px}
 .fmax input{width:5.5em;font:inherit;font-size:16px;line-height:1.3;padding:2px 6px}
 .myp{margin:10px 0 0}

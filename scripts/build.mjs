@@ -225,7 +225,7 @@ const byReviews = (a, b) => b.reviews - a.reviews || byNew(a, b);
 // しぼりこみの目印：送料込み s・ラッピング対応 g・大人向け a・子ども向け k
 const filtOf = (it) => [it.postage === 0 && 's', it.gift === 1 && 'g', isAdult(it.name) && 'a', isKids(it.name) && 'k'].filter(Boolean).join(' ') || '-';
 // filt：しぼりこみの目印をつける。hidden：はじめは隠す（しぼりこんだときに、隠れていたものから補う）
-function cell(it, eager, { filt = false, hidden = false, cat = false, sort = false } = {}) {
+function cell(it, eager, { filt = false, hidden = false, cat = false, sort = false, yk = null, op = '' } = {}) {
   let tag = '';
   if (isRestock(it)) tag = '再入荷';
   else if (isDrop(it)) tag = '値下がり';
@@ -243,7 +243,7 @@ function cell(it, eager, { filt = false, hidden = false, cat = false, sort = fal
     until = '';
   }
   const dl = !isDrop(it) && it.resv?.deadline ? it.resv.deadline : '';
-  return cardHtml(it, { tag, note, high: it.high, eager, seen: it.first, rank: rankLabel(it.code), review: m.review, extra, until, dl, perks: m.perks, filt: filt ? filtOf(it) : '', hidden, cat: cat ? it.cat || '-' : '', sortv: sort });
+  return cardHtml(it, { tag, note, high: it.high, eager, seen: it.first, rank: rankLabel(it.code), review: m.review, extra, until, dl, perks: m.perks, filt: filt ? filtOf(it) : '', hidden, cat: cat ? it.cat || '-' : '', sortv: sort, yk, op });
 }
 
 // しぼりこめる一覧：pool 件まで入れておき、show 件だけ見せる（しぼりこむと、条件に合うものを show 件まで出す）
@@ -404,8 +404,8 @@ const releaseNote = (b) => {
   const when = b.date.year ? b.date.label : `${otherYear}${b.date.label}${b.date.exact && b.date.approx ? '頃' : ''}`;
   return `${when}発売${b.kind ? `・${b.kind}` : ''}`;
 };
-function bookCell(b, eager) {
-  return cardHtml(b, { tag: b.avail === 5 ? '予約' : '', note: releaseNote(b), eager, shop: b.maker, go: '楽天ブックスで見る', size: 120 });
+function bookCell(b, eager, { yk = null, op = '' } = {}) {
+  return cardHtml(b, { tag: b.avail === 5 ? '予約' : '', note: releaseNote(b), eager, shop: b.maker, go: '楽天ブックスで見る', size: 120, yk, op });
 }
 const bookGrid = (list, eagerFirst = false) => `<ul class="grid">${list.map((b, i) => bookCell(b, eagerFirst && i < 4)).join('')}</ul>`;
 // 楽天ブックスで予約受付中のグッズ（おもちゃと、カレンダー・手帳）。これから発売のものだけ、発売日の順
@@ -435,6 +435,63 @@ const oshiPages = chars.flatMap((c) =>
 );
 const oshiPageSet = new Set(oshiPages.map((p) => `${p.c.slug}/${p.o.slug}`));
 const oshiHref = (c, o) => (o.slug && oshiPageSet.has(`${c.slug}/${o.slug}`) ? `/${c.slug}/${o.slug}/` : searchHref({ c: c.slug, q: o.name }));
+
+// ---- わたしの推しの予約帳（推しキャラのページの棚と /yoyaku/。docs/shikumi.md の「予約帳」） ----
+// 楽天ブックスで予約受付中のグッズ（booksYoyaku と同じ条件）と楽天市場の予約（resv があるもの）を、発売の順に並べる。
+// 楽天の販売期間の終わり（endTime）は、並べる順にも締切の文にも使わない（仮の日付があるため。11/6 しょーくんと決めた）
+// d：「予約した」の記録に残す発売の時期（日がわかれば YYYY-MM-DD、月までなら YYYY-MM、わからなければ空）
+// o：並べる順（日がわかるものはその日、月までのものはその月の、日がわかるもののあと。わからないものはいちばんあと）
+// g：/yoyaku/ の見出しのまとまり（月は YYYY-MM、季節・年だけのものは「2027年春」のような名前、わからないものは空）
+const YK_SHELF = 8; // 推しキャラのページの棚の件数
+const YK_MIN = 4; // これより少ない推しには棚を出さない
+const YK_PER_GROUP = 24; // /yoyaku/ の月ごとの件数
+const thisMonth = today.slice(0, 7);
+const oshiHits = oshiPages.map((p) => ({ c: p.c.slug, path: `/${p.c.slug}/${p.o.slug}/`, hit: oshiMatcher(p.o) }));
+const ykEntries = [
+  ...buyable
+    .filter((i) => i.resv)
+    .map((i) => {
+      // 発売の日・月として使うのは「発売」と書いてあるものだけ（「発送」「お届け」「入荷」「出荷」「◯月予約」は発売の時期とは限らないので、時期がわからない側）
+      const r = /発売$/.test(i.resv.label) ? i.resv.release : '';
+      const m = r.slice(0, 7);
+      const exact = Boolean(r) && /月\d{1,2}日/.test(i.resv.label);
+      return { c: i.c, name: i.name, id: `m:${i.code}`, d: exact ? r : m, o: exact ? r : r ? `${m}-32` : '9999', g: m, card: (eager, x) => cell(i, eager, x) };
+    })
+    // 発売の月が過ぎたもの・日にちが過ぎたものは入れない
+    .filter((e) => !e.g || (e.g >= thisMonth && (e.d.length < 10 || e.d >= today))),
+  ...booksYoyaku('').map((b) => ({
+    c: b.c,
+    name: b.name,
+    id: `b:${b.code}`,
+    d: b.date.exact ? b.date.ymd : b.date.year ? '' : b.date.month,
+    o: b.date.exact ? b.date.ymd : `${b.date.month}-32`,
+    g: b.date.year ? b.date.label : b.date.month,
+    card: (eager, x) => bookCell(b, eager, x),
+  })),
+]
+  .map((e) => ({ ...e, op: oshiHits.filter((h) => h.c === e.c && h.hit(e.name)).map((h) => h.path) }))
+  .sort((a, b) => a.o.localeCompare(b.o) || a.name.localeCompare(b.name));
+const ykCard = (e, eager = false) => e.card(eager, { yk: { id: e.id, d: e.d }, op: e.op.join(' ') });
+const ykShelfShown = new Set(); // 棚が出た推しキャラのページ（ビルドの出力用）
+// 推しキャラのページの「<呼び方>の予約受付中」の棚（4件より少ない推しには出さない）
+function ykShelf(path, label) {
+  const list = ykEntries.filter((e) => e.op.includes(path));
+  if (list.length < YK_MIN) return '';
+  ykShelfShown.add(path);
+  return `<section class="shelf yk"><h2>${esc(label)}の予約受付中</h2><ul class="grid">${list.slice(0, YK_SHELF).map((e) => ykCard(e)).join('')}</ul></section>`;
+}
+// /yoyaku/ の見出し：月は「11月発売」（今年でなければ「2027年1月発売」）、季節・年だけのものは「2027年春発売」
+const ykGroupName = (g) => (/^\d{4}-\d\d$/.test(g) ? `${g.slice(0, 4) !== today.slice(0, 4) ? `${g.slice(0, 4)}年` : ''}${Number(g.slice(5, 7))}月発売` : `${g}発売`);
+const ykGroups = (() => {
+  const m = new Map();
+  for (const e of ykEntries) {
+    if (!e.g) continue; // 発売の時期が商品名にないものは、月に分けられないので入れない（推しキャラのページの棚には出す）
+    if (!m.has(e.g)) m.set(e.g, []);
+    m.get(e.g).push(e);
+  }
+  // 推しキャラに当たるものを先に（その中は発売の順）
+  return [...m].map(([g, list]) => ({ g, name: ykGroupName(g), items: [...list.filter((e) => e.op.length), ...list.filter((e) => !e.op.length)].slice(0, YK_PER_GROUP) }));
+})();
 
 // ---- 入荷ビンゴ（推しキャラのページのカード。docs/shikumi.md の「入荷ビンゴ」） ----
 // 記録 data/bingo.json（scripts/bingo.mjs が更新のたびに積み上げる）に、いま載っている商品の分も足して使う（記録がないときも今月ぶんが埋まる）
@@ -987,7 +1044,7 @@ function topYoyaku(n) {
     .filter((c) => yoyakuFor(c.slug).total >= MIN_PAGE)
     .map((c) => `<a href="/${c.slug}/yoyaku/">${esc(c.name)}の予約受付中</a>`)
     .join('／');
-  return `<section><h2>予約受付中のグッズ</h2><ul class="grid">${cards.join('')}</ul>${links ? `<p class="more">${links}</p>` : ''}</section>`;
+  return `<section><h2>予約受付中のグッズ</h2><ul class="grid">${cards.join('')}</ul>${links ? `<p class="more">${links}</p>` : ''}${ykGroups.length ? '<p class="more"><a href="/yoyaku/">推しグッズの予約帳（発売の月ごと）</a></p>' : ''}</section>`;
 }
 
 // 推しキャラのボタンを、作品ごとにたたんで出す（トップ用）
@@ -1318,6 +1375,7 @@ for (const c of chars) {
         (Y.market.length ? section(both ? '楽天市場の予約' : '', Y.market.slice(0, settings.listItems), { eager: true }) : '') +
         (Y.books.length ? `<section>${both ? '<h2>楽天ブックスの予約（発売日の順）</h2>' : ''}${bookGrid(Y.books.slice(0, settings.listItems), !Y.market.length)}</section>` : '') +
         '<p class="asof">締切は商品名に書いてあるもの、販売期間と発売日は楽天の情報です</p>' +
+        (ykGroups.length ? '<p class="more"><a href="/yoyaku/">全作品の予約帳（発売の月ごと）</a></p>' : '') +
         // 時刻はいちばん下に1行（楽天市場があればその時刻。楽天ブックスはそのすぐあとに集めている）
         (Y.market.length ? priceAt() : booksAt()),
       lastmod: Y.market.length ? newest(Y.market) : books.fetchedAt ? jstDate(new Date(books.fetchedAt)) : '',
@@ -1374,6 +1432,8 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
         .map((it, j) => cell(it, j < 4, { cat: true }))
         .join('')}</ul>` +
       priceAt() +
+      // 予約受付中（発売の順。「予約した」のチェックつき）
+      ykShelf(path, label) +
       // 一覧にないランキングのグッズだけ（一覧のカードには、ランキングの印がつく）
       rankSection('楽天のランキングに入っているもの', ranked.filter((r) => !inList.has(r.code)), settings.topItems) +
       section('レビューが多いもの', popular, { limit: settings.topItems }) +
@@ -1962,6 +2022,33 @@ for (const c of chars) {
   });
 }
 
+// ---- 全作品の予約帳 /yoyaku/（発売の月ごと。docs/shikumi.md の「予約帳」） ----
+// 上の「わたしの推しだけ」は、わたしの推しを登録している端末だけに出す（src/my.js がカードの data-o を見てしぼる。どこにも送らない）
+if (ykGroups.length) {
+  const shown = ykGroups.flatMap((x) => x.items);
+  const names = ykGroups.slice(0, 2).map((x) => x.name.replace(/発売$/, ''));
+  const near = shown.filter((e) => e.d.length === 10).map((e) => e.d).sort()[0];
+  page({
+    path: '/yoyaku/',
+    crumbs: [{ name: 'トップ', path: '/' }, { name: '推しグッズの予約帳', path: '/yoyaku/' }],
+    title: `推しグッズの予約受付中・発売予定（${names.join('・')}発売など）｜予約帳｜${settings.siteName}`,
+    description: sentence(
+      `楽天市場と楽天ブックスで予約受付中のキャラクターやアニメのグッズを、${names.join('・')}のように発売の月ごとに並べた予約帳です`,
+      near ? `日にちが決まっている発売日で、いちばん近いのは${mdOfYmd(near)}です` : '',
+      '月の中では、推しキャラのグッズを先にしています',
+    ),
+    h1: '推しグッズの予約帳',
+    count: shown.length,
+    body:
+      '<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>' +
+      ykGroups.map((x, i) => `<section><h2>${esc(x.name)}</h2><ul class="grid">${x.items.map((e, j) => ykCard(e, i === 0 && j < 4)).join('')}</ul></section>`).join('') +
+      '<p class="asof yk-none" hidden>わたしの推しの予約受付中のグッズは、いまはありません</p>' +
+      '<p class="asof">発売の時期は、楽天ブックスの発売日と、楽天市場の商品名に書いてあるものです</p>' +
+      (shown.some((e) => e.id.startsWith('m:')) ? priceAt() : booksAt()),
+    lastmod: today,
+  });
+}
+
 // ---- 推しキャラの誕生日カレンダー ----
 if (birthdays.length) {
   const soon = birthdays.filter((b) => b.days <= BIRTHDAY_SOON && b.items.length);
@@ -2354,6 +2441,7 @@ page({
 <p>「わたしの推し」に選んだ推しキャラと、前にこのサイトを見た時刻を、見ている端末のブラウザの中だけに保存します。サイトや楽天には送りません。ブラウザのデータを消すと消えます。</p>
 <p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。</p>
 <p>推しキャラのページの「入荷ビンゴ」は、開けたマスの種類と、その月に初めて来た日を、見ている端末のブラウザの中だけに保存します。</p>
+<p>予約受付中のグッズの「予約した」は、その商品の番号と発売の時期と押した日だけを、見ている端末のブラウザの中（ot-yoyaku）に保存します。発売の月が過ぎて60日たつと消えます。発売の時期がわからないものは、押した日から60日で消えます。</p>
 ${settings.contact ? `<h2>お問い合わせ</h2>
 <p>お問い合わせは、Google フォーム（Google LLC のサービス）で受けつけています。受け取るのは、書いてもらったお名前・メールアドレス・内容と、どのサイトからのお問い合わせかだけです。お名前とメールアドレスは書かなくても送れます。</p>
 <p>受け取ったものは、返事をすることと、サイトの内容を直すことだけに使います。ほかの人に渡したり、公開したりはしません。フォームの入力のときには、<a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google のプライバシーポリシー</a>も適用されます。</p>
@@ -2507,6 +2595,7 @@ console.log(`商品が少なくて検索に出さない（出さなくなりそ�
 // 送料込み・ラッピング対応の印がどれくらいつくか（楽天の項目が取れているかの確かめ）
 const perkText = `送料込み ${buyable.filter((i) => i.postage === 0).length}件・送料別 ${buyable.filter((i) => i.postage === 1).length}件・ラッピング対応 ${buyable.filter((i) => i.gift === 1).length}件（買えるもの ${buyable.length}件）／予約受付中 ${chars.map((c) => `${c.name}${yoyakuFor(c.slug).total}`).join('・')}`;
 console.log(perkText);
+console.log(`予約帳：推しキャラに当たった予約 ${ykEntries.filter((e) => e.op.length).length}件・棚が出た推し ${ykShelfShown.size}人（${[...ykShelfShown].join('・') || 'なし'}）・/yoyaku/ ${ykGroups.length ? ykGroups.map((x) => `${x.name}${x.items.length}`).join('・') : '作らない'}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=送料込み・ラッピング対応・予約::${perkText}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=商品が少ないページ::${thinText || 'なし'}`);
 // 推しキャラのページができたか（GitHub の実行ページの注釈に出す）

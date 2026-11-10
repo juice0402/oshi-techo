@@ -1,5 +1,5 @@
 // わたしの推し・推し×種類のしおり・前に見てから（ブラウザの中だけで動く。build.mjs がページに入れる）
-// 保存するのは、見ている端末の localStorage の ot-my（推しキャラのページの場所・名前・えらんだ種類）、ot-cur・ot-prev（時刻）、ot-home（ホーム画面の案内をとじた印）だけ。
+// 保存するのは、見ている端末の localStorage の ot-my（推しキャラのページの場所・名前・えらんだ種類）、ot-cur・ot-prev（時刻）、ot-home（ホーム画面の案内をとじた印）、ot-yoyaku（「予約した」の商品の番号と発売の時期）だけ。
 // 楽天のデータは保存しない。サイトや楽天には何も送らない。読みにいくのは、このサイトの推しキャラのページだけ。
 (function () {
   var S;
@@ -88,6 +88,90 @@
         save();
         b.setAttribute('aria-pressed', String(!on));
       });
+    });
+  }
+
+  // 予約帳の「予約した」（推しキャラのページの予約受付中の棚と /yoyaku/）。押すと商品名にペンの線。
+  // 残すのは ot-yoyaku に、商品の番号・発売の時期（日か月。わからないものは空）・押した日だけ。
+  // 発売の月が過ぎて60日たった記録は消す。発売の時期がわからない記録は、押した日から60日で消す
+  var yt = new Date(now + 324e5).toISOString();
+  var yDay = yt.slice(0, 10);
+  var yMon = yt.slice(0, 7);
+  var yk = [];
+  var okY = function (x) { return x && typeof x[0] === 'string' && x[0].length <= 300 && /^(\d{4}-\d\d(-\d\d)?)?$/.test(x[1] || '') && /^\d{4}-\d\d-\d\d$/.test(x[2] || ''); };
+  var yGone = function (x) {
+    var d = x[1];
+    // 日本時間の0時（UTC では前の日の15時）。発売の時期があればその月の次の月の1日、なければ押した日
+    var base = d ? Date.UTC(+d.slice(0, 4), +d.slice(5, 7), 1) - 324e5 : Date.parse(x[2]) - 324e5;
+    return now - base > 5184e6;
+  };
+  var ySave = function () { try { if (yk.length) S.setItem('ot-yoyaku', JSON.stringify(yk)); else S.removeItem('ot-yoyaku'); } catch (e) {} };
+  if (S) {
+    try {
+      yk = JSON.parse(S.getItem('ot-yoyaku') || '[]').filter(okY);
+    } catch (e) {}
+    var yLen = yk.length;
+    yk = yk.filter(function (x) { return !yGone(x); }).slice(-300);
+    if (yk.length !== yLen) ySave();
+  }
+  var yHas = function (id) { return yk.some(function (x) { return x[0] === id; }); };
+  var yMark = function (li, on) {
+    li.classList.toggle('ykd', on);
+    var b = li.querySelector('.ykb');
+    if (b) b.setAttribute('aria-pressed', String(on));
+    var d = li.getAttribute('data-yd') || '';
+    var n = li.querySelector('.ykn');
+    var t = on && (d === yDay ? '今日発売' : d === yMon ? '今月発売' : '');
+    if (t && !n) {
+      n = document.createElement('span');
+      n.className = 'nt ykn';
+      b.parentNode.insertBefore(n, b);
+    }
+    if (n) {
+      if (t) n.textContent = t;
+      else n.remove();
+    }
+  };
+  if (S) {
+    [].forEach.call(document.querySelectorAll('li[data-y]'), function (li) {
+      var b = li.querySelector('.ykb');
+      if (!b) return;
+      var id = li.getAttribute('data-y');
+      yMark(li, yHas(id));
+      b.hidden = false;
+      b.addEventListener('click', function () {
+        var on = !yHas(id);
+        yk = yk.filter(function (x) { return x[0] !== id; });
+        if (on) yk.push([id, li.getAttribute('data-yd') || '', yDay]);
+        ySave();
+        // 同じ商品のカードがほかにもあれば、そろえる
+        [].forEach.call(document.querySelectorAll('li[data-y]'), function (o) { if (o.getAttribute('data-y') === id) yMark(o, on); });
+      });
+    });
+  }
+
+  // /yoyaku/ の「わたしの推しだけ」：わたしの推しを登録している端末だけに出す。カードの data-o（推しキャラのページの場所）でしぼる
+  var ykf = document.querySelector('.ykf');
+  if (ykf && my.length) {
+    var fb = ykf.querySelector('button');
+    var mine2 = my.map(function (x) { return x.p; });
+    ykf.hidden = false;
+    fb.addEventListener('click', function () {
+      var on = fb.getAttribute('aria-pressed') !== 'true';
+      var any = 0;
+      fb.setAttribute('aria-pressed', String(on));
+      [].forEach.call(document.querySelectorAll('main section'), function (s) {
+        var c = 0;
+        [].forEach.call(s.querySelectorAll('li[data-y]'), function (li) {
+          var ok = !on || (li.getAttribute('data-o') || '').split(' ').some(function (p) { return mine2.indexOf(p) >= 0; });
+          li.hidden = !ok;
+          if (ok) c++;
+        });
+        s.hidden = !c;
+        any += c;
+      });
+      var e = document.querySelector('.yk-none');
+      if (e) e.hidden = !!any;
     });
   }
 
