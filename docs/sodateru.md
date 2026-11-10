@@ -74,3 +74,43 @@
 - 読むファイル：docs/shikumi.md の「推しキャラ」「カードの印」「商品が少ないページ」、build.mjs の作品のトップの棚と topYoyaku、scripts/lib/classify.mjs
 - 順番：前の項目（わたしの推しの予約帳）のあと。どちらも build.mjs とトップをさわるので、前の PR がマージ待ちなら、そのブランチの上に積む
 - マージ：する
+
+### [ ] 推し活カレンダーの購読に、季節のイベントと買い方メモの予定を入れる
+- やること：
+  1. scripts/lib/ics.mjs の buildIcs に、1回だけの予定（日にちが決まった from から、to があれば to まで。DTEND は to の翌日、to がなければ from の翌日）も書けるようにする（いまの毎年くり返す予定はそのまま）
+  2. /calendar/oshi.ics に、推しキャラの誕生日（いまのまま。uid も変えない）に加えて、季節のイベント（config/seasons.json の event があるものだけ。ハロウィン・クリスマス・お正月・バレンタイン・ホワイトデー。毎年くり返す）と、買い方メモの予定（src/kaikata/<作品>.json の events のうち、from が日にちまで決まっていて until が過ぎていないもの。1回だけ）を入れる。カレンダーの名前（X-WR-CALNAME）は「推し活カレンダー（<サイト名>）」にする。ファイルの場所 /calendar/oshi.ics は変えない。uid は季節が season-<slug>、買い方メモが kaikata-<作品>-<from>-<何番目>
+  3. /calendar/（今日から来月の終わり）にも、買い方メモの予定を日付の順に足す（いまの誕生日・季節のイベント・特集のはじまり・発売日・締切の並びに入れる。行は「<作品名>：<予定の短い文>」で、作品の /<作品>/kaikata/#yotei へのリンク）
+  4. ics への入口の文を「推しキャラの誕生日と予定を、スマホのカレンダーに入れる」くらいに直す（いまの3か所：/calendar/・/tanjoubi/・誕生日の棚）。docs/shikumi.md の「推し活カレンダー」の1行目を新しい中身に直す
+  5. scripts/test.mjs の推し活カレンダーの点検（oshi.ics の予定の数が誕生日の数と同じ・「発売|締切|予約|円」を含まない・URL の数・入口の文）を、新しい中身に合わせて直す。買い方メモの予定の文には「発売」「予約」が入るので、その点検は誕生日と季節の予定の行だけに当てる。「楽天」の文字と楽天の商品名が入っていないことの点検は全体に当てたまま
+- できあがりの条件：見本データで作った oshi.ics に、誕生日・季節のイベント・買い方メモの予定（見本の日付で until が過ぎていないもの）が入り、楽天のデータ（商品名・値段・楽天の URL・楽天ブックスの発売日）が1つも入っていないことを test.mjs で確かめて通る。月までしか決まっていない予定（from が YYYY-MM）と until が過ぎた予定は入らない。ics の行が75オクテットで折り返され、改行が CRLF のまま。/calendar/ に買い方メモの予定の行が出る。スマホ 390px で /calendar/ が横にはみ出さない
+- 決まったこと：/calendar/ は「日にちが決まったものだけ」、oshi.ics は「楽天のデータは入れない（ファイルとして公開しないため）」（docs/shikumi.md の「推し活カレンダー」・scripts/lib/ics.mjs の頭のコメント）。カレンダーの中身は「日付・短い名前・このサイトのリンクだけ（値段・画像なし）」（claude/oshi-techo-debate-2026-10-22.md の5）。カレンダーの購読は「呼び戻せる入口」（claude/site-principles.md の「楽しさで、わざわざ来てもらう」、連絡板 C-016 の②）。福袋の予約や発売の日は「買う理由の例：予約・発売日」（site-principles の「買いに来る理由がある人を集める」）。買い方メモの events は until の日が過ぎたら出さない（docs/shikumi.md の「買い方メモ」）
+- 迷ったら：予定の短い文は、events の text の最初の「。」までを全角40字までにし、こえたら40字で切って「…」。全文は ics の DESCRIPTION に入れる。SUMMARY は「<作品名>：<短い文>」。季節のイベントの URL は、その季節のまとめ /<季節>/ のページがあればそこ、なければ /calendar/。楽天ブックスの発売日と商品名の予約の締切は、/calendar/ のページには今までどおり出すが ics には入れない。from が月まで（YYYY-MM）の予定は ics にも /calendar/ にも入れない。DTSTAMP はいまの固定の値のままでよい。新しい見た目は足さない
+- 読むファイル：docs/shikumi.md の「推し活カレンダー」「買い方メモ」「季節の特集とデコ」、scripts/lib/ics.mjs、build.mjs の「推し活カレンダー」の所と calendar/oshi.ics を作る所、config/seasons.json、src/kaikata/chiikawa.json（events の形）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-10）
+
+### [ ] ご当地一覧に「持ってる」のチェック（集めた県が端末に残る）
+- やること：
+  1. ご当地の一覧（build.mjs の gotouchiListPage。作品ごとの /<作品>/gotouchi/ とご当地キティ /sanrio/gotouchi/kitty/）の都道府県の見出し（section.gp の h3）の横に「持ってる」のチェックを置く。形はしぼりこみの手帳のチェック欄と同じ（aria-pressed。もう一度押すと外れる）
+  2. 押すと、見ている端末の localStorage に県の id（見出しの id から「p-」を取ったローマ字）だけを残す。ご当地スヌーピーの一覧 /snoopy/gotouchi/ は、読みものの道具（src/yomimono/tools/gotouchi-snoopy-check.html）と同じ ot-gotouchi-snoopy に、同じ形（県の id をカンマでつないだもの）で残し、一覧と道具のどちらでチェックしても両方に出るようにする。ほかの一覧は ot-gotouchi-<作品>（キティは ot-gotouchi-kitty）
+  3. 上の都道府県の目次で、持ってる県にペンの丸（数は出さない）。ご当地スヌーピーの一覧だけ、目次のすぐ下に「47都道府県のチェック表（読みもの）」で読みものの道具へのリンクを1行（一覧には、いま商品のある県しか見出しが出ないため。すでに同じ読みものへのリンクが目次の上にあれば足さない）
+  4. 動きは src/ の小さなスクリプト（build.mjs がコメントを外してページに入れる、my.js と同じやり方）。JS が動かない・保存できない端末ではチェックを出さない（hidden を JS が外す）
+  5. プライバシーポリシー（build.mjs の /privacy/）の「端末に保存するもの」の、読みもの「ご当地スヌーピーの買える場所と集め方」の行に、ご当地の一覧の「持ってる」のチェックも足す。test.mjs が見ている「集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します」の文はそのまま残す（その文のあとに1文足すか、点検の文を合わせて直す）。docs/shikumi.md の「ご当地」に1行足す
+- できあがりの条件：見本データで /snoopy/gotouchi/ の県の見出しにチェックが出て、押すとペンの丸が出て、読みなおしても残り、/yomimono/gotouchi-snoopy/ の道具にも同じ県が入っている（Playwright で確かめる）。test.mjs に「一覧のチェックのスクリプトに fetch・XMLHttpRequest・sendBeacon がない」「保存は県の id だけ（商品の番号・名前・URL を残さない）」を足して通る。いまの道具のテスト（test.mjs の KEEP_LOCAL_TOOLS）も通る。スマホ 390px とパソコン 1280px で横にはみ出さず、チェックの付いていない人の見た目は前と同じ
+- 決まったこと：/snoopy/gotouchi/ は 10/23〜31 に 4,409表示・100クリックで、サイトの表示の9割（claude/search-data-oshi.md の 11/2 の回）。表示の多い答えのページに「自分の数字が残る」来る理由を足す（連絡板 C-026 案A の③。しょーくん「自分で計算できるなどの来る理由を継続していくことが大切」）。ot-gotouchi-snoopy は、集めた記録を残すための道具として端末の localStorage にだけ残すと #16 で決めたもの（scripts/test.mjs の KEEP_LOCAL_TOOLS のコメント）。「積み上がる：保存は端末の中。残すのは最小限にし、プライバシーポリシーに1行」（claude/site-principles.md の「楽しさで、わざわざ来てもらう」）。件数はページに出さない（CLAUDE.md）ので、集めた県の数も出さない
+- 迷ったら：チェックの文字は「持ってる」。「コンプリート」「あと◯県」のような、あおる言い方はしない。読みものの道具のコードと保存の形は変えない（テストが形を見ている）。一覧にない県（いま商品がない県）のチェックも保存からは消さない（道具で付けた県が消えないように）。県の見出しの横に置くと窮屈なとき（スマホ 390px で見出しが2行になるとき）は、見出しのすぐ下の行の右はしに置く。目次のペンの丸は、いまの「えらんだもの」と同じ形を使い、新しい見た目は足さない。ご当地のまとめ /gotouchi/ にはチェックを置かない（作品ごとの一覧だけ）
+- 読むファイル：docs/shikumi.md の「ご当地」「推しキャラ」（わたしの推しの保存のしかた）、build.mjs の gotouchiListPage と /privacy/、src/yomimono/tools/gotouchi-snoopy-check.html、scripts/test.mjs の KEEP_LOCAL_TOOLS の所、src/my.js
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-10）
+
+### [ ] 読みものと入荷ビンゴのまとめの更新のお知らせ（RSS）
+- やること：
+  1. build.mjs で /feed.xml（Atom 1.0）を作る。中身は、読みもの（config/yomimono.json の題・説明文・published か updated の日・/yomimono/<記事>/）と、入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/ のうち検索に出すもの。題・説明文・その月の次の月の1日）を、新しい順に20件まで
+  2. 全ページの head に `<link rel="alternate" type="application/atom+xml" title="<サイト名>の更新" href="/feed.xml">`。/yomimono/ と /bingo/ のいちばん下に「更新のお知らせ（RSS）」の1行
+  3. docs/shikumi.md の「読みもの」に1行足す
+- できあがりの条件：見本データで dist/feed.xml ができ、XML として読めて（Node の簡単な点検でよい）、feed の id・updated・各 entry の title・link・updated・summary がある。test.mjs に「feed に楽天のデータ（商品名・値段・楽天の URL・画像の URL）がない」「noindex のまとめの月が入っていない」「件数が20をこえない」を足して通る。head の link が全ページにある
+- 決まったこと：RSS は「呼び戻せる入口」の1つ（claude/site-principles.md の「楽しさで、わざわざ来てもらう」、連絡板 C-016 の②。運営の SNS 発信はしない）。楽天APIで取ったデータはファイルとして公開しない（CLAUDE.md・楽天の規約 第10条9号）ので、feed には読みものとビンゴのまとめ（このサイトの記録）だけを入れる。印のある推しが10人より少ない月のまとめは noindex,follow（sodateru.md の「入荷ビンゴの先月のまとめ」の項目）
+- 迷ったら：entry の中身は説明文だけ（本文の全文・読みものの棚の商品は入れない）。読みものの日は updated があれば updated、なければ published。feed の updated はいちばん新しい entry の日。商品のページ（新着など）は1日2回入れかわるので入れない。新しい見た目は足さない（1行は今の <p class="more"> の形）。サイトマップに feed.xml は入れない
+- 読むファイル：docs/shikumi.md の「読みもの」「入荷ビンゴ」、build.mjs の page()（head）と /yomimono/・/bingo/ と bingoSummaryPage の所、config/yomimono.json の1件目の形
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-10）
