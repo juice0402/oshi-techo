@@ -98,12 +98,20 @@ const BIRTHDAY_SOON = 30; // 誕生日カレンダーで、グッズも出す日
 const BIRTHDAY_DECO = 7; // 推しキャラのページを誕生日のデコにする日数
 const MIN_INDEX = 12; // 検索に出すページの最低件数（少ないページは noindex,follow にしてサイトマップから外す）
 const INDEX_GRACE = 7; // 検索に出していたページが少なくなっても、この日数続くまでは切りかえない
+// 商品の一覧のうち、検索に出すのはこのサイトの記録や組み立てがある一覧だけ（2026-11-10 しょーくん A「しっかりしぼる」）。
+// コーナーのトップ・ご当地・福袋・発売日カレンダー。推しキャラ・カテゴリ・季節・話題・予算・大人向け・子ども向け・
+// ランキング・値下がり・予約・新着などは、ページはそのまま見られるが noindex,follow にしてサイトマップから外す
+const SEARCH_LISTS = /^\/(?:anime|game|idol)\/$|\/(?:gotouchi|fukubukuro)\/|^\/[^/]+\/hatsubai\/$/;
 
 // 検索に出すかどうか（少ない日がつづいたときだけ外す）。記録は data/index-state.json（見本データで作るときは書かない）
 const INDEX_STATE = 'data/index-state.json';
 const indexState = process.env.DATA_LATEST ? {} : readJson(INDEX_STATE, {});
 const nextIndexState = {};
 function indexable(path, count) {
+  if (!SEARCH_LISTS.test(path)) {
+    nextIndexState[path] = { idx: false, list: true };
+    return false;
+  }
   const prev = indexState[path];
   if (count >= MIN_INDEX) {
     nextIndexState[path] = { idx: true };
