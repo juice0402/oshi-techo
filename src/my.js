@@ -92,17 +92,18 @@
   }
 
   // 予約帳の「予約した」（推しキャラのページの予約受付中の棚と /yoyaku/）。押すと商品名にペンの線。
-  // 残すのは ot-yoyaku に、商品の番号と発売の時期（日か月。わからないものは空）だけ。発売の月が過ぎて60日たった記録は消す
+  // 残すのは ot-yoyaku に、商品の番号・発売の時期（日か月。わからないものは空）・押した日だけ。
+  // 発売の月が過ぎて60日たった記録は消す。発売の時期がわからない記録は、押した日から60日で消す
   var yt = new Date(now + 324e5).toISOString();
   var yDay = yt.slice(0, 10);
   var yMon = yt.slice(0, 7);
   var yk = [];
-  var okY = function (x) { return x && typeof x[0] === 'string' && x[0].length <= 300 && /^(\d{4}-\d\d(-\d\d)?)?$/.test(x[1] || ''); };
-  var yGone = function (d) {
-    if (!d) return false;
-    var y = +d.slice(0, 4);
-    var m = +d.slice(5, 7);
-    return now - Date.UTC(y, m, 1) - 324e5 > 5184e6;
+  var okY = function (x) { return x && typeof x[0] === 'string' && x[0].length <= 300 && /^(\d{4}-\d\d(-\d\d)?)?$/.test(x[1] || '') && /^\d{4}-\d\d-\d\d$/.test(x[2] || ''); };
+  var yGone = function (x) {
+    var d = x[1];
+    // 日本時間の0時（UTC では前の日の15時）。発売の時期があればその月の次の月の1日、なければ押した日
+    var base = d ? Date.UTC(+d.slice(0, 4), +d.slice(5, 7), 1) - 324e5 : Date.parse(x[2]) - 324e5;
+    return now - base > 5184e6;
   };
   var ySave = function () { try { if (yk.length) S.setItem('ot-yoyaku', JSON.stringify(yk)); else S.removeItem('ot-yoyaku'); } catch (e) {} };
   if (S) {
@@ -110,7 +111,7 @@
       yk = JSON.parse(S.getItem('ot-yoyaku') || '[]').filter(okY);
     } catch (e) {}
     var yLen = yk.length;
-    yk = yk.filter(function (x) { return !yGone(x[1]); }).slice(-300);
+    yk = yk.filter(function (x) { return !yGone(x); }).slice(-300);
     if (yk.length !== yLen) ySave();
   }
   var yHas = function (id) { return yk.some(function (x) { return x[0] === id; }); };
@@ -141,7 +142,7 @@
       b.addEventListener('click', function () {
         var on = !yHas(id);
         yk = yk.filter(function (x) { return x[0] !== id; });
-        if (on) yk.push([id, li.getAttribute('data-yd') || '']);
+        if (on) yk.push([id, li.getAttribute('data-yd') || '', yDay]);
         ySave();
         // 同じ商品のカードがほかにもあれば、そろえる
         [].forEach.call(document.querySelectorAll('li[data-y]'), function (o) { if (o.getAttribute('data-y') === id) yMark(o, on); });

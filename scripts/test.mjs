@@ -815,6 +815,7 @@ if (process.env.DATA_LATEST) {
     const at = (w) => shelf.indexOf(w);
     ok(at('缶バッジ 11月20日発売') < at('マグカップ 11月下旬発売') && at('マグカップ 11月下旬発売') < at('アクリルスタンド 12月10日発売') && at('アクリルスタンド 12月10日発売') < at('ポーチ 予約受付中') && at('缶バッジ') > 0, '予約帳：発売の順（日がわかるもの → その月の月までのもの → 発売の時期がわからないもの）で、販売期間の終わりで並べていない');
     const heads = [...ym.matchAll(/<h2>([^<]+)<\/h2>/g)].map((m) => m[1]);
+    ok(!ym.includes('ちいかわ ぬいぐるみ 12月下旬発送') && readFileSync('dist/chiikawa/yoyaku/index.html', 'utf8').includes('ちいかわ ぬいぐるみ 12月下旬発送'), '予約帳：発売の時期に使うのは「発売」と書いてあるものだけ（「12月下旬発送」は月に分けない）');
     ok(ym.includes('<h1 class="tape">推しグッズの予約帳</h1>') && heads.join('・') === '11月発売・12月発売', `予約帳：/yoyaku/ は発売の月ごとの見出し（${heads.join('・')}）`);
     const nov = ym.match(/<h2>11月発売<\/h2><ul class="grid">([\s\S]*?)<\/ul>/)?.[1] ?? '';
     const lis = [...nov.matchAll(/<li [^>]*>/g)].map((m) => m[0]);
