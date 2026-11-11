@@ -9,17 +9,23 @@ name: 更新
 # 公開のログには「済」「失敗」だけを出す。
 # 毎月1日の 0:07 の回は、入荷ビンゴの新しい月のカードと季節の切りかえを、日付が変わってすぐ出すため。
 # cron は「月の終わりの日」を書けないので、28〜31日の 15:07（UTC）に起きて、日本時間で1日のときだけ動く（ほかの日は gate で休む）。
-# GitHub は混む時間に予定の実行を飛ばすことがある（11/2〜11/4 は 12:07 の回が3日つづけて来なかった）。
-# そこで 13:43・20:43 に予備の回を置く。前の150分のあいだに、ほかの「更新」が成功しているか動いているところなら、予備は何もしない。
+# GitHub は混む時間に予定の実行を飛ばすことがある（12:07 の回は 11/2〜11/4 と 11/5〜11/11 に一度も来なかった）。
+# そこでお昼の 12:07 と予備の 13:43 は、Cloudflare の Worker oshi-cron（workers/cron/）の時計から workflow_dispatch で動かす
+# （予備は入力 yobi=true）。夕方の 19:07 と予備の 20:43、毎月1日の 0:07 は、いままでどおり GitHub の予定の実行。
+# 予備の回は、前の150分のあいだに、ほかの「更新」が成功しているか動いているところなら、何もしない。
 on:
   schedule:
-    - cron: '7 3,10 * * *'
-    - cron: '43 4,11 * * *'
+    - cron: '7 10 * * *'
+    - cron: '43 11 * * *'
     - cron: '7 15 28-31 * *'
   workflow_dispatch:
     inputs:
       force:
         description: '変化がなくても公開する'
+        type: boolean
+        default: false
+      yobi:
+        description: '予備の回（前の150分にほかの更新が動いていれば休む。Worker oshi-cron の 13:43 が使う）'
         type: boolean
         default: false
 
@@ -44,6 +50,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SCHEDULE: ${{ github.event.schedule }}
+          YOBI: ${{ inputs.yobi }}
         run: |
           run=true
           if [ "$SCHEDULE" = '7 15 28-31 * *' ] && [ "$(TZ=Asia/Tokyo date +%d)" != '01' ]; then
@@ -52,7 +59,7 @@ jobs:
           fi
           # 予備の回：前の150分のあいだに、ほかの「更新」が成功しているか、動いている・待っているなら休む
           # （調べられなかったときは、更新するほうを選ぶ）
-          if [ "$SCHEDULE" = '43 4,11 * * *' ]; then
+          if [ "$SCHEDULE" = '43 11 * * *' ] || [ "$YOBI" = 'true' ]; then
             since=$(date -u -d '150 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
             n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/update.yml/runs?per_page=20&created=%3E%3D$since" \
               --jq "[.workflow_runs[] | select(.id != $GITHUB_RUN_ID) | select(.status != \"completed\" or .conclusion == \"success\")] | length") || n=0
