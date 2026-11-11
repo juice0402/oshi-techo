@@ -197,6 +197,14 @@
 
 - 「広告　楽天アフィリエイトを利用しています」はページの一番下（しょーくんの判断。楽天の基本機能だけなら表示は任意）。楽天の商品提供などの企画に参加したら、最初の画面に戻す
 
+## お昼の更新（Worker oshi-cron・2026-11-11）
+
+- GitHub の予定の実行（schedule）は、お昼の 12:07 と予備の 13:43 が 11/2〜11/4 と 11/5〜11/11 に一度も来なかった（夕方の回は毎日来る）。そこでお昼の2つは、Cloudflare の Worker oshi-cron（workers/cron/）の時計から update.yml を workflow_dispatch で動かす。13:43 は入力 yobi=true（update.yml の gate が、前の150分にほかの更新が成功しているか動いていれば休む）
+- 夕方の 19:07・予備の 20:43・毎月1日の 0:07 は、いままでどおり update.yml の schedule
+- Worker：時計は UTC の '7 3 * * *'・'43 4 * * *'、workers.dev は使わない（外から呼べない）。自動のデプロイはないので、src/index.js か wrangler.jsonc を直したら Claude が Cloudflare の API（コネクタ）で上げる
+- 秘密の設定 GITHUB_TOKEN（Worker の設定でしょーくんが入れる）：fine-grained の鍵 oshi-cron（juice0402/oshi-techo だけ・Actions の読み書き）。期限が切れるとお昼の更新が来なくなる（夕方はそのまま）。作り直しはカレンダーに入れてある
+- 動いたかは update.yml の実行一覧で見る（お昼の回の event は workflow_dispatch）。Worker の失敗は Cloudflare の画面の「ログ」に出る（GitHub の見張りには出ない）
+
 ## 見張り（2026-11-02）
 
 - .github/workflows/mihari.yml（scripts/mihari.mjs）：main の更新（update.yml）と読みものの資料の点検（check-sources.yml）が終わるたびに動く。failure・timed_out なら issue（題「【見張り】更新が失敗した」など）を作り、次の成功で「直った」とコメントして閉じる。cancelled・注記だけの回・月の終わりの休みの回（update が動かない）は何もしない。SNSの画像（og.yml）は手で動かす道具なので見ない

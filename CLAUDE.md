@@ -18,7 +18,7 @@
 - functions/：search/（探す。その場で楽天に聞く）、koushiki/（公式の YouTube の新しい動画）、_middleware.js（oshi-techo.pages.dev と www、なくしたページを 301）
 - そのほか scripts/：pages-secrets.mjs（楽天・YouTube のキーを Cloudflare の秘密の設定へ）、check-search.mjs（公開後に探すを試す）、indexnow.mjs、cleanup-deployments.mjs（本番以外で3日より古いデプロイを消す）
 - src/：見た目（base.css・themes/・deco/）、楽天のクレジットとバナー、icons/・og/・brand/、my.js（わたしの推し・しおり）
-- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。GitHub に飛ばされたときのため13:43・20:43に予備の回〔前の150分に成功か動いている回があれば休む〕。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）、merge-ok.yml（マージの印。下の節）
+- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。12:07 と予備の13:43 は Cloudflare の Worker oshi-cron〔workers/cron/。GitHub の予定の実行はお昼に飛ばされるため。docs/shikumi.md の「お昼の更新」〕が workflow_dispatch で動かし、19:07・予備の20:43・毎月1日は schedule。予備の回は前の150分に成功か動いている回があれば休む。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）、merge-ok.yml（マージの印。下の節）
 
 ## ページ（くわしくは docs/shikumi.md）
 

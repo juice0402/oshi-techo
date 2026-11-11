@@ -1,0 +1,14 @@
+// Worker oshi-cron：お昼の「更新」を動かす時計（くわしくは src/index.js と docs/shikumi.md の「お昼の更新」）。
+// 自動のデプロイはない。直したら Claude が Cloudflare の API で上げる（または このフォルダで npx wrangler deploy）。
+// 秘密の設定 GITHUB_TOKEN は Cloudflare の画面で入れる（ここには書かない）。
+{
+  "name": "oshi-cron",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": false,
+  "observability": { "enabled": true },
+  "triggers": {
+    // UTC。日本時間 12:07（お昼）・13:43（予備）
+    "crons": ["7 3 * * *", "43 4 * * *"]
+  }
+}
