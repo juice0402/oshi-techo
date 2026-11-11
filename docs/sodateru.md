@@ -114,3 +114,71 @@
 - 読むファイル：docs/shikumi.md の「読みもの」「入荷ビンゴ」、build.mjs の page()（head）と /yomimono/・/bingo/ と bingoSummaryPage の所、config/yomimono.json の1件目の形
 - マージ：する
 - 足した：育てる山の補充（自動・2026-11-10）
+
+### [ ] 発売日カレンダーの下に「発売のメモ」（そのページにしかない中身）
+- やること：
+  1. build.mjs の発売日カレンダー（/<作品>/hatsubai/。「発売日カレンダー（キャラごと）」の所）のいちばん下（「最近発売したもの」のあと）に、入荷メモと同じ形（section.memo・h2「発売のメモ」・ペンの丸の箇条・1行ずつ「。」で終わる）で、calendarFor(c.slug) の upcoming と recent から作る事実の文を5行まで。関数は hatsubaiMemoLines(c, cal) のように memoLines とは別に作る
+  2. 出す行（データがあるものだけ）：①日にちが決まっている発売でいちばん近い日とその種類（「次に日にちが決まっている発売は11月20日で、おもちゃ」。種類は楽天ブックスの kindOf の言葉で、おもちゃ・カレンダー・手帳など）②これから発売のものに多い種類2つまで（説明文の kinds と同じ数え方。数は出さない）③日にちがまだ決まっていない発売の月（date.exact でないものの月。3つまで、近い順）④この30日に発売したものに多い種類2つまで ⑤予約受付中（avail 5）のものがあるときだけ、/<作品>/yoyaku/ と /yoyaku/ への1文（「予約受付中のものは、予約受付中のページと予約帳でも見られます」くらい）
+  3. 箇条のあとに入荷メモと同じ .asof の1行「<今日の月日>までに、楽天ブックスで見つけた発売日から」。2行より少ないときはメモごと出さない
+  4. docs/shikumi.md の「入荷メモ」の節の最後に、発売のメモの1行を足す
+- できあがりの条件：見本データ（test/fixture-books.json）で、発売のある作品の /<作品>/hatsubai/ に「発売のメモ」が出る。test.mjs に「発売のメモに件数（数字＋件）が出ていない」「発売のメモのリンクがこのサイトの中だけ」を足して通る（SITE_MODE=production でも）。title・説明文・h1・ほかの部分は変わっていない（dist の前と後の差が、発売のメモの section だけ）。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：発売日カレンダーは検索に出す一覧の1つ（CLAUDE.md、2026-11-10 しょーくん A「しっかりしぼる」。build.mjs の SEARCH_LISTS）。/sanrio/hatsubai/ 35表示・9.9位・0クリック、/hololive/hatsubai/ 10表示、/pokemon/hatsubai/ 8表示（claude/search-data-oshi.md の 11/2 の回）。表示の多い答えのページに来る理由を足す（連絡板 C-026 案A の②）。1画面めの下に、そのページにしかない中身を置き、水増しはしない（claude/site-principles.md の「広告の審査」）。ここにしかない記録は日付と数字を文字で出す（site-principles の「楽しさで、わざわざ来てもらう」）。件数はページの中に出さない（CLAUDE.md）。入荷メモは B ペンの丸の箇条・2行より少ないときは出さない（docs/shikumi.md の「入荷メモ」）
+- 迷ったら：種類の名前は楽天ブックスの kind の文字のまま（カテゴリのページへのリンクにしない。楽天市場のカテゴリと区切りがちがうため）。「もうすぐ」「お早めに」「締切」「今だけ」は書かない。発売日が「頃」のもの（date.approx）は①に使わない。年が今年でない日は「2027年1月15日」のように年を付ける（releaseNote と同じ）。見た目は入荷メモの CSS をそのまま使い、新しい見た目は足さない。説明文は変えない
+- 読むファイル：docs/shikumi.md の「入荷メモ」「商品が少ないページ」、build.mjs の calendarFor・releaseNote・memoLines・memoSection と「発売日カレンダー（キャラごと）」の所、scripts/lib/books.mjs の kindOf、test/fixture-books.json
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-11）
+
+### [ ] トップの「わたしの推し」に、その推しの予約受付中への1行
+- やること：
+  1. build.mjs の推しキャラのページの予約受付中の棚（section.shelf.yk）に id="yoyaku" を付ける
+  2. src/my.js のトップの「わたしの推し」（推しキャラのページを読んで棚に入れる所）で、読んだページに section.shelf.yk があれば、その推しの棚のすぐ下に1行「<呼び方>の予約受付中（発売の順）」を出し、<推しキャラのページ>#yoyaku へリンクする（今の .myh と同じペンで書いたリストの形の文字のリンク）。種類をえらんでいる推し（o.c）でも出す
+  3. 読んだページの棚の中に、端末の ot-yoyaku（予約したの記録）にある商品があれば、文を「<呼び方>の予約受付中（予約したものあり）」にする。棚のカードの li が持つ商品の番号の属性 data-y（予約帳の ykCard が scripts/lib/view.mjs の cardHtml で付けるもの）と、ot-yoyaku の記録の番号（配列の1つめ。my.js の okY が読む形）を照らす。ot-yoyaku は読むだけで書きかえない
+  4. docs/shikumi.md の「推しキャラ」のわたしの推しの行に1文足す
+- できあがりの条件：見本データで、予約の棚がある推しを ot-my に入れてトップを開くと1行が出て、押すと推しキャラのページの棚へ行く。棚のない推しでは出ない。ot-my が空・保存が使えない端末では今と同じ（Playwright で確かめる）。test.mjs の my.js の点検（fetch するのはこのサイトのページだけ・送らない）が通る。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：遊びに来た人に、いまの買う理由を渡すものを先に作る。買う理由の例に予約・発売日（claude/site-principles.md の「買いに来る理由がある人を集める」、連絡板 C-025）。わたしの推しは見ている端末の localStorage だけで、サイトや楽天には送らない（docs/shikumi.md の「推しキャラ」）。予約帳の棚・ot-yoyaku・「締切」「残りわずか」「今だけ」「お早めに」を書かないこと（sodateru.md の「わたしの推しの予約帳」の項目・#80）。件数はページの中に出さない（CLAUDE.md）
+- 迷ったら：1行は、その推しの箱（div.myo）の中の、8件の棚（ul.grid）のすぐあと。ホーム画面に追加の1行（p.myhome）は箱の外の、すべての箱のあとに付くので、それより上になる。予約の数・発売の日は書かない。ot-yoyaku が読めないときは「（予約したものあり）」を付けないだけ。id="yoyaku" がほかの id とぶつかるときは id="yk-shelf" にする。新しい見た目は足さない
+- 読むファイル：docs/shikumi.md の「推しキャラ」「選び方・予算・予約・話題」（わたしの推しの予約帳）、src/my.js（トップの「わたしの推し」と ot-yoyaku の所）、build.mjs の ykShelf（「<呼び方>の予約受付中」の棚）と id="my" の所
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-11）
+
+### [ ] ご当地の見つけた記録を残す（都道府県ごとの初めて見つけた日・最後に見た日）
+- やること：
+  1. scripts/lib/gotouchi-seen.mjs に、記録の足し算の関数（たとえば mergeGotouchiSeen(record, items, today)）を作る。いま載っている商品から、build.mjs のご当地の一覧と同じ判定（scripts/lib/region.mjs の isGotouchi・regionOf。キティは characters.json の gotouchiSub と同じ見分け方）で、作品ごと（キティは sanrio/kitty）・都道府県の id（prefId の「p-」を取ったローマ字）ごとに、商品の first のいちばん早い日（f）と、その県の商品がいま載っている日の最新（l。日本時間の日付）を足す。早い日だけ書きかえ、消さない。scripts/lib/ は Cloudflare の関数でも使う決まり（CLAUDE.md）なので、node: の部品や process.env を使わない、ファイルを読み書きしない純粋な関数にする
+  2. scripts/gotouchi-seen.mjs：data/latest.json と data/gotouchi-seen.json を読み、1 の関数で足して data/gotouchi-seen.json（{ v: 1, works: { "snoopy": { "kanagawa": { f: "2026-10-20", l: "2026-11-11" } } } }）に書く。残すのは作品・県の id・日付だけ（商品の番号・名前・値段・URL は残さない）。失敗しても公開を止めない（scripts/bingo.mjs と同じ作り）。ビルドの出力（非公開の notes/update.log に入る）に「ご当地の記録：作品の数・県の数」を1行
+  3. .github/workflows/update.yml の「入荷ビンゴの記録を足す」のすぐあとに「ご当地の記録を足す」（bash scripts/quiet.sh node scripts/gotouchi-seen.mjs）。data/ はまるごと oshi-techo-data に戻るので、ほかの変更はいらない
+  4. 見本 test/fixture-gotouchi-seen.json（いまの見本の商品にない県を1つ入れる）と、test.mjs に 1 の関数の点検（早い日だけ書きかわる・消えない・作品と県の id と日付のほかのキーがない）
+  5. docs/shikumi.md の「ご当地」に1行足す
+- できあがりの条件：見本データ（test/fixture-latest.json）で node scripts/gotouchi-seen.mjs を DATA の場所を変えて動かすと記録ができ、もう一度動かしても f が変わらない。test.mjs に足した点検が通る。dist に gotouchi-seen.json が入っていない。ページの見た目は変えない（表は次の項目）。PR 本文に「マージのあとに朝のまとめか司令塔が notes/update.log で「ご当地の記録を足す」のステップと「ご当地の記録：」の行を確かめる」と書く
+- 決まったこと：一覧は楽天にいまその県の商品があるときしか都道府県の見出しが出ない（claude/oshi-handoff.md の 10/31 昼・C-018）。ここにしかない記録は、毎日たまる自前のデータを日付と数字の文字で出す（claude/site-principles.md の「楽しさで、わざわざ来てもらう」）。楽天の記録は非公開の oshi-techo-data だけで、ファイルとして公開しない（CLAUDE.md）。入荷ビンゴの記録も同じ形で data/ に置き、build.mjs も同じ足し算をしてから使う（docs/shikumi.md の「入荷ビンゴ」）。scripts/lib/ は Cloudflare の関数でも使うので node: の部品や process.env を使わない（CLAUDE.md）
+- 迷ったら：f は商品の first（日本時間の日付）、l はスクリプトを動かした日。記録は13か月で消さない（県の数だけなので小さい）。作品がご当地のページを持たない日（6件より少ない日）も記録は足す。地名が商品名にないもの（sonohoka）は記録しない
+- 読むファイル：docs/shikumi.md の「ご当地」「入荷ビンゴ」、build.mjs のご当地を集める所（isGotouchi・regionOf）とキティ（gotouchiSub）の所、scripts/lib/region.mjs、scripts/bingo.mjs と scripts/lib/bingo.mjs（記録の足し方と失敗しても止めない作り）、.github/workflows/update.yml の「入荷ビンゴの記録を足す」の所
+- 順番：「ご当地一覧に「持ってる」のチェック」の項目のあと（同じご当地の所をさわるため）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-11）
+
+### [ ] ご当地一覧に「都道府県ごとの見つけた記録」の表（いま商品のない県も残る）
+- やること：
+  1. build.mjs で data/gotouchi-seen.json（見本のときは test/fixture-gotouchi-seen.json）を読み、前の項目の scripts/lib/gotouchi-seen.mjs の関数で、いま載っている商品を足してから使う（記録がないときも、いま載っている分で表ができる）
+  2. gotouchiListPage の、都道府県の節と「地名が商品名にないもの」のあと・下のリンクの前に、h2「都道府県ごとの見つけた記録」（id="kiroku"）と表（kk-book。列は 都道府県・初めて見つけた日・最後に見た日）。行の並びは scripts/lib/region.mjs の AREAS の地方の順と、その中の prefs の順（北海道から沖縄へ）。いま商品がある県は #p-<id> へのリンク、ない県は文字だけ。表のあとに .asof の1行「<今日の月日>までに、このサイトが楽天市場で見つけたご当地<作品>の記録から」。記録のある県が3つより少ないときは表を出さない。/gotouchi/ のまとめには置かない
+  3. docs/shikumi.md の「ご当地」に1行足す
+- できあがりの条件：見本データで /snoopy/gotouchi/ に表が出て、見本の記録にだけある県も文字で出る。test.mjs に「表に件数（数字＋件）が出ていない」「表のリンクがこのページの中の #p- だけ」を足して通る（SITE_MODE=production でも）。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：/snoopy/gotouchi/ は 10/23〜31 に 4,409表示・100クリックで、取りこぼしは地域の言葉（神奈川 77表示・0クリック、富士急ハイランド 59、ねぶた 21、静岡 15。claude/search-data-oshi.md の 11/2 の回）。表示の多い答えのページに来る理由を足す（連絡板 C-026 案A）。1画面めの下に、そのページにしかない中身を置く（claude/site-principles.md の「広告の審査」）。件数はページの中に出さない・見出しの下に説明の行を重ねない（CLAUDE.md）
+- 迷ったら：「最後に見た日」は、その県の商品がこのサイトの一覧に載っていた最後の日（「売り切れ」「もう買えない」とは書かない）。表の日付は「2026年11月11日」の形。読みもののリンク（prefLink）は今のまま。「持ってる」のチェックは表の行には付けない（見出しの所だけ）。見た目は今ある表（kk-book）のまま、新しい見た目は足さない
+- 読むファイル：docs/shikumi.md の「ご当地」、build.mjs の gotouchiListPage、scripts/lib/region.mjs の AREAS、前の項目で作った scripts/lib/gotouchi-seen.mjs
+- 順番：前の項目のあと
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-11）
+
+### [ ] 季節のまとめ（福袋など）で、わたしの推しの作品を先に並べる
+- やること：
+  1. build.mjs の季節のまとめ（/<季節>/。福袋・クリスマスなど、期間中のまとめのページ）の作品ごとの section に id="<作品の slug>" と、まとめの印（たとえば親の要素に data-mywork）を付ける
+  2. src/my.js で、data-mywork のあるページを開いたとき、端末の ot-my（わたしの推し）の推しキャラのページの場所（/<作品>/<推し>/）から作品の slug を取り、その作品の section をわたしの推しの順にいちばん上へ動かす（ほかの作品の順はそのまま。同じ作品は1回）。新しく保存するものはない
+  3. しぼりこみのある季節（gift：クリスマス・バレンタイン・ホワイトデー）でも、並べかえたあとにしぼりこみが今までどおり動くようにする
+  4. docs/shikumi.md の「季節の特集とデコ」に1行足す
+- できあがりの条件：見本データ（test/fixture-meta-fukubukuro.json の 11月5日で作る福袋）で、ot-my にある推しの作品の福袋が /fukubukuro/ のいちばん上に来て、ot-my が空・保存が使えない端末では今と同じ順（Playwright で確かめる）。dist の HTML の作品の順は変わっていない（構造化データ・説明文もそのまま）。テストが通る。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：福袋は10月20日から（予約が10月から始まるため。docs/shikumi.md の「季節の特集とデコ」）、/fukubukuro/ は検索に出す一覧（CLAUDE.md、build.mjs の SEARCH_LISTS）で、11/3〜9 に検索から4訪問（claude/reports/oshi.md の 11/10 夜）。遊びに来た人に、いまの買う理由（予約・季節）を渡すものを先に作る（claude/site-principles.md の「買いに来る理由がある人を集める」）。ブラウザの中だけの機能は URL を増やさず、サイトや楽天に何も送らない（CLAUDE.md）。わたしの推しの保存は ot-my だけ（docs/shikumi.md の「推しキャラ」）
+- 迷ったら：動かした section に印や「わたしの推し」の文は付けない（見出しの下に行を重ねない決まり）。わたしの推しの作品がそのまとめにないときは何もしない。ページを開いたときに一度だけ動かす。わたしの推しの作品がもう上から順に並んでいるときは動かさない。作品ごとの季節のページ（/<作品>/<季節>/）とトップの季節の入口は変えない。期間外のページ（「次は◯から」）も変えない
+- 読むファイル：docs/shikumi.md の「季節の特集とデコ」「推しキャラ」、build.mjs の季節のまとめ（path: `/${s.slug}/` の page() の所）と filterBar・FILTER_END、src/my.js の ot-my の読み方
+- 順番：「トップの「わたしの推し」に、その推しの予約受付中への1行」の項目のあと（同じ src/my.js をさわるので、前の PR がマージ待ちなら、そのブランチの上に積む）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-11）
