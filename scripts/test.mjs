@@ -788,14 +788,14 @@ if (process.env.DATA_LATEST) {
     ok(birth.length === nBirth && text.includes('SUMMARY:クロミの誕生日\r\n') && text.includes('DTSTART;VALUE=DATE:20241031\r\nDTEND;VALUE=DATE:20241101\r\nRRULE:FREQ=YEARLY\r\n') && text.includes('DTSTART;VALUE=DATE:20240229\r\nDTEND;VALUE=DATE:20240301\r\nRRULE:FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1\r\n'), `スマホのカレンダー：推しキャラの誕生日（${birth.length}件。2月29日生まれは2月の最後の日）`);
     const evSeasons = readJson('config/seasons.json').filter((s) => s.event);
     ok(season.length === evSeasons.length && evSeasons.every((s) => unfolded.includes(`UID:season-${s.slug}@nyuka-techo.com\r\n`) && unfolded.includes(`DTSTART;VALUE=DATE:2024${s.event.replace('-', '')}\r\n`)) && season.every((v) => v.includes('\r\nRRULE:FREQ=YEARLY\r\n') && /\r\nURL:\S+\/(calendar|halloween|christmas|oshougatsu|valentine|whiteday)\/\r\n/.test(v)), `スマホのカレンダー：季節のイベント（${season.length}件。毎年くり返す）`);
-    const icsEsc = (s) => s.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,');
+    const icsEsc = (s) => s.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,');
     const nextDay = (d) => new Date(Date.parse(`${d}T00:00:00Z`) + 864e5).toISOString().slice(0, 10).replace(/-/g, '');
     ok(
       kkIn.length > 0 &&
         kk.length === kkIn.length &&
         kkIn.every(({ c, e, uid }) => {
           const v = kk.find((x) => uidOf(x) === uid);
-          return v && !v.includes('RRULE') && v.includes(`\r\nDTSTART;VALUE=DATE:${e.from.replace(/-/g, '')}\r\nDTEND;VALUE=DATE:${nextDay(e.to ?? e.from)}\r\n`) && v.includes(`\r\nSUMMARY:${icsEsc(`${c.name}：${kkShort(e.text)}`)}\r\n`) && v.includes(`\r\nDESCRIPTION:${icsEsc(`${e.text}。`)}\r\n`) && v.includes(`\r\nURL:${settings.siteUrl.replace(/\/$/, '')}/${c.slug}/kaikata/#yotei\r\n`);
+          return v && !v.includes('RRULE') && v.includes(`\r\nDTSTART;VALUE=DATE:${e.from.replace(/-/g, '')}\r\nDTEND;VALUE=DATE:${nextDay(e.to ?? e.from)}\r\n`) && v.includes(`\r\nSUMMARY:${icsEsc(`${c.name}：${kkShort(e.text)}`)}\r\n`) && v.includes(`\r\nDESCRIPTION:${icsEsc(e.text.endsWith('。') ? e.text : `${e.text}。`)}\r\n`) && v.includes(`\r\nURL:${settings.siteUrl.replace(/\/$/, '')}/${c.slug}/kaikata/#yotei\r\n`);
         }),
       `スマホのカレンダー：買い方メモの予定（${kk.length}件。1回だけ、to があれば to まで）`,
     );

@@ -2164,7 +2164,7 @@ const icsEvents = [
     from: e.from,
     to: e.to,
     summary: `${c.name}：${kkShort(e.text)}`,
-    description: `${e.text}。`,
+    description: e.text.endsWith('。') ? e.text : `${e.text}。`,
     url: `${SITE}/${c.slug}/kaikata/#yotei`,
   })),
 ];
