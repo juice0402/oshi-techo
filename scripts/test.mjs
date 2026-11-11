@@ -104,6 +104,17 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
     const yes = ['〇〇コラボ', '作品名×サンリオキャラクターズ', 'ブランド名×作品名', 'ちいかわ ✕ ブランド名', 'ちいかわ×Disney'].filter((x) => !isCollab(x));
     ok(!no.length && !yes.length, `コラボの見分け：サイズ・セット数・「限定」は入れない${no.length || yes.length ? `（${[...no, ...yes].join('、')}）` : ''}`);
   }
+  {
+    const { collabNames } = await import('./lib/classify.mjs');
+    const chiikawa = collabNames(chars.find((w) => w.slug === 'chiikawa'));
+    const uma = ['ウマ娘', 'キタサンブラック'];
+    const no = ['オフホワイト×ブラック', 'BL×RD', 'スーパーSALE×ポイントアップ', 'ジグソーパズル×アクスタ'].filter((x) => isCollab(x));
+    if (isCollab('ちいかわ×うさぎ', chiikawa)) no.push('ちいかわ×うさぎ');
+    const yes = ['〇〇コラボ', '作品名×サンリオキャラクターズ', 'ブランド名×作品名'].filter((x) => !isCollab(x) || !isCollab(x, chiikawa));
+    if (!isCollab('ウマ娘 キタサンブラック×マイメロディ', uma)) yes.push('ウマ娘 キタサンブラック×マイメロディ');
+    if (!isCollab('ちいかわ×うさぎ')) yes.push('ちいかわ×うさぎ（名前の一覧なし）');
+    ok(!no.length && !yes.length, `コラボの見分け：色の組・セールの言葉・商品の組・同じ作品のキャラ同士は入れない${no.length || yes.length ? `（${[...no, ...yes].join('、')}）` : ''}`);
+  }
   ok(isAdult('ちいかわ 長財布 レディース') && isAdult('ポケモン マグカップ') && !isAdult('ちいかわ キッズ 財布') && !isAdult('ポケモン ぬいぐるみ') && !isAdult('大人気 ちいかわ BIGぬいぐるみ') && !isAdult('ちいかわ インテリア ぬいぐるみ') && isAdult('大人用 ちいかわ ぬいぐるみ') && !isAdult('ちいかわ マグカップ付箋') && !isAdult('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('サンリオ 女の子 Tシャツ') && !isKids('スヌーピー メンズ Tシャツ'), '大人向け・子ども向けの見分け');
   ok(topicsCfg.every((t) => chars.some((c) => c.slug === t.work) && t.title && t.h1 && t.words.length && /^\d{4}-\d\d-\d\d$/.test(t.until ?? '2099-12-31')), '話題：作品・名前・言葉・期限の設定がそろっている');
   const mew = oshiMatcher({ name: 'ミュウ', match: ['mew'], strict: true });
