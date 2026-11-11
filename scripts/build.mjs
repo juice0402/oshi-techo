@@ -2116,14 +2116,14 @@ if (birthdays.length) {
           (b) =>
             `<li><time>${mdLabel(b.o.birthday)}</time><a href="${esc(oshiHref(b.c, b.o))}">${esc(b.o.name)}</a><span>${esc([b.c.name !== b.o.name ? b.c.name : '', b.o.birthdayNote ?? ''].filter(Boolean).join('・'))}</span></li>`,
         )
-        .join('')}</ul><p class="more"><a href="/calendar/oshi.ics">誕生日を、スマホのカレンダーに入れる</a>／<a href="/calendar/">推し活カレンダー</a></p><p class="asof">誕生日は公式で使われている日です</p></section>`,
+        .join('')}</ul><p class="more"><a href="/calendar/oshi.ics">推しキャラの誕生日と予定を、スマホのカレンダーに入れる</a>／<a href="/calendar/">推し活カレンダー</a></p><p class="asof">誕生日は公式で使われている日です</p></section>`,
     decoParts: soon.length ? ['birthday'] : [],
   });
 }
 
 // ---- 推し活カレンダー（/calendar/。今日から来月の終わりまで、日にちが決まったものだけ） ----
 // 推しキャラの誕生日・季節のイベント・特集のはじまり（このサイトの設定）、楽天ブックスの発売日、商品名に書いてある予約の締切。
-// スマホのカレンダーに入れるファイル（/calendar/oshi.ics）は、このサイトが決めた日（推しキャラの誕生日）だけ。楽天のデータは入れない
+// スマホのカレンダーに入れるファイル（/calendar/oshi.ics）は、このサイトが決めた日（推しキャラの誕生日・季節のイベント・買い方メモの予定）だけ。楽天のデータは入れない
 const WD = '日月火水木金土';
 const dayLabel = (ymd) => `${Number(ymd.slice(5, 7))}/${Number(ymd.slice(8, 10))}（${WD[new Date(`${ymd}T00:00:00Z`).getUTCDay()]}）`;
 const calEnd = new Date(Date.UTC(ty, tm + 1, 0)).toISOString().slice(0, 10); // 来月の終わり
@@ -2138,6 +2138,36 @@ const countBy = (list, keyOf) => {
   }
   return [...m.entries()];
 };
+// 買い方メモの予定のうち、日にちまで決まっていて until が過ぎていないもの（i は events の中の何番目か）
+const kkShort = (t) => {
+  const first = [...t.split('。')[0]];
+  return first.length > 40 ? `${first.slice(0, 40).join('')}…` : first.join('');
+};
+const kaikataDays = chars
+  .filter((c) => hasKaikata(c.slug))
+  .flatMap((c) => (readJson(`src/kaikata/${c.slug}.json`).events ?? []).map((e, i) => ({ c, e, i })))
+  .filter(({ e }) => /^\d{4}-\d\d-\d\d$/.test(e.from) && e.until >= today)
+  .sort((a, b) => a.e.from.localeCompare(b.e.from) || workOrder(a.c.slug) - workOrder(b.c.slug) || a.i - b.i);
+// スマホのカレンダーに入れる予定：推しキャラの誕生日と季節のイベント（毎年くり返す）、買い方メモの予定（1回だけ）
+const icsEvents = [
+  ...[...birthdays].sort((a, b) => a.o.birthday.localeCompare(b.o.birthday)).map((b) => ({
+    uid: `birthday-${b.c.slug}-${b.o.slug ?? b.c.slug}`,
+    mmdd: b.o.birthday,
+    summary: `${b.o.name}の誕生日`,
+    url: `${SITE}${oshiPageSet.has(`${b.c.slug}/${b.o.slug}`) ? `/${b.c.slug}/${b.o.slug}/` : '/tanjoubi/'}`,
+  })),
+  ...seasons
+    .filter((s) => s.event)
+    .map((s) => ({ uid: `season-${s.slug}`, mmdd: s.event, summary: s.name, url: `${SITE}${seasonPages.some((x) => x.s.slug === s.slug) ? `/${s.slug}/` : '/calendar/'}` })),
+  ...kaikataDays.map(({ c, e, i }) => ({
+    uid: `kaikata-${c.slug}-${e.from}-${i}`,
+    from: e.from,
+    to: e.to,
+    summary: `${c.name}：${kkShort(e.text)}`,
+    description: `${e.text}。`,
+    url: `${SITE}/${c.slug}/kaikata/#yotei`,
+  })),
+];
 const calEntries = [
   // 推しキャラの誕生日
   ...birthdays
@@ -2175,6 +2205,10 @@ const calEntries = [
     const label = `${c.name}の予約の締切`;
     return { d, o: 4, w: workOrder(slug), html: `${yoyakuFor(slug).total >= MIN_PAGE ? `<a href="/${slug}/yoyaku/">${esc(label)}</a>` : `<b>${esc(label)}</b>`}<span>${list.length}件</span>` };
   }),
+  // 買い方メモの予定（はじまりの日）
+  ...kaikataDays
+    .filter(({ e }) => inCal(e.from))
+    .map(({ c, e }) => ({ d: e.from, o: 5, w: workOrder(c.slug), html: `<a href="/${c.slug}/kaikata/#yotei">${esc(`${c.name}：${kkShort(e.text)}`)}</a>` })),
 ].sort((a, b) => a.d.localeCompare(b.d) || a.o - b.o || a.w - b.w);
 
 if (calEntries.length) {
@@ -2205,7 +2239,7 @@ if (calEntries.length) {
               .join('')}</ul></section>`,
         )
         .join('') +
-      (birthdays.length ? '<p class="more"><a href="/calendar/oshi.ics">推しキャラの誕生日を、スマホのカレンダーに入れる</a></p>' : '') +
+      (icsEvents.length ? '<p class="more"><a href="/calendar/oshi.ics">推しキャラの誕生日と予定を、スマホのカレンダーに入れる</a></p>' : '') +
       (srcNote ? `<p class="asof">${srcNote}です</p>` : '') +
       (calEntries.some((e) => e.o === 3) ? booksAt() : ''),
     lastmod: today,
@@ -2455,7 +2489,7 @@ page({
 <p>ご当地グッズは、商品名に「ご当地」か「北海道限定」のような地名と限定が入っているものです。地方は商品名の地名から分けています。</p>
 <p>「探す」は、そのときに楽天市場で探した結果です。ここでも中古やカードなどは外しています。</p>
 <p>「発売日カレンダー」は、楽天ブックスに載っている発売日の順です。発売日は変わることがあります。</p>
-<p>「推し活カレンダー」は、今日から来月の終わりまでの、日にちが決まった発売日・予約の締切・推しキャラの誕生日・季節のイベントです。スマホのカレンダーに入れるファイルには、推しキャラの誕生日だけを入れています。</p>
+<p>「推し活カレンダー」は、今日から来月の終わりまでの、日にちが決まった発売日・予約の締切・推しキャラの誕生日・季節のイベントです。スマホのカレンダーに入れるファイルには、推しキャラの誕生日・季節のイベント・公式の買い方メモの予定を入れています。楽天市場の商品の情報は入れていません。</p>
 <p>「楽天ランキング入り」は、楽天市場のジャンル別のデイリーランキングに入っている商品です。「20代女性ランキング入り」「30代女性ランキング入り」は、楽天市場の年代・性別のランキングに入っている商品です。</p>
 <p>レビューの件数、「ポイント10倍」のような倍率、タイムセールの終わる日時は、楽天市場の情報です。「前に売り切れたことあり」は、このサイトが売り切れを確かめたことのある商品です。</p>
 <h2>広告について</h2>
@@ -2593,21 +2627,8 @@ files.set(
 );
 // YouTube の公式ロゴ（src/brand/。1バイトも変えない）
 files.set('youtube-logo.svg', readFileSync('src/brand/youtube-logo.svg'));
-// 推しキャラの誕生日（スマホのカレンダーに入れるファイル）。このサイトが決めた日だけで、楽天のデータは入れない
-if (birthdays.length)
-  files.set(
-    'calendar/oshi.ics',
-    buildIcs({
-      name: `推しキャラの誕生日（${settings.siteName}）`,
-      stamp: '20261023T000000Z',
-      events: [...birthdays].sort((a, b) => a.o.birthday.localeCompare(b.o.birthday)).map((b) => ({
-        uid: `birthday-${b.c.slug}-${b.o.slug ?? b.c.slug}`,
-        mmdd: b.o.birthday,
-        summary: `${b.o.name}の誕生日`,
-        url: `${SITE}${oshiPageSet.has(`${b.c.slug}/${b.o.slug}`) ? `/${b.c.slug}/${b.o.slug}/` : '/tanjoubi/'}`,
-      })),
-    }),
-  );
+// スマホのカレンダーに入れるファイル（推しキャラの誕生日・季節のイベント・買い方メモの予定）。このサイトが決めた日だけで、楽天のデータは入れない
+if (icsEvents.length) files.set('calendar/oshi.ics', buildIcs({ name: `推し活カレンダー（${settings.siteName}）`, stamp: '20261023T000000Z', events: icsEvents }));
 // SNSで共有したときの画像（1200×630）
 files.set('og.png', readFileSync('src/og.png'));
 // サイトの絵（Canva で作った絵を WebP にしたもの。見た目の案の CSS が background で使う）

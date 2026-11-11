@@ -10,6 +10,7 @@ import { judge } from './lib/filter.mjs';
 import { readJson } from './lib/util.mjs';
 import { loadWorks } from './lib/load-works.mjs';
 import { AREAS, prefId } from './lib/region.mjs';
+import { esc } from './lib/text.mjs';
 
 let failed = 0;
 const ok = (cond, msg) => {
@@ -744,7 +745,7 @@ if (process.env.DATA_LATEST) {
   const bd = readFileSync('dist/tanjoubi/index.html', 'utf8');
   ok(bd.includes('<li><time>10月31日</time>') && bd.includes('<li><time>2月29日</time><a href="/search/?c=sanrio&amp;q=%E3%83%9D%E3%83%81%E3%83%A3%E3%83%83%E3%82%B3">ポチャッコ</a><span>サンリオ・うるう年生まれ</span></li>') && bd.includes('<span>絵本が生まれた日</span>'), '誕生日：カレンダーに近い順で並ぶ');
   ok(topHtml.includes('<a href="/tanjoubi/">推しキャラの誕生日</a>'), '誕生日：いちばん下にリンク');
-  // 推し活カレンダー（今日から来月の終わりまで）と、スマホのカレンダーに入れるファイル（推しキャラの誕生日だけ。楽天のデータは入れない）
+  // 推し活カレンダー（今日から来月の終わりまで）と、スマホのカレンダーに入れるファイル（推しキャラの誕生日・季節のイベント・買い方メモの予定。楽天のデータは入れない）
   {
     const cal = readFileSync('dist/calendar/index.html', 'utf8');
     const main = cal.slice(cal.indexOf('<main'), cal.indexOf('</main>'));
@@ -754,21 +755,60 @@ if (process.env.DATA_LATEST) {
     const days = [...main.matchAll(/<time datetime="(\d{4}-\d\d-\d\d)">/g)].map((m) => m[1]);
     ok(days.length > 0 && days.every((d, i) => i === 0 || days[i - 1] <= d) && days[0] >= '2026-10-18' && days.at(-1) <= '2026-11-30', '推し活カレンダー：日付の順で、今日より前は出さない');
     ok(!main.includes('<img') && !/href="https?:/.test(main) && main.includes('<a href="/calendar/oshi.ics">'), '推し活カレンダー：画像・外へのリンクなし、スマホのカレンダーに入れるリンク');
-    ok(topHtml.includes('<li><a href="/calendar/">推し活カレンダー</a></li>') && topHtml.includes('<a href="/calendar/">推し活カレンダー</a>／') && bd.includes('<a href="/calendar/oshi.ics">誕生日を、スマホのカレンダーに入れる</a>'), '推し活カレンダー：トップの目次・いちばん下・誕生日のページから行ける');
+    const ICS_LINK = '<a href="/calendar/oshi.ics">推しキャラの誕生日と予定を、スマホのカレンダーに入れる</a>';
+    ok(topHtml.includes('<li><a href="/calendar/">推し活カレンダー</a></li>') && topHtml.includes('<a href="/calendar/">推し活カレンダー</a>／') && bd.includes(ICS_LINK) && main.includes(ICS_LINK), '推し活カレンダー：トップの目次・いちばん下・誕生日のページから行ける（入口の文は「誕生日と予定」）');
+    // 買い方メモの予定（日にちまで決まっていて、until が過ぎていないもの）。build.mjs と同じく記録を取った日で見る
+    const metaPath = process.env.DATA_META ?? 'data/meta.json';
+    const fetchedMs = existsSync(metaPath) ? Date.parse(JSON.parse(readFileSync(metaPath, 'utf8')).fetchedAt) : NaN;
+    const today = new Date((Number.isFinite(fetchedMs) ? fetchedMs : Date.now()) + 9 * 3600000).toISOString().slice(0, 10);
+    const kkShort = (t) => {
+      const first = [...t.split('。')[0]];
+      return first.length > 40 ? `${first.slice(0, 40).join('')}…` : first.join('');
+    };
+    const kkAll = chars
+      .filter((c) => existsSync(`src/kaikata/${c.slug}.json`))
+      .flatMap((c) => (readJson(`src/kaikata/${c.slug}.json`).events ?? []).map((e, i) => ({ c, e, uid: `kaikata-${c.slug}-${e.from}-${i}` })));
+    const kkIn = kkAll.filter(({ e }) => /^\d{4}-\d\d-\d\d$/.test(e.from) && e.until >= today);
+    const kkOut = kkAll.filter((x) => !kkIn.includes(x));
+    const kkCal = kkIn.filter(({ e }) => e.from >= today && e.from <= '2026-11-30');
+    ok(kkCal.length > 0 && kkCal.every(({ c, e }) => main.includes(`<a href="/${c.slug}/kaikata/#yotei">${esc(`${c.name}：${kkShort(e.text)}`)}</a>`)) && main.includes('<a href="/chiikawa/kaikata/#yotei">ちいかわ：千葉市の豊砂公園で、ちいかわクリスマスマーケットが開かれます</a>'), `推し活カレンダー：買い方メモの予定（${kkCal.length}件）が、作品の買い方メモの予定へのリンクで並ぶ`);
     const ics = readFileSync('dist/calendar/oshi.ics');
     const text = ics.toString('utf8');
     const lines = text.split('\r\n');
     ok(text.startsWith('BEGIN:VCALENDAR\r\nVERSION:2.0\r\n') && text.endsWith('END:VCALENDAR\r\n') && !text.replaceAll('\r\n', '').includes('\n') && lines.every((l) => Buffer.byteLength(l) <= 75), 'スマホのカレンダー：iCalendar の形（改行は CRLF、1行75バイトまで）');
-    const ev = text.split('BEGIN:VEVENT').length - 1;
+    const unfolded = text.replaceAll('\r\n ', '');
+    ok(unfolded.includes(`\r\nX-WR-CALNAME:推し活カレンダー（${settings.siteName}）\r\n`), 'スマホのカレンダー：名前は「推し活カレンダー（サイト名）」');
+    const vevents = unfolded.split('BEGIN:VEVENT').slice(1);
+    const uidOf = (v) => v.match(/\r\nUID:([^@\r]+)@/)[1];
+    const birth = vevents.filter((v) => uidOf(v).startsWith('birthday-'));
+    const season = vevents.filter((v) => uidOf(v).startsWith('season-'));
+    const kk = vevents.filter((v) => uidOf(v).startsWith('kaikata-'));
+    const ev = vevents.length;
     const nBirth = chars.reduce((n, c) => n + (c.oshi ?? []).filter((o) => o.birthday).length, 0);
-    ok(ev === nBirth && text.includes('SUMMARY:クロミの誕生日\r\n') && text.includes('DTSTART;VALUE=DATE:20241031\r\nDTEND;VALUE=DATE:20241101\r\nRRULE:FREQ=YEARLY\r\n') && text.includes('DTSTART;VALUE=DATE:20240229\r\nDTEND;VALUE=DATE:20240301\r\nRRULE:FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1\r\n'), `スマホのカレンダー：推しキャラの誕生日だけ（${ev}件。2月29日生まれは2月の最後の日）`);
+    ok(birth.length === nBirth && text.includes('SUMMARY:クロミの誕生日\r\n') && text.includes('DTSTART;VALUE=DATE:20241031\r\nDTEND;VALUE=DATE:20241101\r\nRRULE:FREQ=YEARLY\r\n') && text.includes('DTSTART;VALUE=DATE:20240229\r\nDTEND;VALUE=DATE:20240301\r\nRRULE:FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1\r\n'), `スマホのカレンダー：推しキャラの誕生日（${birth.length}件。2月29日生まれは2月の最後の日）`);
+    const evSeasons = readJson('config/seasons.json').filter((s) => s.event);
+    ok(season.length === evSeasons.length && evSeasons.every((s) => unfolded.includes(`UID:season-${s.slug}@nyuka-techo.com\r\n`) && unfolded.includes(`DTSTART;VALUE=DATE:2024${s.event.replace('-', '')}\r\n`)) && season.every((v) => v.includes('\r\nRRULE:FREQ=YEARLY\r\n') && /\r\nURL:\S+\/(calendar|halloween|christmas|oshougatsu|valentine|whiteday)\/\r\n/.test(v)), `スマホのカレンダー：季節のイベント（${season.length}件。毎年くり返す）`);
+    const icsEsc = (s) => s.replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,');
+    const nextDay = (d) => new Date(Date.parse(`${d}T00:00:00Z`) + 864e5).toISOString().slice(0, 10).replace(/-/g, '');
+    ok(
+      kkIn.length > 0 &&
+        kk.length === kkIn.length &&
+        kkIn.every(({ c, e, uid }) => {
+          const v = kk.find((x) => uidOf(x) === uid);
+          return v && !v.includes('RRULE') && v.includes(`\r\nDTSTART;VALUE=DATE:${e.from.replace(/-/g, '')}\r\nDTEND;VALUE=DATE:${nextDay(e.to ?? e.from)}\r\n`) && v.includes(`\r\nSUMMARY:${icsEsc(`${c.name}：${kkShort(e.text)}`)}\r\n`) && v.includes(`\r\nDESCRIPTION:${icsEsc(`${e.text}。`)}\r\n`) && v.includes(`\r\nURL:${settings.siteUrl.replace(/\/$/, '')}/${c.slug}/kaikata/#yotei\r\n`);
+        }),
+      `スマホのカレンダー：買い方メモの予定（${kk.length}件。1回だけ、to があれば to まで）`,
+    );
+    ok(kkOut.length > 0 && kkOut.every(({ uid }) => !unfolded.includes(`UID:${uid}@`)), `スマホのカレンダー：月までの予定と終わった予定（${kkOut.length}件）は入れない`);
     const fxNames = [...readJson('test/fixture-latest.json'), ...readJson('test/fixture-books.json').items].map((x) => String(x.name).slice(0, 12));
     const urls = [...text.matchAll(/^URL:(.+)$/gm)].map((m) => m[1].trim());
-    ok(!/rakuten|円|発売|締切|予約/.test(text) && !fxNames.some((n) => n && text.includes(n)) && urls.length === ev && urls.every((u) => u.startsWith(settings.siteUrl)), 'スマホのカレンダー：楽天のデータ（商品名・値段・発売日・リンク）を入れない');
+    ok(ev === birth.length + season.length + kk.length && ![...birth, ...season].some((v) => /円|発売|締切|予約/.test(v)) && !/rakuten|楽天/i.test(unfolded) && !fxNames.some((n) => n && unfolded.includes(n)) && urls.length === ev && urls.every((u) => u.startsWith(settings.siteUrl)), 'スマホのカレンダー：楽天のデータ（商品名・値段・発売日・リンク）を入れない');
     const { buildIcs } = await import('./lib/ics.mjs');
     const long = buildIcs({ name: 'テスト', stamp: '20261023T000000Z', events: [{ uid: 'x', mmdd: '12-31', summary: 'あ'.repeat(40) + ',;\\', url: `${settings.siteUrl}tanjoubi/` }] });
     const unf = long.replaceAll('\r\n ', '');
-    ok(long.split('\r\n').every((l) => Buffer.byteLength(l) <= 75) && unf.includes(`SUMMARY:${'あ'.repeat(40)}\\,\;\\\\\r\n`) && unf.includes('DTEND;VALUE=DATE:20250101'), 'スマホのカレンダー：長い名前は字の途中で切らずに折り返す・記号を逃がす・年をまたぐ');
+    ok(long.split('\r\n').every((l) => Buffer.byteLength(l) <= 75) && unf.includes(`SUMMARY:${'あ'.repeat(40)}\\,\\;\\\\\r\n`) && unf.includes('DTEND;VALUE=DATE:20250101'), 'スマホのカレンダー：長い名前は字の途中で切らずに折り返す・記号を逃がす・年をまたぐ');
+    const once = buildIcs({ name: 'テスト', stamp: '20261023T000000Z', events: [{ uid: 'a', from: '2026-12-31', summary: 'a', url: settings.siteUrl }, { uid: 'b', from: '2026-12-30', to: '2027-01-02', summary: 'b', description: 'せつめい', url: settings.siteUrl }] });
+    ok(!once.includes('RRULE') && once.includes('DTSTART;VALUE=DATE:20261231\r\nDTEND;VALUE=DATE:20270101\r\n') && once.includes('DTSTART;VALUE=DATE:20261230\r\nDTEND;VALUE=DATE:20270103\r\n') && once.includes('DESCRIPTION:せつめい\r\n'), 'スマホのカレンダー：1回だけの予定（終わりは to か from の翌日）');
   }
   // 予算で選ぶ
   const yo = readFileSync('dist/chiikawa/yosan/index.html', 'utf8');
