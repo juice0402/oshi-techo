@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { readJson, writeJson } from './lib/util.mjs';
 import { loadWorks } from './lib/load-works.mjs';
 import { esc, yen, mdOf, jstDate, jstMonthDay, jstMonthDayTime, normalize, rakutenTime } from './lib/text.mjs';
-import { CATEGORIES, categoryOf, productKey, reservationInfo, median, oshiMatcher, isAdult, isKids } from './lib/classify.mjs';
+import { CATEGORIES, categoryOf, productKey, reservationInfo, median, oshiMatcher, isAdult, isKids, isCollab } from './lib/classify.mjs';
 import { cardHtml, marksFor, searchFormHtml, oshiChipsHtml, searchHref } from './lib/view.mjs';
 import { activeSeasons, seasonMatcher, nextBirthday, mdLabel } from './lib/season.mjs';
 import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
@@ -192,6 +192,16 @@ function listsFor(slug) {
     ),
   };
 }
+
+// コラボグッズ（作品のトップの棚と /collab/。docs/shikumi.md の「コラボグッズ」）：見つけた日の新しい順
+const COLLAB_MIN = 4; // これより少ない作品には、作品のトップの棚を出さない
+const COLLAB_SHELF = 8; // 棚と /collab/ の作品ごとの件数
+const collabMemo = new Map();
+const collabFor = (slug) => {
+  if (!collabMemo.has(slug)) collabMemo.set(slug, listsFor(slug).all.filter((i) => isCollab(i.name)).sort(byNew));
+  return collabMemo.get(slug);
+};
+const collabWorks = chars.filter((c) => collabFor(c.slug).length);
 
 // ---- 楽天のランキング ----
 const RANK_LABEL = { f20: '20代女性ランキング入り', f30: '30代女性ランキング入り', genre: '楽天ランキング入り' };
@@ -1188,6 +1198,7 @@ function yomiList(list) {
       gotouchiTeaser(N.teaser) +
       rankSection('楽天のランキングに入っているグッズ', rankedFor(''), N.rank) +
       topYoyaku(N.soon) +
+      (collabWorks.length ? '<p class="more"><a href="/collab/">キャラクターのコラボグッズの新着</a></p>' : '') +
       topSoonBooks(N.books) +
       (yomiArticles.length ? `<section class="yomi"><h2>推し活の読みもの</h2>${yomiList(yomiArticles.slice(0, 2))}<p class="more"><a href="/yomimono/">読みものをすべて見る</a></p></section>` : '') +
       (layout === 'now' ? oshiSection(charaWorks) : oshiFolded(charaWorks)),
@@ -1257,6 +1268,13 @@ function chooseNav(c) {
   return links.length ? `<nav class="cats" aria-label="選び方"><h2>選び方</h2><ul>${links.map(([h, t]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul></nav>` : '';
 }
 
+// 作品のトップの「<作品名>のコラボグッズ」の棚（4件より少ない作品には出さない）
+function collabShelf(c) {
+  const list = collabFor(c.slug);
+  if (list.length < COLLAB_MIN) return '';
+  return `<section><h2>${esc(c.name)}のコラボグッズ</h2>${grid(list.slice(0, COLLAB_SHELF))}<p class="more"><a href="/collab/#${esc(c.slug)}">ほかの作品のコラボグッズ</a></p></section>`;
+}
+
 // ---- キャラごと ----
 for (const c of chars) {
   const L = listsFor(c.slug);
@@ -1300,6 +1318,7 @@ for (const c of chars) {
       catNav +
       chooseNav(c) +
       tagS(yoyakuHtml, 'yoyaku') +
+      tagS(collabShelf(c), 'collab') +
       seasonHtml +
       tagS(rankSection('楽天のランキングに入っているもの', rankedFor(c.slug), settings.topItems), 'rank') +
       tagS(section('レビューが多いもの', L.all.filter((i) => i.reviews >= 5).sort(byReviews), { limit: settings.topItems }), 'review') +
@@ -2049,6 +2068,31 @@ if (ykGroups.length) {
   });
 }
 
+// ---- 全作品のコラボグッズ /collab/（作品ごとに見つけた日の新しい順。docs/shikumi.md の「コラボグッズ」） ----
+// 商品の一覧なので検索には出さない（SEARCH_LISTS に足さない）。件数はページに出さない
+if (collabWorks.length) {
+  const shown = collabWorks.flatMap((c) => collabFor(c.slug).slice(0, COLLAB_SHELF));
+  const names = collabWorks.slice(0, 3).map((c) => c.name);
+  page({
+    path: '/collab/',
+    crumbs: [{ name: 'トップ', path: '/' }, { name: 'コラボグッズの新着', path: '/collab/' }],
+    title: `キャラクターのコラボグッズの新着（${names.join('・')}${collabWorks.length > 3 ? 'など' : ''}）｜${settings.siteName}`,
+    description: sentence(
+      `${names.join('・')}${collabWorks.length > 3 ? 'など' : ''}のコラボグッズを、楽天市場で見つけた新しい順に作品ごとに並べています`,
+      '商品名に「コラボ」や「作品名×ブランド名」のように書いてあるものです',
+    ),
+    h1: 'キャラクターのコラボグッズの新着',
+    count: shown.length,
+    body:
+      collabWorks
+        .map((c, i) => `<section><h2 id="${esc(c.slug)}">${esc(c.name)}</h2>${grid(collabFor(c.slug).slice(0, COLLAB_SHELF), i === 0)}<p class="more"><a href="/${esc(c.slug)}/">${esc(c.name)}のグッズをもっと見る</a></p></section>`)
+        .join('') +
+      '<p class="asof">商品名に「コラボ」や「×」で2つの名前が書いてあるものを集めています</p>' +
+      priceAt(),
+    lastmod: newest(shown),
+  });
+}
+
 // ---- 推しキャラの誕生日カレンダー ----
 if (birthdays.length) {
   const soon = birthdays.filter((b) => b.days <= BIRTHDAY_SOON && b.items.length);
@@ -2596,6 +2640,9 @@ console.log(`商品が少なくて検索に出さない（出さなくなりそ�
 const perkText = `送料込み ${buyable.filter((i) => i.postage === 0).length}件・送料別 ${buyable.filter((i) => i.postage === 1).length}件・ラッピング対応 ${buyable.filter((i) => i.gift === 1).length}件（買えるもの ${buyable.length}件）／予約受付中 ${chars.map((c) => `${c.name}${yoyakuFor(c.slug).total}`).join('・')}`;
 console.log(perkText);
 console.log(`予約帳：推しキャラに当たった予約 ${ykEntries.filter((e) => e.op.length).length}件・棚が出た推し ${ykShelfShown.size}人（${[...ykShelfShown].join('・') || 'なし'}）・/yoyaku/ ${ykGroups.length ? ykGroups.map((x) => `${x.name}${x.items.length}`).join('・') : '作らない'}`);
+// コラボ：作品ごとの数と、はじめの3件の商品名（まざりものを見つけるため。非公開の notes/update.log にだけ入る。::notice にはしない）
+console.log(`コラボ：${collabWorks.map((c) => `${c.name}${collabFor(c.slug).length}`).join('・') || 'なし'}`);
+for (const c of collabWorks) for (const it of collabFor(c.slug).slice(0, 3)) console.log(`コラボ ${c.name}：${it.name}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=送料込み・ラッピング対応・予約::${perkText}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=商品が少ないページ::${thinText || 'なし'}`);
 // 推しキャラのページができたか（GitHub の実行ページの注釈に出す）

@@ -98,7 +98,12 @@ ok(!judge({ ...base, name: 'ちいかわ マグ', img: '' }, chiikawa, settings)
   );
   ok(regionOf('【飛騨高山限定】ちいかわ').pref === '岐阜' && regionOf('東京都限定 ちいかわ').pref === '東京' && regionOf('ちいかわ 京都限定').area.name === '近畿' && regionOf('ご当地キティ 草津温泉').pref === '群馬' && regionOf('ちいかわ マグ') === null, 'ご当地：地名から都道府県と地方（「東京都」は京都にしない）');
   ok(['富士急ハイランド', '富士吉田', '河口湖', '山中湖'].every((w) => regionOf(`ご当地スヌーピー ${w}`).pref === '山梨') && regionOf('ご当地スヌーピー 富士山').pref === '静岡' && regionOf('お台場限定 スヌーピー').pref === '東京' && regionOf('ご当地 道後 スヌーピー').pref === '愛媛', 'ご当地：名所の地名（富士急ハイランドは山梨・富士山は静岡のまま）');
-  const { isAdult, isKids } = await import('./lib/classify.mjs');
+  const { isAdult, isKids, isCollab } = await import('./lib/classify.mjs');
+  {
+    const no = ['26×38cm', 'H×W×D', 'W60×D40', '×10枚', '約20×55cm', 'ちいかわ ブランケット 70×100cm', 'ぬいぐるみ×2個', 'サンリオ 限定 ポーチ'].filter((x) => isCollab(x));
+    const yes = ['〇〇コラボ', '作品名×サンリオキャラクターズ', 'ブランド名×作品名', 'ちいかわ ✕ ブランド名', 'ちいかわ×Disney'].filter((x) => !isCollab(x));
+    ok(!no.length && !yes.length, `コラボの見分け：サイズ・セット数・「限定」は入れない${no.length || yes.length ? `（${[...no, ...yes].join('、')}）` : ''}`);
+  }
   ok(isAdult('ちいかわ 長財布 レディース') && isAdult('ポケモン マグカップ') && !isAdult('ちいかわ キッズ 財布') && !isAdult('ポケモン ぬいぐるみ') && !isAdult('大人気 ちいかわ BIGぬいぐるみ') && !isAdult('ちいかわ インテリア ぬいぐるみ') && isAdult('大人用 ちいかわ ぬいぐるみ') && !isAdult('ちいかわ マグカップ付箋') && !isAdult('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('ちいかわ ぷにジェル 6歳 7歳 大人') && isKids('サンリオ 女の子 Tシャツ') && !isKids('スヌーピー メンズ Tシャツ'), '大人向け・子ども向けの見分け');
   ok(topicsCfg.every((t) => chars.some((c) => c.slug === t.work) && t.title && t.h1 && t.words.length && /^\d{4}-\d\d-\d\d$/.test(t.until ?? '2099-12-31')), '話題：作品・名前・言葉・期限の設定がそろっている');
   const mew = oshiMatcher({ name: 'ミュウ', match: ['mew'], strict: true });
@@ -832,6 +837,26 @@ if (process.env.DATA_LATEST) {
     const myJs = readFileSync('src/my.js', 'utf8');
     ok(myJs.includes("S.setItem('ot-yoyaku'") && !/fetch\([^o]/.test(myJs) && myJs.includes('5184e6') && readFileSync('dist/privacy/index.html', 'utf8').includes('ot-yoyaku'), '予約帳：「予約した」は端末の ot-yoyaku だけに残し（60日で消す）、プライバシーポリシーに1行');
     ok(topHtml.includes('<a href="/yoyaku/">推しグッズの予約帳（発売の月ごと）</a>') && readFileSync('dist/chiikawa/yoyaku/index.html', 'utf8').includes('<a href="/yoyaku/">全作品の予約帳（発売の月ごと）</a>'), '予約帳：トップの予約受付中の棚の下と、作品の予約受付中のいちばん下から /yoyaku/ へ');
+  }
+  // コラボグッズ（#82）：作品のトップの棚と、全作品の /collab/
+  {
+    const ck = readFileSync('dist/chiikawa/index.html', 'utf8');
+    const shelf = ck.match(/<section data-s="collab">[\s\S]*?<\/section>/)?.[0] ?? '';
+    const names = [...shelf.matchAll(/<span class="nm">([^<]*)<\/span>/g)].map((m) => m[1]);
+    ok(shelf.includes('<h2>ちいかわのコラボグッズ</h2>') && names.length === 5 && names[0].includes('テストアパレル') && names[4].includes('テストシューズ') && !names.some((n) => n.includes('70×100cm')), `コラボ：作品のトップに見つけた日の新しい順の棚（サイズの×は入れない）（${names.length}件）`);
+    ok(ck.indexOf('data-s="yoyaku"') < ck.indexOf('data-s="collab"') && shelf.includes('<p class="more"><a href="/collab/#chiikawa">'), 'コラボ：棚は予約受付中のあと、下に /collab/#作品 への1行');
+    ok(!readFileSync('dist/sanrio/index.html', 'utf8').includes('data-s="collab"') && !readFileSync('dist/chiikawa/hachiware/index.html', 'utf8').includes('data-s="collab"'), 'コラボ：4件より少ない作品と推しキャラのページには棚を出さない');
+    const cp = readFileSync('dist/collab/index.html', 'utf8');
+    const cm = cp.slice(cp.indexOf('<main'), cp.indexOf('</main>'));
+    const heads = [...cm.matchAll(/<h2 id="([^"]+)">([^<]+)<\/h2>/g)].map((m) => `${m[1]}:${m[2]}`);
+    ok(cm.includes('<h1 class="tape">キャラクターのコラボグッズの新着</h1>') && heads.join('・') === 'chiikawa:ちいかわ・sanrio:サンリオ', `コラボ：/collab/ は作品ごとの見出し（id は作品の slug）（${heads.join('・')}）`);
+    ok(topHtml.indexOf('<h2>予約受付中のグッズ</h2>') < topHtml.indexOf('<a href="/collab/">') && topHtml.includes('<a href="/collab/">'), 'コラボ：トップの予約受付中の棚のあとに /collab/ への1行');
+    const links = [...(shelf + cm).matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/') && !u.startsWith('https://hb.afl.rakuten.co.jp/'));
+    ok(links.length === 0, 'コラボ：棚と /collab/ に楽天以外へのリンクがない');
+    const textOf = (h) => h.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<span class="rv">[^<]*<\/span>/g, '').replace(/<[^>]+>/g, ' ');
+    ok(!/\d+\s*件/.test(textOf(shelf + cm)), 'コラボ：件数が出ていない');
+    ok(!readFileSync('dist/sitemap.xml', 'utf8').includes('/collab/') && /<meta name="robots" content="noindex/.test(cp), 'コラボ：/collab/ は検索に出さない（サイトマップに入れない）');
+
   }
 }
 // YouTube API サービスの決まり：取った情報をファイルに残さない（III.E.4）・ロゴ（III.F.2）・利用規約（III.A.1）
