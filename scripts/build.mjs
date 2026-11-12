@@ -1085,6 +1085,7 @@ const yomiLinksFor = (slug, where) =>
 const YOMI_WORKS_MAX = 3;
 {
   const known = new Set(allWorks.map((c) => c.slug));
+  for (const a of yomiArticles) if (a.linkFrom?.work && !known.has(a.linkFrom.work)) throw new Error(`config/yomimono.json：${a.slug} の linkFrom.work に知らない作品 ${a.linkFrom.work}`);
   for (const a of yomiArticles) for (const w of a.works ?? []) if (!known.has(w)) throw new Error(`config/yomimono.json：${a.slug} の works に知らない作品 ${w}`);
   // cats：カテゴリの slug と季節の slug（つぎに見るで、そのカテゴリ・季節の一覧から記事へつなぐ）
   const catKnown = new Set([...CATEGORIES.map((k) => k.slug), ...seasons.map((x) => x.slug)]);
@@ -1504,13 +1505,12 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
       (adult.length >= 4 ? section(`大人向けの${o.name}グッズ`, adult, { limit: settings.topItems }) : '') +
       section(`${o.name}のグッズ一覧`, list.slice(settings.topItems, settings.listItems), { cat: true }).replace('<section>', '<section class="rest">') +
       oshiSection([c], o.slug) +
-      '<!--tsugi-->' +
       gotouchiSubs
         .filter((x) => x.w.c === c && x.sub.oshi === o.slug)
         .map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}一覧</a></p>`)
         .join('') +
       (bd ? `<p class="more"><a href="/tanjoubi/">${esc(o.name)}の誕生日は${mdLabel(o.birthday)}</a></p>` : '') +
-      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p></div>` +
+      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p><!--tsugi--></div>` +
       `<div class="side" data-stick>${bingoHtml(c, o, label, list.slice(0, settings.listItems))}</div></div>`,
     deco: bd && bd.days <= BIRTHDAY_DECO ? 'birthday' : '',
     lastmod: newest(list),
@@ -2398,7 +2398,7 @@ for (const a of yomiArticles) {
     body: `<article class="yomi-body${toc ? ' spread' : ''}">${hero}${toc.replace('<nav class="toc"', '<nav class="toc" data-stick')}<div class="yb">${html}${a.sources ? `<p class="more"><a href="${path}shiryou/">この記事を書くときに調べた資料</a></p>` : ''}<p class="yomi-date">${dates}。商品の棚は楽天市場から1日2回集めています</p><!--tsugi--></div></article>${shelves ? '<!--asof-->' : ''}`,
     ads: true,
     tsugi: [
-      { why: '同じテーマの読みもの', links: a.theme ? yomiLinks(yomiOrder.filter((x) => x !== a && x.theme === a.theme).slice(0, 2)) : [] },
+      { why: '同じテーマの読みもの', links: a.theme ? yomiLinks(yomiOrder.filter((x) => x !== a && x.theme === a.theme && (!x.corner || x.corner === a.corner)).slice(0, 2)) : [] },
       {
         why: 'この記事に出てくる作品',
         links: [...new Set([...(a.works ?? []), a.linkFrom?.work].filter(Boolean))]

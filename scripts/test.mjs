@@ -520,7 +520,7 @@ for (const f of html) {
   if (process.env.DATA_LATEST) {
     const hw = readFileSync('dist/chiikawa/hachiware/index.html', 'utf8');
     const sec = hw.match(/<section class="bingo"[\s\S]*?<\/section>/)?.[0] ?? '';
-    ok(/<div class="spread"><div class="flow"><ul class="grid" data-pool>[\s\S]*?のグッズの新着へ<\/a><\/p><\/div><div class="side" data-stick><section class="bingo" data-k="chiikawa\/hachiware" data-m="2026-10"><h2>ハチワレの10月の入荷ビンゴ<\/h2><div class="bg-wrap">/.test(hw), '入荷ビンゴ：推しキャラのページのいちばん下（スマホ）・右の柱（パソコン）に、見出し（説明の行を重ねない）');
+    ok(/<div class="spread"><div class="flow"><ul class="grid" data-pool>[\s\S]*?のグッズの新着へ<\/a><\/p>(?:<nav class="tsugi2"[\s\S]*?<\/nav>)?<\/div><div class="side" data-stick><section class="bingo" data-k="chiikawa\/hachiware" data-m="2026-10"><h2>ハチワレの10月の入荷ビンゴ<\/h2><div class="bg-wrap">/.test(hw), '入荷ビンゴ：推しキャラのページのいちばん下（スマホ）・右の柱（パソコン）に、見出し（説明の行を重ねない）');
     ok((sec.match(/<li class="bg-c /g) ?? []).length === 9 && sec.indexOf('data-k="nui"') < sec.indexOf('st-mid') && sec.indexOf('st-mid') < sec.indexOf('data-k="pouch"') && /data-k="sticker"[^]*<\/ol>/.test(sec), '入荷ビンゴ：3×3 でまん中は「来た」');
     ok(sec.includes('<li class="bg-c st-on" data-k="nui"><span class="bg-a"><span class="bg-pic"><img src="/art/bingo-nui-') && sec.includes('<small class="bg-dt">10/3</small><small class="bg-nm">ぬいぐるみ</small>') && sec.includes('<li class="bg-c st-none" data-k="mug">') && sec.includes('<b class="bg-han">来た</b>'), '入荷ビンゴ：印のあるマスは日付と名前、ないマスは名前だけ（記録と、いま載っている商品から）');
     ok(sec.includes('<p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/9 タオル</span><span>10/12 キーホルダー</span>') && !/件/.test(sec), '入荷ビンゴ：見つけた日の記録は日付の順（件数は出さない）');
@@ -997,19 +997,23 @@ ok(broken.size === 0, `サイト内のリンク切れがない${broken.size ? `�
   const main = (s) => s.slice(s.indexOf('<main'), s.indexOf('</main>'));
   ok(/<\/nav><p class="asof end">[^<]*時点の価格<\/p>\s*$/.test(main(kh)), 'つぎに見る：本文のいちばん最後で、時点の価格の行はその下のまま');
   const hw = readFileSync('dist/chiikawa/hachiware/index.html', 'utf8');
-  ok(has('chiikawa/hachiware/') && hw.indexOf('<section class="oshi">') < hw.indexOf('class="tsugi2"') && hw.indexOf('class="tsugi2"') < hw.indexOf('<div class="side" data-stick>') && navOf(hw).split('<li>').length - 1 <= 2, 'つぎに見る：推しキャラのページは推しキャラの節のすぐあと（入荷ビンゴより上）に2行まで');
+  ok(has('chiikawa/hachiware/') && hw.indexOf('のグッズの新着へ</a></p>') < hw.indexOf('class="tsugi2"') && /<\/nav><\/div><div class="side" data-stick>/.test(hw) && navOf(hw).split('<li>').length - 1 <= 2, 'つぎに見る：推しキャラのページは本文（.flow）の最後（入荷ビンゴより上）に2行まで');
   const pg = readFileSync('dist/yomimono/pc-game/index.html', 'utf8');
   ok(pg.indexOf('この記事を書くときに調べた資料') < pg.indexOf('class="tsugi2"') && navOf(pg).includes('<span>同じテーマの読みもの</span>') && navOf(pg).includes('<span>この記事に出てくる作品</span><a href="/minecraft/">マインクラフトのグッズの新着</a>'), 'つぎに見る：読みものの記事は、調べた資料の行のあとに同じテーマの読みものと出てくる作品');
   const yomiNo = readdirSync('dist/yomimono', { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync(`dist/yomimono/${d.name}/index.html`) && d.name !== 'img').map((d) => d.name).filter((d) => !has(`yomimono/${d}/`));
   ok(yomiNo.length === 0, `つぎに見る：読みものの記事はどれも最後に次の道がある${yomiNo.length ? `（${yomiNo.join('、')}）` : ''}`);
-  const gameOnly = readJson('config/yomimono.json').filter((a) => a.corner).map((a) => `/yomimono/${a.slug}/`);
+  const yomiCfg = readJson('config/yomimono.json');
+  const gameOnly = yomiCfg.filter((a) => a.corner).map((a) => `/yomimono/${a.slug}/`);
   const leak = html.filter((f) => {
     const s = readFileSync(f, 'utf8');
     const nav = navOf(s);
     const slug = pathOf(f).split('/')[1];
-    return nav && gameOnly.some((h) => nav.includes(`href="${h}"`)) && !chars.some((c) => c.slug === slug && c.corner === 'game') && !pathOf(f).startsWith('/yomimono/');
+    if (!nav || !gameOnly.some((h) => nav.includes(`href="${h}"`))) return false;
+    // 読みものの記事は、同じ corner の記事のページだけ
+    if (pathOf(f).startsWith('/yomimono/')) return !yomiCfg.some((a) => a.corner && `/yomimono/${a.slug}/` === pathOf(f));
+    return !chars.some((c) => c.slug === slug && c.corner === 'game');
   });
-  ok(leak.length === 0, `つぎに見る：ゲームの記事は、ゲームのコーナーの作品のページにだけ出す${leak.length ? `（${leak.slice(0, 3).join('、')}）` : ''}`);
+  ok(leak.length === 0, `つぎに見る：ゲームの記事は、ゲームのコーナーの作品と、同じコーナーの記事のページにだけ出す${leak.length ? `（${leak.slice(0, 3).join('、')}）` : ''}`);
   const css = readFileSync('src/themes/a-techo.css', 'utf8');
   ok(/@media \(min-width:900px\)\{\.tsugi2 ul\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(css) && !/\.tsugi2[^{]*\{[^}]*border-left/.test(css), 'つぎに見る：パソコン（900px 以上）は2列・左はしの帯なし');
 }
