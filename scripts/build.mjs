@@ -402,6 +402,13 @@ const MY_JS = `<script>${readFileSync('src/my.js', 'utf8')
   .map((l) => l.trim())
   .filter(Boolean)
   .join('\n')}</script>`;
+// ご当地の一覧の「持ってる」のチェック（src/gotouchi.js。県の id だけを端末の ot-gotouchi-<作品> に残す。どこにも送らない）
+const GOTOUCHI_JS = `<script>${readFileSync('src/gotouchi.js', 'utf8')
+  .split('\n')
+  .filter((l) => !/^\s*\/\//.test(l))
+  .map((l) => l.trim())
+  .filter(Boolean)
+  .join('\n')}</script>`;
 
 // ---- 発売日（楽天ブックス） ----
 const MIN_CAL = 3; // 発売日カレンダーを作る最低件数
@@ -1830,7 +1837,8 @@ const MAX_TOC_OPEN = 15; // 都道府県がこれより多いと、目次を地�
 // 都道府県ごとの一覧のページ。作品（/作品/gotouchi/）とキャラだけ（/作品/gotouchi/キャラ/）で同じ形
 // who：説明文と節の名前に使う名前（サンリオ・ハローキティ）。part：都道府県の節の名前（「北海道のご当地{part}」）。top：目次の上に置くもの
 // prefLink：都道府県の id → 見出しのすぐ下に置く1行（読みものに同じ県の見出しがあるときだけ）
-function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [], prefLink = {} }) {
+// gk：「持ってる」のチェックを残す localStorage の名前（ot-gotouchi-<作品>。スヌーピーは読みものの道具と同じ ot-gotouchi-snoopy）
+function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [], prefLink = {}, gk }) {
   const w = { items, newest: newestItems };
   const areas = AREAS.map((a) => {
     const prefs = a.prefs
@@ -1860,6 +1868,8 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     const chips = [...areas.map((a) => [a.slug, a.name]), ...(rest.length ? [['sonohoka', SONOHOKA]] : [])];
     if (chips.length > 1) toc = `<ul class="chips">${chips.map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join('')}</ul>`;
   }
+  // ご当地スヌーピーは、一覧にない県もチェックできる読みものの道具へ1行（目次の上に同じ読みものへのリンクがあれば足さない）
+  if (gk === 'ot-gotouchi-snoopy' && !top.includes('href="/yomimono/gotouchi-snoopy/')) toc += '<p class="more"><a href="/yomimono/gotouchi-snoopy/#gsfit">47都道府県のチェック表（読みもの）</a></p>';
   let first = true;
   const gridOnce = (items) => {
     const html = grid(items, first);
@@ -1879,12 +1889,14 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     ...(GOTOUCHI_ART ? { ogImage: GOTOUCHI_ART.og } : {}),
     // パソコンは上の部分だけ2列（左に h1・読みもの・地方のリスト、右に顔の絵）
     intro: { side: GOTOUCHI_ART?.html ?? '', rest: top + toc },
+    extraJs: GOTOUCHI_JS,
     body:
+      `<div hidden data-gk="${esc(gk)}"></div>` +
       areas
         .map(
           (a) =>
             `<section id="${a.slug}"><h2>${esc(a.name)}</h2>${a.prefs
-              .map((p) => `<section class="gp" id="${p.id}"><h3>${esc(p.pref)}</h3>${prefLink[p.id] ?? ''}${gridOnce(p.items.slice(0, MAX_PER_PREF))}</section>`)
+              .map((p) => `<section class="gp" id="${p.id}"><h3>${esc(p.pref)}</h3>${prefLink[p.id] ?? ''}<button type="button" class="gpk" data-p="${p.id.slice(2)}" aria-pressed="false" hidden>持ってる</button>${gridOnce(p.items.slice(0, MAX_PER_PREF))}</section>`)
               .join('')}</section>`,
         )
         .join('') +
@@ -1921,6 +1933,7 @@ for (const w of gotouchiWorks) {
     top: yomiLinksFor(c.slug, 'gotouchi') + subs.map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}だけを見る</a></p>`).join(''),
     more: gotouchiWorks.filter((x) => x !== w).map((x) => [`/${x.c.slug}/gotouchi/`, `ご当地${x.c.name}一覧`]),
     prefLink: yomiPrefLinks(c),
+    gk: `ot-gotouchi-${c.slug}`,
   });
 }
 for (const x of gotouchiSubs) {
@@ -1936,6 +1949,7 @@ for (const x of gotouchiSubs) {
     h1,
     who,
     part: x.sub.name,
+    gk: `ot-gotouchi-${x.sub.slug}`,
     title: (places) => `${h1}｜都道府県ごとの${who}のご当地グッズ${placesNote(places)}｜${settings.siteName}`,
     crumbs: [
       { name: 'トップ', path: '/' },
@@ -2585,7 +2599,7 @@ page({
 <p>このサイトには会員登録がありません。名前やメールアドレスを受け取るのは、お問い合わせのフォームに書いてもらったときだけです。</p>
 <h2>端末に保存するもの</h2>
 <p>「わたしの推し」に選んだ推しキャラと、前にこのサイトを見た時刻を、見ている端末のブラウザの中だけに保存します。サイトや楽天には送りません。ブラウザのデータを消すと消えます。</p>
-<p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。</p>
+<p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。ご当地グッズの一覧の「持ってる」のチェックも同じで、保存するのは都道府県の名前（ローマ字）だけです。</p>
 <p>推しキャラのページの「入荷ビンゴ」は、開けたマスの種類と、その月に初めて来た日を、見ている端末のブラウザの中だけに保存します。</p>
 <p>予約受付中のグッズの「予約した」は、その商品の番号と発売の時期と押した日だけを、見ている端末のブラウザの中（ot-yoyaku）に保存します。発売の月が過ぎて60日たつと消えます。発売の時期がわからないものは、押した日から60日で消えます。</p>
 ${settings.contact ? `<h2>お問い合わせ</h2>

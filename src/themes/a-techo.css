@@ -131,7 +131,7 @@ main.sheet .idx+section h2,main.sheet .idx+.my+section h2,main.sheet .idx+.my[hi
 .myhome button{min-height:44px;margin-left:10px;padding:0;border:0;background:none;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:5px}
 .flt{margin:0 0 8px}
 .flt .chips{gap:0 10px}
-.flt button,.ykb{min-height:44px;color:var(--ink);font-size:14px}
+.flt button,.ykb,.gpk{min-height:44px;color:var(--ink);font-size:14px}
 .ykd .nm{text-decoration-color:var(--berry)}
 .fmax label{color:var(--ink);font-size:14px}
 .fmax input{color:var(--ink);background:#fff;border:1.5px solid var(--lav);border-radius:8px}
@@ -198,6 +198,8 @@ footer.ft.wrap::before{content:"";display:block;height:24px;margin:0 calc(50% - 
 .yomi-body p{margin:.7em 0;font-size:16px;line-height:1.85}
 main.sheet .yomi-body h2{margin-top:36px}
 .yomi-body h3,.gp h3{margin:22px 0 6px;font-size:16px;color:var(--ink)}
+.gp{position:relative}.gpk{position:absolute;right:0;top:-10px}.gp h3:has(~.gpk:not([hidden])){padding-right:7em}
+.gtoc a[data-got]{padding:11px 10px;margin:0 -10px;text-decoration-line:none;background:var(--pen) no-repeat center/100% 34px}
 .yomi-body ul.dots{margin:.6em 0;padding:0 0 0 1.2em;line-height:1.8}
 .toc{margin:6px 0 20px;padding:4px 16px 12px;background:var(--lav2);border-radius:10px}
 main.sheet .toc h2{margin:10px 0 4px}
