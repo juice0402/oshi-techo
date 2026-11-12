@@ -11,6 +11,11 @@ on:
     workflows: [更新, 読みものの資料の点検]
     types: [completed]
     branches: [main]  # PR の資料の点検は見ない
+  # 3時間ごとにも、見張る workflow ごとのいちばん新しい実行を見る（2026-11-13）。
+  # マージの印（merge-ok.yml）が GITHUB_TOKEN で動かした更新は、終わっても workflow_run が来ない（GitHub の決まり）。
+  # 11/13 7:15 の更新の失敗に issue が作られなかった。同じ issue には1日1回しかコメントしない（notedToday）
+  schedule:
+    - cron: '37 */3 * * *'
   workflow_dispatch:
     inputs:
       dry_run:

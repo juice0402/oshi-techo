@@ -1406,7 +1406,11 @@ for (const c of chars) {
       title: `${s.title}｜${settings.siteName}`,
       description: empty
         ? sentence(`${c.name}のグッズを、楽天市場で作品名から新しい順に探して並べるページです`, 'この7日に作品名で見つけた新着は、いまはありません', '推しキャラや種類のページから探せます')
-        : s.desc(list),
+        : (() => {
+            // 見つけた物が少ない日は短くなるので、ほかのページへの道を1文足す（説明文は70字以上。11/13 lovelive の新着が70字に届かず更新が止まった）
+            const d = s.desc(list);
+            return [...d].length >= 70 ? d : sentence(d, '推しキャラや種類のページからも探せます');
+          })(),
       h1: s.h1,
       lead: s.lead,
       body: empty
