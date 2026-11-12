@@ -94,6 +94,13 @@ export function closes(pr, n) {
   return new RegExp(`(?:^|/)night-${n}$`).test(String(pr?.head?.ref ?? ''));
 }
 
+// 本文の Closes #◯ の番号ぜんぶ（GITHUB_TOKEN の squash では GitHub が issue を閉じないので、マージの印が閉じる）
+export function closesOf(body) {
+  const s = String(body ?? '').normalize('NFKC');
+  return [...new Set([...s.matchAll(new RegExp(`(?<![A-Za-z])(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)${SP}:?${SP}#(\\d+)(?!\\d)`, 'gi'))].map((m) => Number(m[1])))];
+}
+export const closedText = (n, sha = '') => `PR #${n} でマージ済み${sha ? `（${String(sha).slice(0, 7)}）` : ''}。閉じます（マージの印）`;
+
 // 順番の指定で待つ理由（空ならマージしてよい）。openPrs は 番号 → 開いている PR の Map
 export function blockers(pr, openPrs) {
   const me = pr.number;
@@ -244,7 +251,30 @@ export async function processPr(pr, openPrs, { api = github, dry = false, now = 
     return { state: 'blocked' };
   }
   log(`#${n}: マージした（${text}）`);
+  await closeLinked(pr, res.sha ?? '', ctx);
   return { state: 'merged' };
+}
+
+// マージした PR の本文の Closes #◯ の issue を、コメントをつけて閉じる（開いている issue だけ。PR・閉じた issue はさわらない。失敗してもマージは止めない）
+export async function closeLinked(pr, sha = '', { api = github, dry = false, log = console.log } = {}) {
+  const done = [];
+  for (const n of closesOf(pr?.body)) {
+    try {
+      const it = await api(`repos/${REPO}/issues/${n}`);
+      if (!it || it.pull_request || it.state !== 'open') continue;
+      if (dry) {
+        log(`（ためし）#${n} を閉じるはず（PR #${pr.number} の Closes）`);
+        continue;
+      }
+      await api(`repos/${REPO}/issues/${n}/comments`, { method: 'POST', body: { body: closedText(pr.number, sha) } });
+      await api(`repos/${REPO}/issues/${n}`, { method: 'PATCH', body: { state: 'closed', state_reason: 'completed' } });
+      log(`#${n} を閉じた（PR #${pr.number} の Closes）`);
+      done.push(n);
+    } catch (e) {
+      log(`#${n} を閉じられなかった（${String(e.message).slice(0, 150)}）`);
+    }
+  }
+  return done;
 }
 
 // 1回ぶん見る → { merged: マージした番号, grace: いちばん早く10分たつまでの秒数 or null, error: 失敗があったか }。
@@ -283,6 +313,7 @@ export async function main({
   now = () => new Date(),
   dry = (process.env.MERGE_OK_DRY_RUN ?? '').toLowerCase() === 'true',
   pr = process.env.MERGE_OK_PR ?? '',
+  sweep = (process.env.MERGE_OK_SWEEP ?? '').toLowerCase() === 'true',
 } = {}) {
   const want = String(pr).trim();
   if (want && !/^\d+$/.test(want)) {
@@ -292,6 +323,17 @@ export async function main({
   const only = want ? Number(want) : null;
   if (dry) log('ためし（dry_run）: マージ・コメント・ラベル・更新はしない');
   else await ensureLabels(api, log);
+  if (sweep) {
+    // 掃除：この21日に main へマージされた PR の Closes #◯ で、まだ開いている issue を閉じる
+    const since = now().getTime() - 21 * 864e5;
+    const done = await all(api, `repos/${REPO}/pulls?state=closed&sort=updated&direction=desc`, null, 3);
+    for (const p of done) {
+      if (!p.merged_at || Date.parse(p.merged_at) < since || p.base?.ref !== BASE) continue;
+      await closeLinked(p, p.merge_commit_sha ?? '', { api, dry, log });
+    }
+    log('掃除が終わった');
+    return 0;
+  }
   const first = await runOnce({ api, log, sleep, dry, only, now: now() });
   const merged = [...first.merged];
   let { error } = first;
