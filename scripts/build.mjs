@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { readJson, writeJson } from './lib/util.mjs';
 import { loadWorks } from './lib/load-works.mjs';
 import { esc, yen, mdOf, jstDate, jstMonthDay, jstMonthDayTime, normalize, rakutenTime } from './lib/text.mjs';
-import { CATEGORIES, categoryOf, productKey, reservationInfo, median, oshiMatcher, isAdult, isKids, isCollab } from './lib/classify.mjs';
+import { CATEGORIES, categoryOf, productKey, reservationInfo, median, oshiMatcher, isAdult, isKids, isCollab, collabNames } from './lib/classify.mjs';
 import { cardHtml, marksFor, searchFormHtml, oshiChipsHtml, searchHref } from './lib/view.mjs';
 import { activeSeasons, seasonMatcher, nextBirthday, mdLabel } from './lib/season.mjs';
 import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
@@ -198,7 +198,10 @@ const COLLAB_MIN = 4; // これより少ない作品には、作品のトップ�
 const COLLAB_SHELF = 8; // 棚と /collab/ の作品ごとの件数
 const collabMemo = new Map();
 const collabFor = (slug) => {
-  if (!collabMemo.has(slug)) collabMemo.set(slug, listsFor(slug).all.filter((i) => isCollab(i.name)).sort(byNew));
+  if (!collabMemo.has(slug)) {
+    const names = collabNames(allWorks.find((w) => w.slug === slug));
+    collabMemo.set(slug, listsFor(slug).all.filter((i) => isCollab(i.name, names)).sort(byNew));
+  }
   return collabMemo.get(slug);
 };
 const collabWorks = chars.filter((c) => collabFor(c.slug).length);
