@@ -244,5 +244,28 @@ ok(wf.includes(`name: ${M.SELF_CHECK}`), 'マージの印：ジョブの名前�
 ok(!wf.includes('secrets.') && wf.includes('GH_TOKEN: ${{ github.token }}'), 'マージの印：鍵は GITHUB_TOKEN だけ');
 ok(/^\s*workflow_dispatch:/m.test(readFileSync(`.github/workflows/${M.PUBLISH}`, 'utf8')), 'マージの印：更新（update.yml）は手で動かせる（workflow_dispatch）');
 
+// 本文の Closes #◯（マージのあとに閉じる issue）
+ok(same(M.closesOf('Closes #150'), [150]), 'Closes：1つ');
+ok(same(M.closesOf('⚠️ #106 の PR #109 のあとにマージ\n\nCloses #107'), [107]), 'Closes：順番の指定の番号は入れない');
+ok(same(M.closesOf('closed #3, fixes: #4\nResolves #5 close #6'), [3, 4, 5, 6]), 'Closes：いろいろな書き方');
+ok(same(M.closesOf('Closes #150\nCloses #150'), [150]), 'Closes：同じ番号は1つ');
+ok(same(M.closesOf('Closes ＃１５２'), [152]), 'Closes：全角の数字');
+ok(same(M.closesOf('夜 #72 の一部（マージしても issue は閉じない）'), []) && same(M.closesOf(null), []), 'Closes：一部・空は閉じない');
+{
+  const calls = [];
+  const api = async (path, o = {}) => {
+    calls.push(`${o.method ?? 'GET'} ${path}`);
+    if (path.endsWith('/issues/7')) return { number: 7, state: 'open' };
+    if (path.endsWith('/issues/8')) return { number: 8, state: 'closed' };
+    if (path.endsWith('/issues/9')) return { number: 9, state: 'open', pull_request: {} };
+    return {};
+  };
+  const done = await M.closeLinked({ number: 20, body: 'Closes #7\nCloses #8\nCloses #9' }, 'abcdef1234', { api, log: () => {} });
+  ok(same(done, [7]) && calls.includes(`PATCH ${R}/issues/7`) && !calls.some((c) => /PATCH .*issues\/(8|9)$/.test(c)), 'Closes：開いている issue だけ閉じる（閉じた issue・PR はさわらない）');
+  const dry = [];
+  await M.closeLinked({ number: 20, body: 'Closes #7' }, '', { api: async (p, o = {}) => { dry.push(o.method ?? 'GET'); return { state: 'open' }; }, dry: true, log: () => {} });
+  ok(same(dry, ['GET']), 'Closes：ためしでは閉じない');
+}
+
 console.log(failed ? `\nマージの印：${failed}件のNG` : '\nマージの印：すべてOK');
 process.exit(failed ? 1 : 0);
