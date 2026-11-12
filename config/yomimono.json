@@ -8,6 +8,10 @@
     "published": "2026-10-27",
     "updated": "2026-10-27",
     "theme": "tsukuru",
+    "cats": [
+      "keyholder",
+      "bag"
+    ],
     "hero": "itabag",
     "heroAlt": "透明ポケットに缶バッジをならべたトートバッグと、台紙・缶バッジカバー・リボン",
     "shelves": [
@@ -100,6 +104,9 @@
     "published": "2026-10-27",
     "updated": "2026-10-27",
     "theme": "tsukuru",
+    "cats": [
+      "keyholder"
+    ],
     "hero": "kazari",
     "heroAlt": "段差のある台にならべたアクリルスタンドと、ボードに留めた缶バッジ・ケース・収納ファイル",
     "shelves": [
@@ -502,6 +509,9 @@
     "published": "2026-10-28",
     "updated": "2026-10-28",
     "theme": "tsukuru",
+    "cats": [
+      "nuigurumi"
+    ],
     "hero": "nuikatsu",
     "heroAlt": "小さなハンガーにかけたぬい服と、窓つきのポーチ・ブラシ・タオル",
     "shelves": [
@@ -839,6 +849,9 @@
     "published": "2026-10-29",
     "updated": "2026-10-29",
     "theme": "game",
+    "cats": [
+      "omocha"
+    ],
     "hero": "switch2-case",
     "heroAlt": "ファスナーつきのハードケースと、透明の保護フィルム・クロス・カードケース",
     "corner": "game",
@@ -1260,6 +1273,9 @@
     "published": "2026-10-29",
     "updated": "2026-10-29",
     "theme": "game",
+    "cats": [
+      "omocha"
+    ],
     "hero": "game-katazuke",
     "heroAlt": "スタンドに立てたコントローラーと、まとめたケーブル・ヘッドホンスタンド",
     "corner": "game",
@@ -1910,6 +1926,10 @@
     "published": "2026-10-29",
     "updated": "2026-10-29",
     "theme": "tsukuru",
+    "cats": [
+      "keyholder",
+      "nuigurumi"
+    ],
     "hero": "saidan",
     "heroAlt": "段のある台と、丸とハートの風船・小さなライトのガーランド・背景の布",
     "shelves": [
@@ -2393,6 +2413,10 @@
     "published": "2026-11-06",
     "updated": "2026-11-06",
     "theme": "tsukuru",
+    "cats": [
+      "techo",
+      "bunbougu"
+    ],
     "hero": "oshi-techo",
     "heroAlt": "開いた手帳と丸いシール・マスキングテープ・ペン・付箋",
     "shelves": [
