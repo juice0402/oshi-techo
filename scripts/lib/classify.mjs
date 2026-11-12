@@ -47,11 +47,26 @@ export const isAdult = (name) => {
 
 // コラボグッズ：商品名に「コラボ」があるか、「×」「✕」の両側が言葉のもの（docs/shikumi.md の「コラボグッズ」）。
 // 「26×38cm」「H×W×D」「W60×D40」「×10枚」「約20×55cm」のようなサイズやセット数は外す。
+// コラボではない「×」も外す（#85）：色の組（オフホワイト×ブラック・BL×RD）、セールの言葉（スーパーSALE×ポイントアップ）、
+// 商品の組（ジグソーパズル×アクスタ）、同じ作品のキャラ同士（ちいかわ×うさぎ。names に作品の名前の一覧を渡したときだけ）。
 // 「限定」は数量限定・店舗限定まで入って広すぎるので見分けに使わない
 const COLLAB_WORD = /[\p{L}\p{N}ー]/u;
-export function isCollab(name) {
+// 「×」のとなりの言葉（字・数字・ーが続くところ）
+const LEFT_WORD = /[\p{L}\p{N}ー]+$/u;
+const RIGHT_WORD = /^[\p{L}\p{N}ー]+/u;
+const COLORS = ['オフホワイト', 'ホワイト', 'ブラック', 'アイボリー', 'ブラウン', 'グリーン', 'ラメ', 'レッド', 'ブルー', 'ピンク', 'ネイビー', 'グレー', 'グレイ', 'ベージュ', 'イエロー', 'パープル', 'オレンジ', 'シルバー', 'ゴールド', 'カーキ', 'ミント', 'ラベンダー', 'クリア', 'ライト', 'ダーク', 'black', 'white', 'red', 'blue', 'pink', 'navy', 'gray', 'grey', 'green', 'brown', 'beige', 'yellow', 'purple', 'orange', 'silver', 'gold', '黒', '白', '赤', '青', '緑', '黄', '茶', '紺', '灰'];
+const ONLY_COLORS = new RegExp(`^(?:${COLORS.join('|')})+(?:色|系)?$`, 'u');
+const SALE = /スーパーsale|スーパーセール|お買い物マラソン|お買物マラソン|ポイントアップ|ポイント|クーポン/;
+const TYPE_WORDS = [...new Set(CATEGORIES.flatMap((c) => c.words).map(normalize))].sort((a, b) => b.length - a.length);
+// 言葉がグッズの種類で終わる（ジグソーパズル・アクスタ）。種類の前に作品の名前があるものは数えない
+const isTypeWord = (w, names) => {
+  const t = TYPE_WORDS.find((x) => w.endsWith(x));
+  return !!t && !names.some((x) => w.slice(0, -t.length).includes(x));
+};
+export function isCollab(name, names = []) {
   const n = normalize(name);
   if (n.includes('コラボ')) return true;
+  const own = names.map(normalize).filter((x) => x.length >= 2);
   for (let i = 0; i < n.length; i++) {
     if (n[i] !== '×' && n[i] !== '✕') continue;
     const left = n.slice(0, i).trimEnd();
@@ -61,10 +76,23 @@ export function isCollab(name) {
     if (/(?:\p{N}|cm|mm)$/u.test(left) || /(?:^|[^a-z])[hwd]$/.test(left)) continue;
     // 右が数字・「約」・H・W・D で始まる
     if (/^(?:\p{N}|約|[hwd](?![a-z]))/u.test(right)) continue;
+    const lw = left.match(LEFT_WORD)[0];
+    const rw = right.match(RIGHT_WORD)[0];
+    // 色の組：右がまるごと色の言葉か、左右が英字2文字（左はキャラ名のこともあるので、左だけでは外さない）
+    if (ONLY_COLORS.test(rw) || (/^[a-z]{2}$/.test(lw) && /^[a-z]{2}$/.test(rw))) continue;
+    // セールの言葉
+    if (SALE.test(lw) || SALE.test(rw)) continue;
+    // 商品の組
+    if (isTypeWord(lw, own) && isTypeWord(rw, own)) continue;
+    // 同じ作品のキャラ同士
+    if (own.length && own.some((x) => lw.includes(x)) && own.some((x) => rw.includes(x))) continue;
     return true;
   }
   return false;
 }
+
+// isCollab にわたす作品の名前の一覧（作品名・match・推しキャラの名前と match）
+export const collabNames = (w) => [w.name, ...(w.match ?? []), ...(w.oshi ?? []).flatMap((o) => [o.name, ...(o.match ?? [])])];
 
 export function categoryOf(name) {
   const n = normalize(name);
