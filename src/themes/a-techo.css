@@ -97,6 +97,12 @@ main.sheet .idx+section h2,main.sheet .idx+.my+section h2,main.sheet .idx+.my[hi
 .cats ul{gap:0 18px}
 .cats a,.chips a,.srt a,.so a,.myh a,.cats.idx a{display:inline-block;padding:11px 0;font-size:14px;line-height:22px;color:var(--ink);text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:5px}
 .cats span{color:var(--sub)}
+/* つぎに見る：理由は小さいうす字の1行、行き先はペンの点線の下線の文字、行のあいだにうすい点線。パソコン（900px 以上）は2列 */
+.tsugi2 li{padding:8px 0 4px;border-top:1px dotted var(--line)}
+.tsugi2 li:first-child{border-top:0}
+.tsugi2 li>span{font-size:12px;line-height:1.5;color:var(--sub)}
+.tsugi2 a{display:inline-block;padding:8px 0;font-size:14px;line-height:22px;color:var(--ink);text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:5px}
+@media (min-width:900px){.tsugi2 ul{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px}.tsugi2 li:nth-child(2){border-top:0}}
 .idx,.orow{margin:0 0 4px}
 .idx ul,.orow ul{flex-wrap:nowrap;margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
 .idx ul::-webkit-scrollbar,.orow ul::-webkit-scrollbar{display:none}

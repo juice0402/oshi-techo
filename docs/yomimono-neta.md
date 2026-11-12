@@ -7,6 +7,7 @@
 ### 置く場所と作り方
 - 1本でさわるファイル：config/yomimono.json（最後に1件）・src/yomimono/<slug>.html（本文）・src/yomimono/tools/<slug>-<名前>.html（計算の道具）・src/yomimono/fig/<slug>-<名前>.html（図。要るときだけ）・src/yomimono/sources/<slug>.json（資料）・src/yomimono/img/<slug>.webp と <slug>-og.jpg（絵）
 - config/yomimono.json の1件：slug（ローマ字）・title・seoTitle（検索の問いの形。例「〜はどこで売ってる？〜」）・summary（一覧の1行。全角22字まで）・description（その記事だけの具体を入れて全角80〜120字）・published と updated（書いた日）・hero（slug）・heroAlt（絵に描いてあるもの）・shelves（棚3〜5）・sources（slug）。ゲームの記事は corner: "game"。1つの作品だけの記事は linkFrom（work・pages・text。gotouchi-snoopy が例）。本文に作品の名前が出てきて、その作品の人に役立つ記事は works（作品の slug の配列。pc-game が例）を書くと、作品のトップに1行出る（全部の作品に付けない）。ファイルは Python の json.dumps(indent=2, ensure_ascii=False)＋改行で書く
+- cats：そのカテゴリのグッズの扱い方が本文に出てくる記事だけ、カテゴリの slug と季節の slug の配列（nuikatsu は ["nuigurumi"]）。そのカテゴリ・季節の一覧の「つぎに見る」に出る
 - theme：山の行の［テーマ］を書く（tsukuru 作る・飾る・しまう／atsumeru 買う・集める・送る／dekakeru ライブ・お出かけ／gotouchi ご当地／game ゲーム のどれか1つ）。/yomimono/ の一覧はこのテーマの見出しで分かれ、書かないと最後の「そのほか」に入る
 - 本文：h2 に id を書く（3つ以上で目次ができる）。<!--tool:名前-->・<!--fig:名前-->・<!--shelf:棚のid--> を置いた所に、道具・図・楽天の棚が入る。ひな形は近い記事をまねる（数を入れて答えを出す道具は kyuukei・penlight、チェックの地図は gotouchi-snoopy、大きさが入るかは switch2-case・game-katazuke）
 - 計算の道具：1本に1つ以上。ブラウザの中だけで計算し、どこにも送らず何も残さない（テストが見張る。残してよいのは gotouchi-snoopy のチェックだけ）。範囲の外・空・整数でない数字では計算せず、直してほしいことを1行で出す。答えはめやすと書き、式の出どころ（メーカーの解説など）を本文に書く

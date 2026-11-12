@@ -779,9 +779,14 @@ function pageKind(path) {
   return 'page';
 }
 // intro：パソコン（幅1100px以上）で上の部分だけ2列にするとき。side（右に置く顔の絵）がないときは rest を h1 の下に1列で出す
-function page({ path, title, description, h1, lead = '', body, tab = '', corner = '', crumbs = [], lastmod = '', extraLd = [], noindex = false, deco = '', decoParts = [], mainClass = '', ads = true, count = null, ogImage = '', extraCss = '', extraJs = '', intro = null }) {
+function page({ path, title, description, h1, lead = '', body, tab = '', corner = '', crumbs = [], lastmod = '', extraLd = [], noindex = false, deco = '', decoParts = [], mainClass = '', ads = true, count = null, ogImage = '', extraCss = '', extraJs = '', intro = null, tsugi = null }) {
   if (count !== null && !noindex && !indexable(path, count)) noindex = 'follow';
   const url = `${SITE}${path}`;
+  // つぎに見る（tsugiNav）：本文の <!--tsugi--> の所か、なければ本文のいちばん最後（時点の価格の行より上）。中身は書き出しの前にまとめて入れる
+  // 作品の一覧（ご当地の一覧はのぞく）は 'list'（このページの商品の名前から行を作る）。ほかのページは行の配列を渡す
+  const kind = pageKind(path);
+  if (tsugi === null && kind === 'list' && path.split('/')[2] !== 'gotouchi') tsugi = 'list';
+  const bodyT = tsugi && !body.includes('<!--tsugi-->') ? `${body}<!--tsugi-->` : body;
   const link = (t) => `<a href="${t.href}"${t.key === tab ? ' aria-current="page"' : ''}>${esc(t.label)}</a>`;
   // しくみ（トップ・探す）は右上の札、作品（キャラ）は手帳のインデックスのタブ
   const fn = [
@@ -830,7 +835,7 @@ ${calChars.some((c) => c.corner === (cn || 'chara')) ? `<p class="fl">発売日�
 ${gotouchiWorks.length || seasonPages.length ? `<p class="fl">特集　${[...(gotouchiWorks.length ? ['<a href="/gotouchi/">ご当地グッズ</a>'] : []), ...seasonPages.map(({ s }) => `<a href="/${s.slug}/">${esc(s.name)}</a>`)].join('／')}</p>` : ''}
 <p>${yomiArticles.length ? '<a href="/yomimono/">推し活の読みもの</a>／' : ''}<a href="/koushiki/">公式の最新情報</a>／<a href="/calendar/">推し活カレンダー</a>／${oshiPages.length ? '<a href="/bingo/">推しの入荷ビンゴ</a>／' : ''}${birthdays.length ? '<a href="/tanjoubi/">推しキャラの誕生日</a>／' : ''}<a href="/about/">このサイトについて</a>／${settings.contact ? '<a href="/contact/">お問い合わせ</a>／' : ''}<a href="/terms/">利用規約</a>／<a href="/privacy/">プライバシーポリシー</a></p>`;
   const html = `<!doctype html>
-<html lang="ja" data-pg="${pageKind(path)}">
+<html lang="ja" data-pg="${kind}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -870,7 +875,7 @@ ${cornerNav}
 ${intro?.side ? '<div class="gtop"><div class="gtop-a">' : ''}${crumbHtml}
 ${deco ? `<div class="h1w"><h1 class="tape">${esc(h1)}</h1><span class="stk stk-2" aria-hidden="true"></span></div><span class="stk stk-1" aria-hidden="true"></span><span class="stk stk-3" aria-hidden="true"></span>` : `<h1 class="tape">${esc(h1)}</h1>`}
 ${lead ? `<p class="lead">${esc(lead)}</p>` : ''}${intro?.side ? `</div>${intro.side}<div class="gtop-b">${intro.rest}</div></div>` : (intro?.rest ?? '')}
-${body.replaceAll('<!--asof-->', '').replaceAll('<!--asof-books-->', '')}${body.includes('<!--asof-->') ? `<p class="asof end">${jstMonthDayTime(meta.fetchedAt)} 時点の価格</p>` : ''}${body.includes('<!--asof-books-->') ? `<p class="asof end">${jstMonthDayTime(books.fetchedAt)} 時点の情報</p>` : ''}
+${bodyT.replaceAll('<!--asof-->', '').replaceAll('<!--asof-books-->', '')}${body.includes('<!--asof-->') ? `<p class="asof end">${jstMonthDayTime(meta.fetchedAt)} 時点の価格</p>` : ''}${body.includes('<!--asof-books-->') ? `<p class="asof end">${jstMonthDayTime(books.fetchedAt)} 時点の情報</p>` : ''}
 </main>
 <footer class="ft wrap">
 <nav class="stoc" aria-label="サイトの目次">${tocHtml}</nav>
@@ -887,7 +892,7 @@ ${extraJs}${body.includes(' data-stick') ? STICK_JS : ''}${ads ? `<script>(funct
 </body>
 </html>
 `;
-  pages.push({ path, html, lastmod, noindex });
+  pages.push({ path, html, lastmod, noindex, h1, tsugi, names: tsugi === 'list' ? [...body.matchAll(/<span class="nm">([^<]*)<\/span>/g)].map((m) => unesc(m[1])) : null });
 }
 
 const fileOf = (path) => (path.endsWith('/') ? `${path.slice(1)}index.html` : path.slice(1));
@@ -1080,7 +1085,11 @@ const yomiLinksFor = (slug, where) =>
 const YOMI_WORKS_MAX = 3;
 {
   const known = new Set(allWorks.map((c) => c.slug));
+  for (const a of yomiArticles) if (a.linkFrom?.work && !known.has(a.linkFrom.work)) throw new Error(`config/yomimono.json：${a.slug} の linkFrom.work に知らない作品 ${a.linkFrom.work}`);
   for (const a of yomiArticles) for (const w of a.works ?? []) if (!known.has(w)) throw new Error(`config/yomimono.json：${a.slug} の works に知らない作品 ${w}`);
+  // cats：カテゴリの slug と季節の slug（つぎに見るで、そのカテゴリ・季節の一覧から記事へつなぐ）
+  const catKnown = new Set([...CATEGORIES.map((k) => k.slug), ...seasons.map((x) => x.slug)]);
+  for (const a of yomiArticles) for (const k of a.cats ?? []) if (!catKnown.has(k)) throw new Error(`config/yomimono.json：${a.slug} の cats に知らないカテゴリ ${k}`);
 }
 const yomiWorksFor = (c) =>
   yomiArticles
@@ -1090,6 +1099,38 @@ const yomiWorksFor = (c) =>
     .slice(0, YOMI_WORKS_MAX)
     .map(({ a }) => `<p class="more"><a href="/yomimono/${a.slug}/">${esc(c.name)}の${esc(a.title)}（読みもの）</a></p>`)
     .join('');
+// つぎに見る（tsugiNav）で使う読みもの：新しい順（同じ日は config/yomimono.json のあとに書いた記事が先）
+// corner のある記事（ゲームの記事）は、そのコーナーの作品のページにだけ出す
+const yomiOrder = yomiArticles
+  .map((a, i) => ({ a, i }))
+  .sort((x, y) => (y.a.published ?? '').localeCompare(x.a.published ?? '') || y.i - x.i)
+  .map((x) => x.a);
+const yomiFor = (pred, c, n = 2) => yomiOrder.filter((a) => (!a.corner || a.corner === c?.corner) && pred(a)).slice(0, n);
+const yomiHasWork = (a, c) => a.works?.includes(c.slug) || a.linkFrom?.work === c.slug;
+const yomiLinks = (list) => list.map((a) => ({ href: `/yomimono/${a.slug}/`, text: a.title }));
+// 商品カードの名前（esc したもの）をもとの文字に（page() が一覧の商品の名前を拾うとき）
+function unesc(s) {
+  return s.replace(/&(amp|lt|gt|quot|#39);/g, (_, k) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" })[k]);
+}
+// 商品の名前から、多いカテゴリの順（2件以上のもの）
+function catRank(names) {
+  const n = new Map();
+  for (const x of names) {
+    const k = categoryOf(x);
+    if (k) n.set(k, (n.get(k) ?? 0) + 1);
+  }
+  return CATEGORIES.map((k) => k.slug)
+    .filter((k) => (n.get(k) ?? 0) >= 2)
+    .sort((a, b) => n.get(b) - n.get(a));
+}
+// 多いカテゴリの順に、そのカテゴリを cats に持つ記事（最初に見つかったカテゴリの記事だけ）
+function yomiByCats(cats, c) {
+  for (const k of cats) {
+    const l = yomiFor((a) => a.cats?.includes(k), c);
+    if (l.length) return l;
+  }
+  return [];
+}
 const yomiData = readJson(process.env.DATA_LATEST ? 'test/fixture-yomimono.json' : 'data/yomimono.json', { fetchedAt: '', items: [] });
 const YOMI_SHELF_MAX = 8;
 const yomiDate = (ymd) => `${Number(ymd.slice(0, 4))}年${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
@@ -1271,6 +1312,8 @@ function chooseNav(c) {
   return links.length ? `<nav class="cats" aria-label="選び方"><h2>選び方</h2><ul>${links.map(([h, t]) => `<li><a href="${h}">${esc(t)}</a></li>`).join('')}</ul></nav>` : '';
 }
 
+// つぎに見るの「同じ作品のコラボ」（棚と同じく4件から）
+const collabRow = (c) => ({ why: '同じ作品のコラボ', links: collabFor(c.slug).length >= COLLAB_MIN ? [{ href: `/collab/#${c.slug}`, text: `${c.name}のコラボグッズ` }] : [] });
 // 作品のトップの「<作品名>のコラボグッズ」の棚（4件より少ない作品には出さない）
 function collabShelf(c) {
   const list = collabFor(c.slug);
@@ -1467,12 +1510,17 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
         .map((x) => `<p class="more"><a href="${subPath(x)}">ご当地${esc(x.sub.name)}一覧</a></p>`)
         .join('') +
       (bd ? `<p class="more"><a href="/tanjoubi/">${esc(o.name)}の誕生日は${mdLabel(o.birthday)}</a></p>` : '') +
-      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p></div>` +
+      `<p class="more"><a href="/${c.slug}/">${esc(c.name)}のグッズの新着へ</a></p><!--tsugi--></div>` +
       `<div class="side" data-stick>${bingoHtml(c, o, label, list.slice(0, settings.listItems))}</div></div>`,
     deco: bd && bd.days <= BIRTHDAY_DECO ? 'birthday' : '',
     lastmod: newest(list),
     extraCss: BINGO_CSS,
     extraJs: BINGO_JS,
+    tsugi: [
+      collabRow(c),
+      // その推しに当たる商品に多いカテゴリの記事 → なければ作品の記事
+      { why: '読みもの', links: yomiLinks([yomiByCats(catRank(list.map((i) => i.name)), c), yomiFor((a) => yomiHasWork(a, c), c)].find((l) => l.length) ?? []) },
+    ],
   });
 }
 
@@ -2052,6 +2100,10 @@ if (ykGroups.length) {
   const near = shown.filter((e) => e.d.length === 10).map((e) => e.d).sort()[0];
   page({
     path: '/yoyaku/',
+    tsugi: [
+      { why: '推し活カレンダー', links: [{ href: '/calendar/', text: '発売日と予約の締切のカレンダー' }] },
+      { why: 'コラボグッズ', links: [{ href: '/collab/' }] },
+    ],
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推しグッズの予約帳', path: '/yoyaku/' }],
     title: `推しグッズの予約受付中・発売予定（${names.join('・')}発売など）｜予約帳｜${settings.siteName}`,
     description: sentence(
@@ -2343,8 +2395,17 @@ for (const a of yomiArticles) {
     h1: a.title,
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推し活の読みもの', path: '/yomimono/' }, { name: a.title, path }],
     // パソコン（幅1100px以上）は、もくじを右の柱にして本文と2列（見開き）。もくじのない記事は1列のまま
-    body: `<article class="yomi-body${toc ? ' spread' : ''}">${hero}${toc.replace('<nav class="toc"', '<nav class="toc" data-stick')}<div class="yb">${html}${a.sources ? `<p class="more"><a href="${path}shiryou/">この記事を書くときに調べた資料</a></p>` : ''}<p class="yomi-date">${dates}。商品の棚は楽天市場から1日2回集めています</p></div></article>${shelves ? '<!--asof-->' : ''}`,
+    body: `<article class="yomi-body${toc ? ' spread' : ''}">${hero}${toc.replace('<nav class="toc"', '<nav class="toc" data-stick')}<div class="yb">${html}${a.sources ? `<p class="more"><a href="${path}shiryou/">この記事を書くときに調べた資料</a></p>` : ''}<p class="yomi-date">${dates}。商品の棚は楽天市場から1日2回集めています</p><!--tsugi--></div></article>${shelves ? '<!--asof-->' : ''}`,
     ads: true,
+    tsugi: [
+      { why: '同じテーマの読みもの', links: a.theme ? yomiLinks(yomiOrder.filter((x) => x !== a && x.theme === a.theme && (!x.corner || x.corner === a.corner)).slice(0, 2)) : [] },
+      {
+        why: 'この記事に出てくる作品',
+        links: [...new Set([...(a.works ?? []), a.linkFrom?.work].filter(Boolean))]
+          .map((w) => allWorks.find((x) => x.slug === w))
+          .map((w) => ({ href: `/${w.slug}/`, text: `${w.name}のグッズの新着` })),
+      },
+    ],
     lastmod: a.updated || a.published,
     ogImage: `/yomimono/img/${a.hero}-og.jpg?v=${createHash('sha256').update(readFileSync(`src/yomimono/img/${a.hero}-og.jpg`)).digest('hex').slice(0, 8)}`,
     extraLd: [
@@ -2588,6 +2649,67 @@ page({
   body: '<p class="text"><a href="/">トップへ</a></p>',
 });
 
+// ---- つぎに見る（行き止まりのページの終わりに、次の道。docs/shikumi.md の「つぎに見る」） ----
+// 理由（小さいうす字）と行き先（ペンの点線の下線の文字）を1行ずつ。4行まで・1行にリンク3つまで。
+// リンクは、できたページだけ・自分のページは外す。行き先の文がないリンクは、そのページの h1
+const TSUGI_ROWS = 4;
+const TSUGI_LINKS = 3;
+const pageByPath = new Map(pages.map((p) => [p.path, p]));
+function tsugiNav(rows) {
+  if (!rows.length) return '';
+  return `<nav class="tsugi2" aria-label="つぎに見る"><h2>つぎに見る</h2><ul>${rows
+    .map((r) => `<li><span>${esc(r.why)}</span>${r.links.map((l) => `<a href="${esc(l.href)}">${esc(l.text)}</a>`).join('　')}</li>`)
+    .join('')}</ul></nav>`;
+}
+// 作品の一覧（カテゴリ・新着・季節など）の行：多い推しキャラ → コラボ → ほかの推しキャラ（いなければ予約受付中）→ 読みもの
+function listTsugi(p) {
+  const [slug, sub] = p.path.split('/').filter(Boolean);
+  const c = chars.find((x) => x.slug === slug);
+  const names = p.names;
+  const cands = oshiPages
+    .filter((x) => x.c === c)
+    .map((x, i) => {
+      const hit = oshiMatcher(x.o);
+      return { o: x.o, i, n: names.filter((nm) => hit(nm)).length };
+    })
+    .sort((a, b) => b.n - a.n || a.i - b.i);
+  const top = cands[0]?.n >= 2 ? cands[0] : null;
+  const oshiLink = (x) => ({ href: `/${c.slug}/${x.o.slug}/`, text: `${x.o.name}のグッズ` });
+  const rows = [];
+  if (top) rows.push({ why: 'このページに多い推しキャラ', links: [oshiLink(top)] });
+  rows.push(collabRow(c));
+  if (cands.length) rows.push({ why: '同じ作品のほかの推しキャラ', links: cands.filter((x) => x !== top).map(oshiLink) });
+  else rows.push({ why: '発売前のもの', links: [{ href: `/${c.slug}/yoyaku/`, text: `${c.name}の予約受付中` }] });
+  const isCat = CATEGORIES.some((k) => k.slug === sub);
+  const isSeason = seasons.some((x) => x.slug === sub);
+  let yomi = isCat || isSeason ? yomiFor((a) => a.cats?.includes(sub), c) : yomiFor((a) => yomiHasWork(a, c), c);
+  if (!yomi.length) yomi = yomiByCats(catRank(names), c);
+  rows.push({ why: '読みもの', links: yomiLinks(yomi) });
+  return rows;
+}
+const tsugiCount = { list: 0, listNone: 0, oshi: 0, yomi: 0 };
+for (const p of pages) {
+  if (!p.tsugi) continue;
+  const rows = (p.tsugi === 'list' ? listTsugi(p) : p.tsugi)
+    .map((r) => ({
+      why: r.why,
+      links: r.links
+        .filter((l) => {
+          const to = pageByPath.get(l.href.split('#')[0]);
+          return to && to.path !== p.path;
+        })
+        .map((l) => ({ href: l.href, text: l.text ?? pageByPath.get(l.href.split('#')[0]).h1 }))
+        .slice(0, TSUGI_LINKS),
+    }))
+    .filter((r) => r.links.length)
+    .slice(0, TSUGI_ROWS);
+  p.html = p.html.replace('<!--tsugi-->', () => tsugiNav(rows));
+  const kind = pageKind(p.path);
+  if (p.tsugi === 'list') tsugiCount[rows.length ? 'list' : 'listNone']++;
+  else if (kind === 'oshi' && rows.length) tsugiCount.oshi++;
+  else if (kind === 'yomi' && rows.length) tsugiCount.yomi++;
+}
+
 // ---- 書き出し ----
 const files = new Map(pages.map((p) => [fileOf(p.path), p.html]));
 
@@ -2665,6 +2787,7 @@ const perkText = `送料込み ${buyable.filter((i) => i.postage === 0).length}�
 console.log(perkText);
 console.log(`予約帳：推しキャラに当たった予約 ${ykEntries.filter((e) => e.op.length).length}件・棚が出た推し ${ykShelfShown.size}人（${[...ykShelfShown].join('・') || 'なし'}）・/yoyaku/ ${ykGroups.length ? ykGroups.map((x) => `${x.name}${x.items.length}`).join('・') : '作らない'}`);
 // コラボ：作品ごとの数と、はじめの3件の商品名（まざりものを見つけるため。非公開の notes/update.log にだけ入る。::notice にはしない）
+console.log(`つぎに見る：一覧${tsugiCount.list + tsugiCount.listNone}ページ（行なし${tsugiCount.listNone}）・推しキャラ${tsugiCount.oshi}・読みもの${tsugiCount.yomi}`);
 console.log(`コラボ：${collabWorks.map((c) => `${c.name}${collabFor(c.slug).length}`).join('・') || 'なし'}`);
 for (const c of collabWorks) for (const it of collabFor(c.slug).slice(0, 3)) console.log(`コラボ ${c.name}：${it.name}`);
 if (process.env.GITHUB_ACTIONS) console.log(`::notice title=送料込み・ラッピング対応・予約::${perkText}`);
