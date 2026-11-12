@@ -130,5 +130,10 @@ for (const file of Object.keys(M.WATCH)) {
   ok(listed.includes(name), `見張り：${file}（${name}）が mihari.yml の workflows: にある`);
 }
 
+// 3時間ごとにも見る（merge-ok が GITHUB_TOKEN で動かした更新は、終わっても workflow_run が来ないため。2026-11-13）
+const wf = readFileSync('.github/workflows/mihari.yml', 'utf8');
+ok(/^\s*schedule:\s*\n\s*- cron: '37 \*\/3 \* \* \*'/m.test(wf), '見張り：3時間ごとにも見る（schedule）');
+ok(readFileSync('scripts/mihari.mjs', 'utf8').includes("process.env.GITHUB_EVENT_NAME === 'workflow_run'"), '見張り：schedule のときは、手で動かしたときと同じくいちばん新しい実行を見る');
+
 console.log(failed ? `\n見張り：${failed}件のNG` : '\n見張り：すべてOK');
 process.exit(failed ? 1 : 0);
