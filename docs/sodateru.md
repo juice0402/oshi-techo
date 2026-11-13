@@ -123,7 +123,7 @@
 - マージ：する
 - 足した：育てる山の補充（自動・2026-11-10）
 
-### [ ] 読みものと入荷ビンゴのまとめの更新のお知らせ（RSS）
+### [x] 読みものと入荷ビンゴのまとめの更新のお知らせ（RSS）（#98）
 - やること：
   1. build.mjs で /feed.xml（Atom 1.0）を作る。中身は、読みもの（config/yomimono.json の題・説明文・published か updated の日・/yomimono/<記事>/）と、入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/ のうち検索に出すもの。題・説明文・その月の次の月の1日）を、新しい順に20件まで
   2. 全ページの head に `<link rel="alternate" type="application/atom+xml" title="<サイト名>の更新" href="/feed.xml">`。/yomimono/ と /bingo/ のいちばん下に「更新のお知らせ（RSS）」の1行
