@@ -109,7 +109,7 @@
 - 順番：いちばん先。ほかの山（発売日カレンダーの「発売のメモ」など）より前に取る。その PR がマージ待ちのときに同じ build.mjs をさわる山を取るなら、そのブランチの上に積む
 - マージ：する
 
-### [ ] ご当地一覧に「持ってる」のチェック（集めた県が端末に残る）
+### [x] ご当地一覧に「持ってる」のチェック（集めた県が端末に残る）（#95）
 - やること：
   1. ご当地の一覧（build.mjs の gotouchiListPage。作品ごとの /<作品>/gotouchi/ とご当地キティ /sanrio/gotouchi/kitty/）の都道府県の見出し（section.gp の h3）の横に「持ってる」のチェックを置く。形はしぼりこみの手帳のチェック欄と同じ（aria-pressed。もう一度押すと外れる）
   2. 押すと、見ている端末の localStorage に県の id（見出しの id から「p-」を取ったローマ字）だけを残す。ご当地スヌーピーの一覧 /snoopy/gotouchi/ は、読みものの道具（src/yomimono/tools/gotouchi-snoopy-check.html）と同じ ot-gotouchi-snoopy に、同じ形（県の id をカンマでつないだもの）で残し、一覧と道具のどちらでチェックしても両方に出るようにする。ほかの一覧は ot-gotouchi-<作品>（キティは ot-gotouchi-kitty）

@@ -749,6 +749,19 @@ if (process.env.DATA_LATEST) {
     const jumpIds = [...jump.matchAll(/href="#(p-[a-z]+)"/g)].map((m) => m[1]);
     ok(jumpIds.length === heads.length && jumpIds.every((id, i) => id === heads[i]) && ys.indexOf('class="gtr gs-to"') < ys.indexOf('class="fit-out"'), 'チェックの道具：売り場を書いた県の名前から、記事の県の見出しへ飛べる');
     ok(readFileSync('dist/privacy/index.html', 'utf8').includes('集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します'), '読みもの：プライバシーポリシーに、チェックをブラウザの中だけに残すことを書く');
+    // ご当地の一覧の「持ってる」のチェック（#95）：県の見出しごとに1つ（JS が動くまでかくす）。県の id だけを端末の ot-gotouchi-<作品> に残し、スヌーピーは読みものの道具と同じ名前
+    const gjs = readFileSync('src/gotouchi.js', 'utf8');
+    const gpk = (h) => [...h.matchAll(/<section class="gp" id="p-([a-z]+)"><h3>[^<]+<\/h3>(?:<p class="more">.*?<\/p>)?<button type="button" class="gpk" data-p="([a-z]+)" aria-pressed="false" hidden>持ってる<\/button>/g)];
+    const gpn = (h) => (h.match(/<section class="gp" /g) ?? []).length;
+    const sg2 = readFileSync('dist/sanrio/gotouchi/kitty/index.html', 'utf8');
+    const ch2 = readFileSync('dist/chiikawa/gotouchi/index.html', 'utf8');
+    ok(
+      [sn, sg2, ch2].every((h) => gpn(h) > 0 && gpk(h).length === gpn(h) && gpk(h).every((m) => m[1] === m[2]) && h.includes('src/gotouchi.js') === false && h.includes("querySelector('[data-gk]')")) &&
+        sn.includes('data-gk="ot-gotouchi-snoopy"') && sg2.includes('data-gk="ot-gotouchi-kitty"') && ch2.includes('data-gk="ot-gotouchi-chiikawa"') && !readFileSync('dist/gotouchi/index.html', 'utf8').includes('class="gpk"'),
+      'ご当地の一覧：県の見出しごとに「持ってる」のチェック（作品ごとの名前で残す。スヌーピーは読みものの道具と同じ。ご当地のまとめには置かない）',
+    );
+    ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(gjs) && (gjs.match(/setItem\(/g) ?? []).length === 2 && gjs.includes("S.setItem(KEY, a.join(','))") && gjs.includes("S.setItem('ot-t', '1')") && /if \(\/\^\[a-z\]\+\$\/\.test\(p\)\) got\[p\] = 1/.test(gjs) && gjs.includes("b.getAttribute('data-p')"), 'ご当地の一覧のチェック：どこにも送らず、残すのは県の id だけ（商品の番号・名前・URL を残さない）');
+    ok(readFileSync('dist/privacy/index.html', 'utf8').includes('ご当地グッズの一覧の「持ってる」のチェックも同じ'), 'ご当地の一覧のチェック：プライバシーポリシーに1文');
   }
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
   // 誕生日
