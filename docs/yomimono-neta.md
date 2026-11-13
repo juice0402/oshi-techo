@@ -47,7 +47,7 @@
 書いたら「- [x] 題（PR #◯・日付）」。行の形：題［テーマ］— だれの何に答えるか・道具／資料
 - [x] 推し活手帳の作り方（2027年の手帳）（PR #66・2026-11-06）
 - [x] 冬のライブ・イベントの寒さ対策（PR #73・2026-11-09）
-- [x] ライブ遠征の予算と荷物の大きさ（PR #PRNUM・2026-11-13）
+- [x] ライブ遠征の予算と荷物の大きさ（PR #97・2026-11-13）
 - [ ] モバイルバッテリーの選び方［dekakeru］— ライブやイベントの日にスマホの電池が足りるか。道具：バッテリーの容量（mAh）とスマホの電池の容量から、充電できる回数のめやすと Wh／資料：https://www.mlit.go.jp/report/press/kouku10_hh_000310.html（2026年4月24日からの機内の決まり。持ちこみ2個まで・160Wh以下・機内で充電しない）・https://www.mlit.go.jp/report/press/content/001984061.pdf（Wh の式 mAh×V÷1,000）・https://www.nite.go.jp/jiko/chuikanki/press/2026fy/prs260715.html（事故の注意）・https://www.elecom.co.jp/pickup/mobile_battery/（充電回数は容量の約6割の考え方）・https://www.ankerjapan.com/blogs/magazine/how-to-choose-battery（電圧の変換で減る）
 - [ ] ランダムグッズ・くじ・受注生産の言葉［atsumeru］— 「ランダム」「ブラインド」「くじ」「受注生産」「二次受注」の買い方のちがい。道具：全何種のランダムを何個買うと、推しが1つは出る見こみ（1−(1−1/種類)^個数。どれも同じ数だけ入っているとしたときのめやす）／資料：https://1kuji.com/guide（一番くじの公式の説明。ラストワン賞・ダブルチャンス）・https://www.caa.go.jp/policies/policy/representation/fair_labeling/premium_regulation/（景品の決まり）・https://shop.hololivepro.com/products/sakuramiko_2ndlive_bloomingparade_madetoorder（受注生産の公式の案内の例。期間のあとに順に発送・確定後はキャンセルできない）。「必ず出る」と書かない
 - [ ] ガチャ（カプセルトイ）のそろえ方［atsumeru］— 推しのガチャを全種そろえたい人に。道具：全何種かから、全種そろうまでに回す回数のめやす（種類×(1+1/2+…+1/種類)。どれも同じ数だけ入っているとしたとき）と、そのときの金額／資料：https://gashapon.jp/（バンダイのガシャポン公式。値段の幅・売り場の探し方）・https://www.bandai.co.jp/press/2026/261008.php（市場の大きさと毎月の数。ページの中で海外の年が食いちがうので、その所は使わない）。棚：カプセルトイを飾るケース・ミニフィギュアのケース
