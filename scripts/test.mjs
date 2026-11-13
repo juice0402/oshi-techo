@@ -159,6 +159,31 @@ const walk = (dir) => {
 walk('dist');
 const html = files.filter((f) => f.endsWith('.html'));
 
+// 更新のお知らせ（/feed.xml。Atom 1.0）：XML として読めるか（タグの組・& の書き方）と、entry ごとの中身
+const feedCheck = (xml) => {
+  const body = xml.replace(/^<\?xml[^>]*\?>\s*/, '');
+  const stack = [];
+  let good = /^<feed xmlns="http:\/\/www\.w3\.org\/2005\/Atom"/.test(body) && !/&(?!(amp|lt|gt|quot|apos|#\d+);)/.test(body);
+  for (const m of body.matchAll(/<(\/?)([a-zA-Z][\w:.-]*)((?:\s+[\w:.-]+="[^"<]*")*)\s*(\/?)>|</g)) {
+    if (!m[2]) good = false;
+    else if (m[4]) continue;
+    else if (m[1]) good = good && stack.pop() === m[2];
+    else stack.push(m[2]);
+  }
+  good = good && stack.length === 0;
+  const entries = [...body.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) => m[1]);
+  const head = body.split('<entry>')[0];
+  const has = (t, tag) => new RegExp(`<${tag}>[^<]+</${tag}>`).test(t);
+  return {
+    good,
+    head: has(head, 'id') && has(head, 'title') && /<updated>\d{4}-\d\d-\d\dT00:00:00\+09:00<\/updated>/.test(head),
+    entries,
+    full: entries.every((e) => has(e, 'id') && has(e, 'title') && has(e, 'summary') && /<link rel="alternate" type="text\/html" href="https:\/\/[^"]+\/"\/>/.test(e) && /<updated>\d{4}-\d\d-\d\dT00:00:00\+09:00<\/updated>/.test(e)),
+    paths: entries.map((e) => e.match(/<id>https?:\/\/[^/<]+(\/[^<]*)<\/id>/)?.[1] ?? ''),
+    dates: entries.map((e) => e.match(/<updated>([^<]+)<\/updated>/)?.[1] ?? ''),
+  };
+};
+
 // コーナー（config/corners/）：作品の置き場所・URL・見た目のファイル・関数の読みこみ
 {
   const cornerFiles = readdirSync('config/corners').filter((f) => f.endsWith('.json'));
@@ -336,6 +361,22 @@ for (const c of noItemWorks) {
   if (process.env.DATA_LATEST) ok(newsZero.some((c) => c.slug === 'lovelive') && noItemWorks.some((c) => c.slug === 'miku'), '見本：新着が0件の作品（ラブライブ！）と、買える商品がない作品（初音ミク）がある');
   if (process.env.DATA_LATEST) ok(existsSync('dist/lovelive/oshougatsu/index.html') && !existsSync('dist/miku/oshougatsu/index.html'), '見本：新着が0件の作品にも季節の特集の期間外のページ。商品がない作品には作らない');
   const sm = readFileSync('dist/sitemap.xml', 'utf8');
+  // 更新のお知らせ（/feed.xml）
+  {
+    const xml = existsSync('dist/feed.xml') ? readFileSync('dist/feed.xml', 'utf8') : '';
+    const f = feedCheck(xml);
+    ok(xml && f.good && f.head && f.entries.length > 0 && f.full, '更新のお知らせ：/feed.xml が XML として読めて、feed の id・updated と、entry ごとの title・link・updated・summary がある');
+    ok(f.entries.length <= 20, `更新のお知らせ：件数が20をこえない（${f.entries.length}件）`);
+    ok(f.dates.every((d, i) => i === 0 || f.dates[i - 1] >= d) && xml.includes(`<updated>${f.dates[0]}</updated>\n<author>`), '更新のお知らせ：新しい順で、feed の updated はいちばん新しい entry の日');
+    ok(f.paths.every((x) => /^\/yomimono\/[a-z0-9-]+\/$/.test(x) || /^\/bingo\/\d{4}-\d\d\/$/.test(x)) && f.paths.some((x) => x.startsWith('/yomimono/')), '更新のお知らせ：読みものと先月のまとめだけ（商品のページは入れない）');
+    ok(f.paths.every((x) => sm.includes(`${x}</loc>`)) && !sm.includes('feed.xml'), '更新のお知らせ：noindex のページ（まとめの月など）を入れない・サイトマップに feed.xml は入れない');
+    const names = buyableAll.map((i) => String(i.name ?? '').slice(0, 16)).filter((n) => n.length >= 8);
+    ok(xml && !/rakuten|円|thumbnail|<img|\.jpg|\.webp|\.png/i.test(xml) && !names.some((n) => xml.includes(esc(n)) || xml.includes(n)), '更新のお知らせ：楽天のデータ（商品名・値段・楽天の URL・画像の URL）がない');
+    const noLink = html.filter((x) => !readFileSync(x, 'utf8').includes(`<link rel="alternate" type="application/atom+xml" title="${esc(settings.siteName)}の更新" href="/feed.xml">`));
+    ok(!noLink.length, `更新のお知らせ：全ページの head に /feed.xml の link がある${noLink.length ? `（${noLink.slice(0, 3).join('、')}）` : ''}`);
+    const line = '<p class="more"><a href="/feed.xml">更新のお知らせ（RSS）</a></p>';
+    ok(['dist/yomimono/index.html', 'dist/bingo/index.html'].every((x) => !existsSync(x) || readFileSync(x, 'utf8').includes(line)), '更新のお知らせ：/yomimono/ と /bingo/ のいちばん下に1行');
+  }
   for (const c of newsZero) {
     const p = `dist/${c.slug}/new/index.html`;
     if (!existsSync(p)) continue;
@@ -632,6 +673,8 @@ if (process.env.DATA_LATEST) {
       ok(!existsSync(join(out, 'bingo/2026-11/index.html')), '先月のまとめ：今の月のページは作らない');
       const old = rd('bingo/2025-08/index.html');
       ok(old && (process.env.SITE_MODE !== 'production' || /<meta name="robots" content="noindex,follow">/.test(old)) && !sm11.includes('/bingo/2025-08/'), '先月のまとめ：記録から消えた月もまとめから作り、印のある推しが10人より少ない月は noindex,follow でサイトマップから外す');
+      const f11 = feedCheck(rd('feed.xml'));
+      ok(f11.good && f11.paths.includes('/bingo/2026-10/') && f11.dates[f11.paths.indexOf('/bingo/2026-10/')] === '2026-11-01T00:00:00+09:00' && !f11.paths.includes('/bingo/2025-08/'), '更新のお知らせ：検索に出す先月のまとめ（次の月の1日）は入れ、noindex のまとめの月（印のある推しが10人より少ない）は入れない');
       const bp11 = rd('bingo/index.html');
       ok(/<section class="memo"><h2>前の月のまとめ<\/h2><ul><li><a href="\/bingo\/2026-10\/">2026年10月の入荷ビンゴのまとめ<\/a><\/li><li><a href="\/bingo\/2026-09\/">/.test(bp11), '先月のまとめ：/bingo/ の下のほうに前の月のまとめ（新しい月から）');
     }

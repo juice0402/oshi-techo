@@ -869,6 +869,7 @@ ${verify}
 <link rel="icon" href="/icon-192.png?v=${ICON_V}" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=${ICON_V}">
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="alternate" type="application/atom+xml" title="${esc(settings.siteName)}の更新" href="/feed.xml">
 ${ld.length ? `<script type="application/ld+json">${JSON.stringify(ld.length === 1 ? ld[0] : ld).replace(/</g, '\\u003c')}</script>` : ''}
 <style>${css}${decoCss([...new Set([deco, ...decoParts].filter(Boolean))], decoStyle)}${extraCss}</style>
 </head>
@@ -1082,6 +1083,9 @@ function oshiFolded(list) {
 // ---- 読みもの（/yomimono/）：調べて書いた記事。図と、記事に合う楽天市場の棚（config/yomimono.json・src/yomimono/） ----
 // 本文は src/yomimono/<記事>.html。<!--fig:名前--> は src/yomimono/fig/、<!--tool:名前--> は src/yomimono/tools/、<!--shelf:棚--> は楽天市場の棚に置きかえる
 const yomiArticles = readJson('config/yomimono.json', []);
+// 更新のお知らせ（/feed.xml）の件数と、/yomimono/・/bingo/ のいちばん下の1行
+const FEED_MAX = 20;
+const FEED_LINE = '<p class="more"><a href="/feed.xml">更新のお知らせ（RSS）</a></p>';
 // 作品のページから読みものへの1行（記事の linkFrom：work の作品の gotouchi（ご当地の一覧の目次の上）・kaikata（買い方メモ）・top（作品のトップの入荷メモの下））
 const yomiLinksFor = (slug, where) =>
   yomiArticles
@@ -1580,7 +1584,8 @@ if (oshiPages.length) {
       '<div class="bg-list" id="bgmy" hidden></div>' +
       `<div class="bg-pick">${pick ? `<div class="bg-list">${pick}</div>` : ''}<p class="bg-hint">推しキャラのページで「わたしの推し」を選ぶと、ここに並びます</p></div>` +
       `<script type="application/json" id="bgcfg">${JSON.stringify(cfg).replace(/</g, '\\u003c')}</script>` +
-      (bingoPast.length ? `<section class="memo"><h2>前の月のまとめ</h2><ul>${bingoPast.map((ym) => `<li><a href="/bingo/${ym}/">${ymLabel(ym)}の入荷ビンゴのまとめ</a></li>`).join('')}</ul></section>` : ''),
+      (bingoPast.length ? `<section class="memo"><h2>前の月のまとめ</h2><ul>${bingoPast.map((ym) => `<li><a href="/bingo/${ym}/">${ymLabel(ym)}の入荷ビンゴのまとめ</a></li>`).join('')}</ul></section>` : '') +
+      FEED_LINE,
     lastmod: today,
     extraCss: BINGO_CSS,
     extraJs: BINGO_JS + BINGO_PAGE_JS,
@@ -1590,6 +1595,8 @@ if (oshiPages.length) {
 // ---- 入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/。docs/shikumi.md の「入荷ビンゴ」） ----
 // 記録の推し・種類・日付だけで作る（楽天の商品の情報・商品の件数は出さない）。印のある推しが10人より少ない月は検索に出さない。今の月は作らない
 const BINGO_SUM_MIN = 10;
+// 更新のお知らせ（/feed.xml）に入れるもの：読みものと、検索に出す先月のまとめだけ（楽天の商品の情報は入れない）
+const feedEntries = [];
 const BINGO_SUM_TOP = 10;
 function bingoSummaryPage(ym) {
   const s = bingoSummary.months[ym];
@@ -1635,6 +1642,8 @@ function bingoSummaryPage(ym) {
   // 全角120字に収まるまで、うしろの文から外す
   while (desc.length > 2 && [...sentence(...desc)].length > 120) desc.pop();
   const description = sentence(...desc);
+  const noindex = all.length < BINGO_SUM_MIN ? 'follow' : false;
+  if (!noindex) feedEntries.push({ path: `/bingo/${ym}/`, title: `${ymLabel(ym)}の入荷ビンゴのまとめ`, summary: description, date: nextMonthDay(ym) });
   page({
     path: `/bingo/${ym}/`,
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推しの入荷ビンゴ（今月）', path: '/bingo/' }, { name: `${ymLabel(ym)}のまとめ`, path: `/bingo/${ym}/` }],
@@ -1643,7 +1652,7 @@ function bingoSummaryPage(ym) {
     h1: `${ymLabel(ym)}の入荷ビンゴのまとめ`,
     body,
     lastmod: nextMonthDay(ym),
-    noindex: all.length < BINGO_SUM_MIN ? 'follow' : false,
+    noindex,
   });
 }
 for (const ym of bingoPast) bingoSummaryPage(ym);
@@ -2403,6 +2412,7 @@ page({
 // ---- 読みもののページ ----
 for (const a of yomiArticles) {
   const path = `/yomimono/${a.slug}/`;
+  feedEntries.push({ path, title: a.title, summary: a.description, date: a.updated || a.published });
   const { html, toc, shelves } = yomiBody(a);
   const hero = `<p class="yomi-hero"><img src="/yomimono/img/${a.hero}.webp" width="1200" height="600" alt="${esc(a.heroAlt)}" decoding="async" fetchpriority="high"></p>`;
   const dates = a.updated && a.updated !== a.published ? `${yomiDate(a.published)}に書いて、${yomiDate(a.updated)}に見なおしました` : `${yomiDate(a.published)}に書きました`;
@@ -2463,7 +2473,7 @@ if (yomiArticles.length) {
     description: sentence(`推し活の道具の選び方や作り方を、図でまとめた読みものです`, `いまあるのは${joinTo(yomiArticles.slice(0, 3).map((a) => `「${a.title}」`))}${yomiArticles.length > 3 ? 'など' : ''}です`, '記事に合う商品は楽天市場から1日2回集めています'),
     h1: '推し活の読みもの',
     crumbs: [{ name: 'トップ', path: '/' }, { name: '推し活の読みもの', path: '/yomimono/' }],
-    body: yomiByTheme(),
+    body: yomiByTheme() + FEED_LINE,
     lastmod: yomiArticles.map((a) => a.updated || a.published).sort().at(-1),
   });
 }
@@ -2738,6 +2748,17 @@ files.set(
     .map((p) => `<url><loc>${esc(`${SITE}${p.path}`)}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`)
     .join('\n')}\n</urlset>\n`,
 );
+// 更新のお知らせ（Atom 1.0）：読みものと先月のまとめを新しい順に20件まで。中身は題と説明文だけ（本文・商品は入れない）。サイトマップには入れない
+{
+  const feedTime = (d) => `${d}T00:00:00+09:00`;
+  const list = [...feedEntries].sort((a, b) => b.date.localeCompare(a.date) || a.path.localeCompare(b.path)).slice(0, FEED_MAX);
+  files.set(
+    'feed.xml',
+    `<?xml version="1.0" encoding="utf-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ja">\n<id>${esc(`${SITE}/`)}</id>\n<title>${esc(settings.siteName)}の更新</title>\n<link rel="self" href="${esc(`${SITE}/feed.xml`)}"/>\n<link rel="alternate" type="text/html" href="${esc(`${SITE}/`)}"/>\n<updated>${feedTime(list[0]?.date ?? today)}</updated>\n<author><name>${esc(settings.siteName)}</name></author>\n${list
+      .map((e) => `<entry>\n<id>${esc(`${SITE}${e.path}`)}</id>\n<title>${esc(e.title)}</title>\n<link rel="alternate" type="text/html" href="${esc(`${SITE}${e.path}`)}"/>\n<updated>${feedTime(e.date)}</updated>\n<summary>${esc(e.summary)}</summary>\n</entry>\n`)
+      .join('')}</feed>\n`,
+  );
+}
 // 検索の結果のページは、検索エンジンに回ってもらわない（楽天を何度も呼ばないため）
 files.set('robots.txt', production ? `User-agent: *\nAllow: /\nDisallow: /search/\n\nSitemap: ${SITE}/sitemap.xml\n` : 'User-agent: *\nDisallow: /\n');
 files.set(
