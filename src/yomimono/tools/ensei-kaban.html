@@ -1,0 +1,34 @@
+<div class="fit" id="ekaban">
+<p class="fit-mm"><label>縦<input type="number" name="ka" inputmode="numeric" min="1" max="200" step="1" value="55">cm</label><label>横<input type="number" name="kb" inputmode="numeric" min="1" max="200" step="1" value="40">cm</label><label>奥行<input type="number" name="kc" inputmode="numeric" min="1" max="200" step="1" value="20">cm</label></p>
+<p class="fit-mm"><label>重さ<input type="number" name="kw" inputmode="decimal" min="0.1" max="50" step="0.1" value="7">kg</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="-1 -1 262 14" role="img" aria-label="カバンの3辺の合計を帯の長さにして、100cm・115cm・160cm・250cmの所に縦の線を引いた"></svg><figcaption>3辺の合計（縦の線は左から100cm・115cm・160cm・250cm）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('ekaban');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+// 空・範囲の外・整数でない数字のときは計算せず、直してほしいことを出す（重さは0.1kgまで）
+var bad='';
+function num(n,lo,hi,t,u,dec){var s=f.querySelector('input[name="'+n+'"]').value.trim(),x=Number(s);if(s!==''&&(dec?Math.abs(x*10-Math.round(x*10))<1e-9:Number.isInteger(x))&&x>=lo&&x<=hi)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+(dec?'の数字（0.1'+u+'まで）':'の整数')+'で入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+// カバンは向きを変えられるので、長い辺から順に、決まりの長い辺とくらべる
+function fits(d,l){return d[0]<=l[0]&&d[1]<=l[1]&&d[2]<=l[2];}
+function run(){bad='';
+var a=num('ka',1,200,'縦','cm'),b=num('kb',1,200,'横','cm'),c=num('kc',1,200,'奥行','cm'),w=num('kw',0.1,50,'重さ','kg',1),svg=f.querySelector('.fit-a');
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+var d=[a,b,c].sort(function(x,y){return y-x;}),s=a+b+c,r=[];
+r.push('3辺の合計は'+s+'cmです。');
+var big=s<=115&&fits(d,[55,40,25]),sm=s<=100&&fits(d,[45,35,20]);
+r.push('飛行機の機内持ち込みは、'+(sm?'100席未満の機体でも大きさの中です。':big?'100席以上の機体なら大きさの中で、100席未満の機体ではこえます。':'大きさをこえます。'));
+if(big||sm)r.push(w<=10?'重さは、身の回り品の分も足して10kgまでかを見てください。':'カバンだけで10kgをこえるので、身の回り品と合わせた10kgに入りません。');
+r.push('JALの普通席で預けるなら、'+(fits(d,[120,60,50])?(w<=20?'大きさも重さも無料の範囲です。':'20kgをこえた分に料金がかかります。'):'50×60×120cmをこえます。'));
+if(s>250||d[0]>200||w>30)r.push('JR西日本の手回り品の決まりをこえます。');
+else r.push(s>160?'JR西日本の手回り品の中ですが、新幹線では特大荷物スペースつき座席の予約が要ります。':'JR西日本の列車にも新幹線にも、予約なしで持ちこめる大きさです。');
+f.querySelector('.fit-ans').textContent=r.join('');
+clear(svg);el(svg,'rect',{x:0,y:2,width:260,height:8,'class':'fit-w'});el(svg,'rect',{x:0,y:2,width:Math.min(s,260),height:8,'class':'fit-c '+(s>250?'fit-p':s>160?'fit-l':'fit-s')});
+[100,115,160,250].forEach(function(x){el(svg,'path',{d:'M'+x+' 0V12','class':'fg-tick'});});}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

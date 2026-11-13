@@ -1,0 +1,40 @@
+{
+  "checked": "2026-11-13",
+  "items": [
+    {
+      "name": "ANA（国内線の機内持ち込み手荷物）",
+      "url": "https://www.ana.co.jp/ja/at/guide/boarding-procedures/baggage/domestic/carry-rule/",
+      "used": "機内持ち込み手荷物1個と身の回り品1個の合計2個まで・合わせて10kgまで。100席以上は3辺の和115cm以内・55×40×25cm以内、100席未満は100cm以内・45×35×20cm以内。身の回り品は40×30×20cm以内。キャスターやハンドルも寸法に入る"
+    },
+    {
+      "name": "JAL（国内線の機内持ち込み手荷物）",
+      "url": "https://www.jal.co.jp/jp/ja/dom/baggage/inflight/index.html",
+      "used": "身の回り品1個とお手荷物1個の合計2個まで（ハンドバッグ・空港で買ったおみやげも数に入る）・合計10kgまで。100席以上は115cm以内・55×40×25cm以内、100席未満（JAIR・JAC・HAC・RAC のE70/E90/DH4/AT4/AT7）は100cm以内・45×35×20cm以内。付属品も寸法に入る。各辺が中でも3辺の合計をこえると持ちこめない"
+    },
+    {
+      "name": "JAL（国内線のお預けの手荷物）",
+      "url": "https://www.jal.co.jp/jp/ja/dom/baggage/checked/index.html",
+      "used": "普通席は1人20kgまで無料（ファーストクラスは45kg）・個数の制限なし・50×60×120cm以内。無料分の重さをこえると超過手荷物料金"
+    },
+    {
+      "name": "ANA（国内線のお預けの手荷物の大きさ）",
+      "url": "https://www.ana.co.jp/ja/jp/domestic/prepare/baggage/checked-in/baggage-size.html",
+      "used": "3辺の和203cm超・1個32kg超・総重量100kg超は電話の窓口に問い合わせ。292cm超・1個45kg超・20個超は預けられない"
+    },
+    {
+      "name": "JR西日本（JRおでかけネット 手回り品）",
+      "url": "https://www.jr-odekake.net/railroad/service/baggage/",
+      "used": "無料の手回り品は3辺の合計250cm以内・長さ2mまで・30kg以内を2個まで（かさ・つえ・ハンドバッグなどは数えない）。新幹線で3辺の合計160cm超250cm以内は特大荷物スペースつき座席の予約（指定席と同じ料金で追加なし）。予約なしは手数料1,000円で乗務員の指定する場所へ。250cm超は持ちこめない"
+    },
+    {
+      "name": "ジェイアールバス関東（旅客営業取扱規程）",
+      "url": "https://www.jrbuskanto.co.jp/wp-content/uploads/eigyokitei1101.pdf",
+      "used": "第109条：携帯品は容積や重さの数字を示さず、トランクルームなどに収納でき、座席や通路をふさがない程度。第110条：有料手回品は1回の乗車ごとに1個、高速線は500円。2025年11月1日施行"
+    },
+    {
+      "name": "WILLER（高速バスの荷物の案内）",
+      "url": "https://travel.willer.co.jp/willer-colle/3440/",
+      "used": "WILLER EXPRESSのトランクは2個まで・1個なら3辺の合計155cm以内・2個なら合計240cm以内。網棚の例は1階建て24×30cm・2階建て17×22×6cm、網棚のない車両もある。2023年8月22日更新"
+    }
+  ]
+}
