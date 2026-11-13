@@ -1,0 +1,50 @@
+<div class="fit" id="eyosan">
+<p class="fit-mm"><label>交通（行きと帰りの合計）<input type="number" name="yk" inputmode="numeric" min="0" max="2000000" step="1">円</label></p>
+<p class="fit-mm"><label>宿（1泊）<input type="number" name="yy" inputmode="numeric" min="0" max="2000000" step="1">円</label></p>
+<fieldset class="pick"><legend>宿の泊数</legend>
+<label><input type="radio" name="yn" value="0"><span>泊まらない</span></label>
+<label><input type="radio" name="yn" value="1" checked><span>1泊</span></label>
+<label><input type="radio" name="yn" value="2"><span>2泊</span></label>
+<label><input type="radio" name="yn" value="3"><span>3泊</span></label>
+</fieldset>
+<p class="fit-mm"><label>チケット（1枚。手数料も入れる）<input type="number" name="yt" inputmode="numeric" min="0" max="2000000" step="1">円</label></p>
+<fieldset class="pick"><legend>チケットの枚数</legend>
+<label><input type="radio" name="ym" value="1" checked><span>1枚</span></label>
+<label><input type="radio" name="ym" value="2"><span>2枚</span></label>
+<label><input type="radio" name="ym" value="3"><span>3枚</span></label>
+<label><input type="radio" name="ym" value="4"><span>4枚</span></label>
+</fieldset>
+<p class="fit-mm"><label>グッズ（上限）<input type="number" name="yg" inputmode="numeric" min="0" max="2000000" step="1">円</label></p>
+<p class="fit-mm"><label>食事とそのほか（1日）<input type="number" name="ys" inputmode="numeric" min="0" max="2000000" step="1">円</label></p>
+<fieldset class="pick"><legend>日数</legend>
+<label><input type="radio" name="yd" value="1"><span>1日</span></label>
+<label><input type="radio" name="yd" value="2" checked><span>2日</span></label>
+<label><input type="radio" name="yd" value="3"><span>3日</span></label>
+<label><input type="radio" name="yd" value="4"><span>4日</span></label>
+</fieldset>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 10" role="img" aria-label="合計の金額を横の帯にして、5つの費用の割合で色を分けた"></svg><figcaption>合計の帯（左から交通・宿・チケット・グッズ・食事とそのほか）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('eyosan');if(!f)return;
+var NS='http://www.w3.org/2000/svg',C=['fit-p','fit-l','fit-s','fit-p','fit-l'];
+function v(n){var e=f.querySelector('input[name="'+n+'"]:checked');return e?+e.value:0;}
+// 空・範囲の外・整数でない金額のときは計算せず、直してほしいことを出す
+var bad='';
+function yen(n,t){var s=f.querySelector('input[name="'+n+'"]').value.trim(),x=Number(s);if(s!==''&&Number.isInteger(x)&&x>=0&&x<=2000000)return x;if(!bad)bad=s===''?t+'の金額を入れてください。かからないときは0です。':t+'は0〜2000000円の整数で入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function c(x){return x.toLocaleString('ja-JP');}
+function run(){bad='';
+var k=yen('yk','交通'),y=yen('yy','宿'),t=yen('yt','チケット'),g=yen('yg','グッズ'),s=yen('ys','食事とそのほか'),n=v('yn'),m=v('ym'),d=v('yd'),svg=f.querySelector('.fit-a');
+if(!bad&&n>=d)bad='泊数は日数より少なくしてください。1泊なら2日からです。';
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 合計 ＝ 交通 ＋ 宿×泊数 ＋ チケット×枚数 ＋ グッズ ＋ 食事とそのほか×日数。1日あたりは合計÷日数を円に丸める
+var p=[k,y*n,t*m,g,s*d],T=p[0]+p[1]+p[2]+p[3]+p[4];
+f.querySelector('.fit-ans').textContent='合計は'+c(T)+'円'+(d>1?'、1日あたり約'+c(Math.round(T/d))+'円':'')+'です。宿は'+c(p[1])+'円、チケットは'+c(p[2])+'円、食事とそのほかは'+c(p[4])+'円で数えています。';
+clear(svg);el(svg,'rect',{x:0,y:0,width:100,height:10,'class':'fit-w'});if(!T)return;
+for(var i=0,x=0;i<5;i++){if(!p[i])continue;var w=p[i]/T*100;el(svg,'rect',{x:x,y:0,width:w,height:10,'class':'fit-c '+C[i]});x+=w;}}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
