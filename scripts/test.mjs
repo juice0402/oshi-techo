@@ -226,6 +226,17 @@ const feedCheck = (xml) => {
     ok(ch.includes('その前の3週間より多い') && ch.includes('売り切れるまでが短め（まんなかで3日ほど）'), '入荷メモ：記録がたまると、入荷の増え方と売り切れまでの日数が出る（見本）');
   }
 }
+// 発売のメモ（発売日カレンダーのいちばん下。#100）：件数を出さない・5行まで・出どころの1行・リンクはこのサイトの中だけ
+{
+  const hm = chars
+    .map((c) => [c.slug, existsSync(`dist/${c.slug}/hatsubai/index.html`) ? readFileSync(`dist/${c.slug}/hatsubai/index.html`, 'utf8').match(/<section class="memo"><h2>発売のメモ<\/h2>([\s\S]*?)<\/section>/) : null])
+    .filter(([, m]) => m);
+  if (existsSync('dist/chiikawa/hatsubai/index.html')) ok(hm.some(([s]) => s === 'chiikawa'), '発売のメモ：見本データでは、ちいかわの発売日カレンダーに出る');
+  ok(hm.every(([, m]) => !/\d+\s*件/.test(m[1].replace(/<[^>]+>/g, ''))), '発売のメモに件数（数字＋件）が出ていない');
+  ok(hm.every(([, m]) => [...m[1].matchAll(/href="([^"]*)"/g)].every(([, h]) => h.startsWith('/') && !h.startsWith('//'))), '発売のメモのリンクがこのサイトの中だけ');
+  ok(hm.every(([, m]) => { const n = (m[1].match(/<li>/g) ?? []).length; return n >= 2 && n <= 5 && m[1].includes('class="asof"'); }), '発売のメモは2〜5行・出どころの1行がある');
+  ok(hm.every(([, m]) => !/もうすぐ|お早めに|締切|今だけ/.test(m[1])), '発売のメモにあおる言葉がない');
+}
 // 読みもの（/yomimono/）：図の中に字を入れない（字は HTML）・計算の道具はどこにも送らない・絵に大きさの指定・調べた資料へのリンク
 {
   const arts = readJson('config/yomimono.json', []);

@@ -2328,6 +2328,48 @@ if (calEntries.length) {
   });
 }
 
+// ---- 発売のメモ（発売日カレンダーのいちばん下。入荷メモと同じ形。楽天ブックスの発売日から作る事実だけ・件数は出さない） ----
+// 日付は「11月20日」。今年でない日は「2027年1月15日」
+const jpDate = (ymd) => `${ymd.slice(0, 4) !== today.slice(0, 4) ? `${Number(ymd.slice(0, 4))}年` : ''}${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
+// 多い種類（楽天ブックスの kind の言葉のまま。説明文の kinds と同じ数え方）
+const topKinds = (list, n = 2) => {
+  const m = {};
+  for (const b of list) if (b.kind) m[b.kind] = (m[b.kind] ?? 0) + 1;
+  return Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, n).map(([k]) => k);
+};
+function hatsubaiMemoLines(c, cal) {
+  const lines = [];
+  // 日にちが決まっている発売でいちばん近い日（「頃」は使わない）
+  const next = cal.upcoming.find((b) => b.date.exact && !b.date.approx);
+  if (next) lines.push(`次に日にちが決まっている発売は${jpDate(next.date.ymd)}${next.kind ? `で、${esc(next.kind)}` : ''}`);
+  // これから発売のものに多い種類
+  const up = topKinds(cal.upcoming);
+  if (up.length) lines.push(`これから発売のものは、${joinTo(up.map(esc))}が多め`);
+  // 日にちがまだ決まっていない発売の月（近い順に3つまで）
+  const monthOf = (b) => (b.date.year ? b.date.label : `${b.date.month.slice(0, 4) !== today.slice(0, 4) ? `${Number(b.date.month.slice(0, 4))}年` : ''}${Number(b.date.month.slice(5, 7))}月`);
+  const months = [...new Set(cal.upcoming.filter((b) => !b.date.exact).map(monthOf))].slice(0, 3);
+  if (months.length) lines.push(`日にちがまだ決まっていない発売は、${joinTo(months.map(esc))}のもの`);
+  // この30日に発売したものに多い種類
+  const since = jstDate(new Date(nowMs - 30 * DAY));
+  const rec = topKinds(cal.recent.filter((b) => b.date.ymd >= since));
+  if (rec.length) lines.push(`この30日に発売したものは、${joinTo(rec.map(esc))}が多め`);
+  // 予約受付中のものがあるときだけ、予約のページへ
+  if ([...cal.upcoming, ...cal.recent].some((b) => b.avail === 5)) {
+    // リンクはこのサイトの中で、もうできているページだけ（予約のページは12件より少ないと作らない）
+    const links = [
+      [`/${c.slug}/yoyaku/`, '予約受付中のページ'],
+      ['/yoyaku/', '予約帳'],
+    ].filter(([href]) => pages.some((p) => p.path === href));
+    if (links.length) lines.push(`予約受付中のものは、${joinTo(links.map(([href, t]) => `<a href="${href}">${t}</a>`))}でも見られます`);
+  }
+  return lines.slice(0, MEMO_MAX);
+}
+function hatsubaiMemoSection(c, cal) {
+  const lines = hatsubaiMemoLines(c, cal);
+  if (lines.length < 2) return '';
+  return `<section class="memo"><h2>発売のメモ</h2><ul>${lines.map((t) => `<li>${t}${/[。]$/.test(t) ? '' : '。'}</li>`).join('')}</ul><p class="asof">${jpDate(today)}までに、楽天ブックスで見つけた発売日から</p></section>`;
+}
+
 // ---- 発売日カレンダー（キャラごと） ----
 for (const c of calChars) {
   const cal = calendarFor(c.slug);
@@ -2338,7 +2380,8 @@ for (const c of calChars) {
     months
       .map((m, i) => `<section><h2>${esc(m)}</h2>${bookGrid(cal.upcoming.filter((b) => groupOf(b) === m), i === 0)}</section>`)
       .join('') +
-    (cal.recent.length ? `<section><h2>最近発売したもの</h2>${bookGrid(cal.recent.slice(0, settings.listItems), !months.length)}</section>` : '');
+    (cal.recent.length ? `<section><h2>最近発売したもの</h2>${bookGrid(cal.recent.slice(0, settings.listItems), !months.length)}</section>` : '') +
+    hatsubaiMemoSection(c, cal);
   page({
     path,
     tab: c.slug,
