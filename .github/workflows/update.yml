@@ -133,6 +133,9 @@ jobs:
       - name: 入荷ビンゴの記録を足す
         run: bash scripts/quiet.sh node scripts/bingo.mjs
 
+      - name: ご当地の記録を足す
+        run: bash scripts/quiet.sh node scripts/gotouchi-seen.mjs
+
       - name: ページを作る
         run: bash scripts/quiet.sh node scripts/build.mjs
 

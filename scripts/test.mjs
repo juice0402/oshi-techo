@@ -1,7 +1,7 @@
 // 自動テスト：除外ルールと、作ったページ（dist/）が決まりを守っているかを確かめる。
 // 使い方：node scripts/test.mjs （先に node scripts/build.mjs を実行しておく）
 
-import { readFileSync, readdirSync, statSync, existsSync, mkdtempSync, rmSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -559,6 +559,57 @@ for (const f of html) {
   ok(wf.indexOf('node scripts/fetch-yomimono.mjs') < wf.indexOf('node scripts/bingo.mjs') && wf.indexOf('node scripts/bingo.mjs') < wf.indexOf('node scripts/build.mjs') && /run: bash scripts\/quiet\.sh node scripts\/bingo\.mjs/.test(wf), '入荷ビンゴ：更新では「集める」のあと・「作る」の前に記録を足す（出力は非公開のメモだけ）');
   const bsrc = readFileSync('scripts/bingo.mjs', 'utf8');
   ok(/catch \(e\)/.test(bsrc) && /process\.exit\(0\);\s*$/.test(bsrc), '入荷ビンゴ：記録の更新は失敗しても公開を止めない');
+  // ご当地の見つけた記録（scripts/lib/gotouchi-seen.mjs・scripts/gotouchi-seen.mjs。data/gotouchi-seen.json は非公開の記録）
+  {
+    const { mergeGotouchiSeen } = await import('./lib/gotouchi-seen.mjs');
+    const subs = [{ key: 'sanrio/kitty', c: 'sanrio', hit: (n) => n.includes('キティ') }];
+    const gi = [
+      { c: 'snoopy', name: 'スヌーピー 北海道限定 キーホルダー', first: '2026-11-03T16:00:00.000Z', code: 's:1', price: 1, url: 'https://x/' },
+      { c: 'snoopy', name: 'スヌーピー 横浜限定 マスコット', first: '2026-11-05T01:00:00.000Z' },
+      { c: 'snoopy', name: 'スヌーピー ご当地 ストラップ', first: '2026-11-01T01:00:00.000Z' },
+      { c: 'snoopy', name: 'スヌーピー 沖縄限定 タオル', first: '2026-11-01T01:00:00.000Z', avail: 0 },
+      { c: 'snoopy', name: 'スヌーピー 京都 ぬいぐるみ', first: '2026-11-01T01:00:00.000Z' },
+      { c: 'sanrio', name: 'ハローキティ 京都限定 根付', first: '2026-11-02T01:00:00.000Z' },
+      { c: 'sanrio', name: 'マイメロディ 大阪限定 根付', first: '2026-11-02T01:00:00.000Z' },
+    ];
+    const gb = { v: 1, works: { snoopy: { hokkaido: { f: '2026-10-01', l: '2026-10-20' }, kanagawa: { f: '2026-11-10', l: '2026-11-10' }, nagasaki: { f: '2026-09-01', l: '2026-09-02', code: 's:9' } }, bad: { 'p-x': {} } }, extra: 1 };
+    const gr = mergeGotouchiSeen(gb, gi, '2026-11-12', subs);
+    ok(
+      eq(gr, {
+        v: 1,
+        works: {
+          sanrio: { kyoto: { f: '2026-11-02', l: '2026-11-12' }, osaka: { f: '2026-11-02', l: '2026-11-12' } },
+          'sanrio/kitty': { kyoto: { f: '2026-11-02', l: '2026-11-12' } },
+          snoopy: { hokkaido: { f: '2026-10-01', l: '2026-11-12' }, kanagawa: { f: '2026-11-05', l: '2026-11-12' }, nagasaki: { f: '2026-09-01', l: '2026-09-02' } },
+        },
+      }) && gb.works.snoopy.kanagawa.f === '2026-11-10',
+      'ご当地の記録：f は早い日だけ・l は新しい日だけ書きかえ、いまない県も消さない。地名のないもの・ご当地でないもの・売り切れは数えない。キティは sanrio/kitty にも',
+    );
+    const keysOk = (r) => eq(Object.keys(r), ['v', 'works']) && Object.entries(r.works).every(([w, ps]) => /^[a-z0-9-]+(\/[a-z0-9-]+)?$/.test(w) && Object.entries(ps).every(([p, d]) => /^[a-z]+$/.test(p) && eq(Object.keys(d), ['f', 'l']) && /^\d{4}-\d{2}-\d{2}$/.test(d.f) && /^\d{4}-\d{2}-\d{2}$/.test(d.l)));
+    ok(keysOk(gr) && eq(mergeGotouchiSeen(gr, gi, '2026-11-12', subs), gr), 'ご当地の記録：作品・県の id・日付のほかのキーを残さない。同じ日にもう一度足しても変わらない');
+    // 見本データでスクリプトを2回動かす（DATA の場所を変えて）
+    const tmp = mkdtempSync(join(tmpdir(), 'gseen-'));
+    try {
+      const out = join(tmp, 'gotouchi-seen.json');
+      writeFileSync(out, readFileSync('test/fixture-gotouchi-seen.json'));
+      const run = () => spawnSync(process.execPath, ['scripts/gotouchi-seen.mjs'], { env: { ...process.env, GITHUB_ACTIONS: '', DATA_LATEST: 'test/fixture-latest.json', DATA_META: 'test/fixture-meta.json', DATA_GOTOUCHI_SEEN: out }, encoding: 'utf8' });
+      const r1 = run();
+      const s1 = readJson(out, null);
+      const r2 = run();
+      const s2 = readJson(out, null);
+      ok(
+        r1.status === 0 && /^ご当地の記録：作品 \d+・県 \d+\n$/.test(r1.stdout) && r2.status === 0 && eq(s1, s2) && keysOk(s1) && eq(s1.works.snoopy.nagasaki, { f: '2026-08-10', l: '2026-09-20' }) && s1.works.snoopy.hokkaido.f === '2026-09-01' && s1.works.snoopy.hokkaido.l === '2026-10-18' && !!s1.works['sanrio/kitty'],
+        'ご当地の記録：見本データで記録ができ、もう一度動かしても変わらない。見本の商品にない県（長崎）も残る。出力は数の1行だけ',
+      );
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+    const gsrc = readFileSync('scripts/gotouchi-seen.mjs', 'utf8');
+    const glib = readFileSync('scripts/lib/gotouchi-seen.mjs', 'utf8');
+    ok(/catch \(e\)/.test(gsrc) && /process\.exit\(0\);\s*$/.test(gsrc) && !/from 'node:|process\.|readFile|writeFile/.test(glib), 'ご当地の記録：失敗しても公開を止めない。足し算の部品は node: の部品・process・ファイルを使わない');
+    ok(wf.indexOf('node scripts/bingo.mjs') < wf.indexOf('node scripts/gotouchi-seen.mjs') && wf.indexOf('node scripts/gotouchi-seen.mjs') < wf.indexOf('node scripts/build.mjs') && /- name: ご当地の記録を足す\n\s+run: bash scripts\/quiet\.sh node scripts\/gotouchi-seen\.mjs/.test(wf), 'ご当地の記録：更新では入荷ビンゴの記録のあと・「作る」の前に足す（出力は非公開のメモだけ）');
+    ok(!files.some((f) => /gotouchi-seen/.test(f)), 'ご当地の記録：dist に記録のファイルを入れない');
+  }
   const js = readFileSync('src/bingo.js', 'utf8');
   ok(!/fetch\(|XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage/.test(js) && (js.match(/'oshi-bingo'/g) ?? []).length >= 2 && /try \{\s*S = window\.localStorage/.test(js), '入荷ビンゴ：端末の localStorage（oshi-bingo）にだけ残し、どこにも送らない');
   // ③ 画像で保存：canvas で描く。共有（ファイル）かダウンロードだけで、どこにも送らない。Canva の絵・商品の画像は描かない
