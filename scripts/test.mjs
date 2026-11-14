@@ -929,11 +929,11 @@ if (process.env.DATA_LATEST) {
   // わたしの推しの予約帳（#80）：推しキャラのページの「<呼び方>の予約受付中」の棚と、全作品の /yoyaku/
   {
     const gojo = readFileSync('dist/jujutsu/gojo/index.html', 'utf8');
-    const shelf = gojo.match(/<section class="shelf yk">[\s\S]*?<\/section>/)?.[0] ?? '';
+    const shelf = gojo.match(/<section class="shelf yk" id="yoyaku">[\s\S]*?<\/section>/)?.[0] ?? '';
     const yp = readFileSync('dist/yoyaku/index.html', 'utf8');
     const ym = yp.slice(yp.indexOf('<main'), yp.indexOf('</main>'));
     const textOf = (h) => h.replace(/<script[\s\S]*?<\/script>/g, '').replace(/<[^>]+>/g, ' ');
-    ok(shelf.includes('<h2>五条悟の予約受付中</h2>') && gojo.indexOf('<ul class="grid" data-pool>') < gojo.indexOf('<section class="shelf yk">') && (shelf.match(/<li /g) ?? []).length === 4, '予約帳：予約のある推しのページに、最初の並びのすぐあとの棚');
+    ok(shelf.includes('<h2>五条悟の予約受付中</h2>') && gojo.indexOf('<ul class="grid" data-pool>') < gojo.indexOf('<section class="shelf yk" id="yoyaku">') && (shelf.match(/<li /g) ?? []).length === 4, '予約帳：予約のある推しのページに、最初の並びのすぐあとの棚');
     ok(['chiikawa/hachiware', 'sanrio/hellokitty'].every((x) => !readFileSync(`dist/${x}/index.html`, 'utf8').includes('class="shelf yk"')), '予約帳：予約が4件より少ない推しには棚を出さない');
     const at = (w) => shelf.indexOf(w);
     ok(at('缶バッジ 11月20日発売') < at('マグカップ 11月下旬発売') && at('マグカップ 11月下旬発売') < at('アクリルスタンド 12月10日発売') && at('アクリルスタンド 12月10日発売') < at('ポーチ 予約受付中') && at('缶バッジ') > 0, '予約帳：発売の順（日がわかるもの → その月の月までのもの → 発売の時期がわからないもの）で、販売期間の終わりで並べていない');
@@ -953,6 +953,7 @@ if (process.env.DATA_LATEST) {
     const cards = [...(shelf + ym).matchAll(/<li [^>]*>[\s\S]*?<\/li>/g)].map((m) => m[0]);
     ok(cards.length > 0 && cards.every((c) => /^<li [^>]*data-y="[^"]+" data-yd="(\d{4}-\d\d(-\d\d)?)?"/.test(c) && c.includes('</a><button type="button" class="ykb" aria-pressed="false" hidden>予約した</button></li>')), '予約帳：予約受付中のカードに「予約した」のチェック（リンクの外。動くときだけ出す）');
     const myJs = readFileSync('src/my.js', 'utf8');
+    ok(myJs.includes("o.p + '#yoyaku'") && myJs.includes("'（予約したものあり）'") && myJs.includes("'（発売の順）'") && (myJs.match(/S\.setItem\('ot-yoyaku'/g) ?? []).length === 1 && (gojo.match(/ id="yoyaku"/g) ?? []).length === 1, 'トップのわたしの推し：予約の棚がある推しは棚の下に #yoyaku への1行（ot-yoyaku は読むだけ。id はページに1つ）');
     ok(myJs.includes("S.setItem('ot-yoyaku'") && !/fetch\([^o]/.test(myJs) && myJs.includes('5184e6') && readFileSync('dist/privacy/index.html', 'utf8').includes('ot-yoyaku'), '予約帳：「予約した」は端末の ot-yoyaku だけに残し（60日で消す）、プライバシーポリシーに1行');
     ok(topHtml.includes('<a href="/yoyaku/">推しグッズの予約帳（発売の月ごと）</a>') && readFileSync('dist/chiikawa/yoyaku/index.html', 'utf8').includes('<a href="/yoyaku/">全作品の予約帳（発売の月ごと）</a>'), '予約帳：トップの予約受付中の棚の下と、作品の予約受付中のいちばん下から /yoyaku/ へ');
   }

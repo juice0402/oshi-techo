@@ -498,7 +498,7 @@ function ykShelf(path, label) {
   const list = ykEntries.filter((e) => e.op.includes(path));
   if (list.length < YK_MIN) return '';
   ykShelfShown.add(path);
-  return `<section class="shelf yk"><h2>${esc(label)}の予約受付中</h2><ul class="grid">${list.slice(0, YK_SHELF).map((e) => ykCard(e)).join('')}</ul></section>`;
+  return `<section class="shelf yk" id="yoyaku"><h2>${esc(label)}の予約受付中</h2><ul class="grid">${list.slice(0, YK_SHELF).map((e) => ykCard(e)).join('')}</ul></section>`;
 }
 // /yoyaku/ の見出し：月は「11月発売」（今年でなければ「2027年1月発売」）、季節・年だけのものは「2027年春発売」
 const ykGroupName = (g) => (/^\d{4}-\d\d$/.test(g) ? `${g.slice(0, 4) !== today.slice(0, 4) ? `${g.slice(0, 4)}年` : ''}${Number(g.slice(5, 7))}月発売` : `${g}発売`);
