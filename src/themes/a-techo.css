@@ -242,6 +242,8 @@ main.sheet .toc h2{margin:10px 0 4px}
 .kk a{color:var(--ink);text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--berry);text-decoration-thickness:1.5px;text-underline-offset:4px}
 .kk-book{width:100%;border-collapse:collapse}.kk-book th,.kk-book td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
 .kk-book th{width:1%;white-space:nowrap;font-size:13px;font-weight:700;color:var(--berry);background:var(--lav2)}.kk-book td a{font-weight:700}.kk-book td span{display:block;font-size:13px;line-height:1.6;color:var(--sub)}
+/* ご当地の見つけた記録の日付：「2026年」のあとでだけ折り返す（日付の途中で切らない） */
+.kk-book td.kd{word-break:keep-all}
 .kk-flow{position:relative;list-style:none;margin:6px 0 0;padding:0 0 0 38px}
 .kk-flow::before{content:"";position:absolute;left:14px;top:12px;bottom:16px;border-left:1.5px dotted var(--berry)}
 .kk-flow li{position:relative;padding:0 0 12px}

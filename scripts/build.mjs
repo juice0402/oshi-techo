@@ -12,6 +12,7 @@ import { cardHtml, marksFor, searchFormHtml, oshiChipsHtml, searchHref } from '.
 import { activeSeasons, seasonMatcher, nextBirthday, mdLabel } from './lib/season.mjs';
 import { AREAS, regionOf, isGotouchi, prefId } from './lib/region.mjs';
 import { buildIcs } from './lib/ics.mjs';
+import { mergeGotouchiSeen, PREF_IDS } from './lib/gotouchi-seen.mjs';
 import { KINDS, CELLS, mergeBingo, mergeSummary, nextMonthDay } from './lib/bingo.mjs';
 import { decoCss, DECO_STYLES } from '../src/deco/deco.mjs';
 
@@ -668,6 +669,32 @@ const gotouchiSubs = gotouchiWorks
   )
   .filter((x) => x.items.length >= MIN_GOTOUCHI);
 const subPath = (x) => `/${x.w.c.slug}/gotouchi/${x.sub.slug}/`;
+// ご当地の見つけた記録（data/gotouchi-seen.json。見本データのときは test/fixture-gotouchi-seen.json を読み、書かない。書くのは scripts/gotouchi-seen.mjs）
+// いま載っている商品を足してから使う（記録がない日も、いま載っている分で表ができる）。作品は slug、キャラだけのご当地は「作品/キャラ」
+const gotouchiSeen = (() => {
+  let record = null;
+  try {
+    record = readJson(process.env.DATA_LATEST ? 'test/fixture-gotouchi-seen.json' : 'data/gotouchi-seen.json', null);
+  } catch {
+    record = null;
+  }
+  const subs = allWorks.flatMap((c) => (c.gotouchiSub ?? []).filter((s) => s.slug).map((s) => ({ key: `${c.slug}/${s.slug}`, c: c.slug, hit: oshiMatcher(s) })));
+  return mergeGotouchiSeen(record, items, today, subs).works;
+})();
+const PREF_NAME = Object.fromEntries(AREAS.flatMap((a) => a.prefs.map((p) => [prefId(p).slice(2), p])));
+const ymdJp = (ymd) => `${Number(ymd.slice(0, 4))}年<wbr>${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
+const MIN_KIROKU = 3; // 記録のある県がこれより少ないときは、表を出さない
+// ご当地の一覧の下の「都道府県ごとの見つけた記録」の表。北から南の順。いま商品のある県（here）はページの中の見出しへのリンク、ない県は文字だけ
+function gotouchiKiroku(key, here, part) {
+  const rec = gotouchiSeen[key] ?? {};
+  const ids = PREF_IDS.filter((id) => rec[id]);
+  if (ids.length < MIN_KIROKU) return '';
+  const rows = ids.map((id) => {
+    const name = esc(PREF_NAME[id]);
+    return `<tr><th scope="row">${here.has(`p-${id}`) ? `<a href="#p-${id}">${name}</a>` : name}</th><td class="kd">${ymdJp(rec[id].f)}</td><td class="kd">${ymdJp(rec[id].l)}</td></tr>`;
+  });
+  return `<section id="kiroku"><h2>都道府県ごとの見つけた記録</h2><table class="kk-book"><thead><tr><th scope="col">都道府県</th><th scope="col">初めて見つけた日</th><th scope="col">最後に見た日</th></tr></thead><tbody>${rows.join('')}</tbody></table><p class="asof">${TODAY_MD}までに、このサイトが楽天市場で見つけたご当地${esc(part)}の記録から</p></section>`;
+}
 // 多い地名（ページの名前に使う）
 const topPlaces = (items, n = 3) => {
   const count = {};
@@ -1847,7 +1874,8 @@ const MAX_TOC_OPEN = 15; // 都道府県がこれより多いと、目次を地�
 // who：説明文と節の名前に使う名前（サンリオ・ハローキティ）。part：都道府県の節の名前（「北海道のご当地{part}」）。top：目次の上に置くもの
 // prefLink：都道府県の id → 見出しのすぐ下に置く1行（読みものに同じ県の見出しがあるときだけ）
 // gk：「持ってる」のチェックを残す localStorage の名前（ot-gotouchi-<作品>。スヌーピーは読みものの道具と同じ ot-gotouchi-snoopy）
-function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [], prefLink = {}, gk }) {
+// seenKey：見つけた記録の名前（作品の slug か「作品/キャラ」）
+function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, crumbs, top = '', more = [], prefLink = {}, gk, seenKey }) {
   const w = { items, newest: newestItems };
   const areas = AREAS.map((a) => {
     const prefs = a.prefs
@@ -1910,6 +1938,7 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
         )
         .join('') +
       (rest.length ? `<section id="sonohoka"><h2>${SONOHOKA}</h2>${gridOnce(rest.slice(0, MAX_PER_PREF))}</section>` : '') +
+      gotouchiKiroku(seenKey, new Set(prefList.map((p) => p.id)), part) +
       priceAt() +
       (more.length ? `<p class="more">${more.map(([href, name]) => `<a href="${href}">${esc(name)}</a>`).join('／')}</p>` : ''),
     lastmod: newest(w.items),
@@ -1943,6 +1972,7 @@ for (const w of gotouchiWorks) {
     more: gotouchiWorks.filter((x) => x !== w).map((x) => [`/${x.c.slug}/gotouchi/`, `ご当地${x.c.name}一覧`]),
     prefLink: yomiPrefLinks(c),
     gk: `ot-gotouchi-${c.slug}`,
+    seenKey: c.slug,
   });
 }
 for (const x of gotouchiSubs) {
@@ -1959,6 +1989,7 @@ for (const x of gotouchiSubs) {
     who,
     part: x.sub.name,
     gk: `ot-gotouchi-${x.sub.slug}`,
+    seenKey: `${c.slug}/${x.sub.slug}`,
     title: (places) => `${h1}｜都道府県ごとの${who}のご当地グッズ${placesNote(places)}｜${settings.siteName}`,
     crumbs: [
       { name: 'トップ', path: '/' },
