@@ -161,7 +161,7 @@
 - マージ：する
 - 足した：育てる山の補充（自動・2026-11-11）
 
-### [ ] ご当地の見つけた記録を残す（都道府県ごとの初めて見つけた日・最後に見た日）
+### [x] ご当地の見つけた記録を残す（都道府県ごとの初めて見つけた日・最後に見た日）（#105）
 - やること：
   1. scripts/lib/gotouchi-seen.mjs に、記録の足し算の関数（たとえば mergeGotouchiSeen(record, items, today)）を作る。いま載っている商品から、build.mjs のご当地の一覧と同じ判定（scripts/lib/region.mjs の isGotouchi・regionOf。キティは characters.json の gotouchiSub と同じ見分け方）で、作品ごと（キティは sanrio/kitty）・都道府県の id（prefId の「p-」を取ったローマ字）ごとに、商品の first のいちばん早い日（f）と、その県の商品がいま載っている日の最新（l。日本時間の日付）を足す。早い日だけ書きかえ、消さない。scripts/lib/ は Cloudflare の関数でも使う決まり（CLAUDE.md）なので、node: の部品や process.env を使わない、ファイルを読み書きしない純粋な関数にする
   2. scripts/gotouchi-seen.mjs：data/latest.json と data/gotouchi-seen.json を読み、1 の関数で足して data/gotouchi-seen.json（{ v: 1, works: { "snoopy": { "kanagawa": { f: "2026-10-20", l: "2026-11-11" } } } }）に書く。残すのは作品・県の id・日付だけ（商品の番号・名前・値段・URL は残さない）。失敗しても公開を止めない（scripts/bingo.mjs と同じ作り）。ビルドの出力（非公開の notes/update.log に入る）に「ご当地の記録：作品の数・県の数」を1行
