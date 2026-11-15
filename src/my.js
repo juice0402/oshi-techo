@@ -34,6 +34,23 @@
   var save = function () { try { S.setItem('ot-my', JSON.stringify(my)); } catch (e) {} };
   var here = function () { return my.filter(function (x) { return x.p === location.pathname; })[0]; };
 
+  // 季節のまとめ（/<季節>/）：わたしの推しの作品の section を、わたしの推しの順にいちばん上へ（ほかの作品の順はそのまま）。
+  // 開いたときに一度だけ。もう上から順に並んでいるとき・その作品がないときは動かさない。HTML とどこへの保存も変えない
+  var mws = [].slice.call(document.querySelectorAll('section[data-mywork]'));
+  if (mws.length && my.length) {
+    var want = [];
+    my.forEach(function (x) {
+      var w = document.getElementById(x.p.split('/')[1]);
+      if (w && w.hasAttribute('data-mywork') && want.indexOf(w) < 0) want.push(w);
+    });
+    if (want.some(function (w, i) { return mws[i] !== w; })) {
+      for (var wi = want.length - 1; wi >= 0; wi--) {
+        var first = document.querySelector('section[data-mywork]');
+        if (first !== want[wi]) first.parentNode.insertBefore(want[wi], first);
+      }
+    }
+  }
+
   // 推し×種類のしおり（推しキャラのページ）
   var nav = document.querySelector('nav.shiori');
   var pool = document.querySelector('ul[data-pool]');
