@@ -59,7 +59,8 @@
   if (nav && pool) {
     var mine = here();
     var start = location.hash.slice(1);
-    show(okCat(start) && start ? start : mine && mine.c ? mine.c : '');
+    // #種類 のときだけその種類（#yoyaku などの棚への飛び先では、覚えた種類のまま）
+    show(okCat(start) && start && nav.querySelector('a[data-c="' + start + '"]') ? start : mine && mine.c ? mine.c : '');
     [].forEach.call(nav.querySelectorAll('a'), function (a) {
       a.addEventListener('click', function (ev) {
         ev.preventDefault();
@@ -227,6 +228,19 @@
       });
       box.appendChild(hd);
       box.appendChild(ul);
+      // その推しの予約受付中の棚があれば、棚の下に1行（予約したものが棚にあれば、そう書く。ot-yoyaku は読むだけ）
+      var ys = d.querySelector('main section.shelf.yk');
+      var yh = ys && ys.querySelector('h2');
+      if (yh) {
+        var yp = document.createElement('p');
+        var ya = document.createElement('a');
+        var did = [].some.call(ys.querySelectorAll('li[data-y]'), function (li) { return yHas(li.getAttribute('data-y')); });
+        yp.className = 'myh';
+        ya.setAttribute('href', o.p + '#yoyaku');
+        ya.textContent = yh.textContent + (did ? '（予約したものあり）' : '（発売の順）');
+        yp.appendChild(ya);
+        box.appendChild(yp);
+      }
     }).catch(function () { box.remove(); });
   });
   // ホーム画面に追加できることを、わたしの推しを選んだ人にだけ棚の下に1行。とじたら ot-home を覚えて、もう出さない
