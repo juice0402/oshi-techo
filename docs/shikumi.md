@@ -224,3 +224,27 @@
 - .github/workflows/mihari.yml（scripts/mihari.mjs）：main の更新（update.yml）と読みものの資料の点検（check-sources.yml）が終わるたびと、3時間ごとに動く（マージの印が動かした更新は、終わっても知らせが来ないため。11/13）。failure・timed_out なら issue（題「【見張り】更新が失敗した」など）を作り、次の成功で「直った」とコメントして閉じる。cancelled・注記だけの回・月の終わりの休みの回（update が動かない）は何もしない。SNSの画像（og.yml）は手で動かす道具なので見ない
 - issue のラベルは mihari（しょーくんに知らせるだけ。毎朝の Claude の「朝の確認」が知らせる）。同じ題の開いた issue があれば作らず、1日1回だけ「まだ続いている」。更新の失敗のくわしいことは非公開の oshi-techo-data の notes/update.log（issue に楽天のデータは書かない）
 - いじるとき：見張る workflow の name を変えたら mihari.yml の workflows: と scripts/mihari.mjs の WATCH もそろえる（scripts/mihari-test.mjs が見る。scripts/test.mjs から動く）。試すのは Actions の「見張り」→ Run workflow（dry_run が true なら書かない）
+
+## ページの一覧
+
+2026-11-16 に CLAUDE.md の「ページ」から移したもの（中身はそのまま）。
+
+- 作品ごと：新着・値下がり・再入荷・予約受付中・カテゴリ・推しキャラ（6件以上）・季節の特集・ご当地・選び方（人気ランキング・大人向け・子ども向け）・予算で選ぶ・話題・発売日カレンダー。作品のトップの下のほうに入荷メモ（このサイトの記録からの事実。docs/shikumi.md の「入荷メモ」）
+- 全体：トップ（横にすべらせる棚）・探す・公式（/koushiki/）・誕生日・推し活カレンダー・季節とご当地のまとめ・推し活の読みもの（/yomimono/。調べて書いた記事に図・計算の道具・楽天の棚。docs/shikumi.md の「読みもの」）・作品ごとの買い方メモ（/<作品>/kaikata/。公式のお店と新作・予約・くじ・再販。楽天の商品と広告を出さない。docs/shikumi.md の「買い方メモ」）
+- 推しキャラのページに入荷ビンゴ（今月その推しの種類を初めて見つけた日の3×3。記録は scripts/bingo.mjs が data/bingo.json に。docs/shikumi.md の「入荷ビンゴ」）と /bingo/（わたしの推しのカードと前の月までの記録）と /bingo/<年>-<月>/（終わった月のまとめ。data/bingo-summary.json）
+- 商品の一覧で検索に出すのは、コーナーのトップ・ご当地・福袋・発売日カレンダーだけ（2026-11-10 しょーくん A「しっかりしぼる」。build.mjs の SEARCH_LISTS）。推しキャラ・カテゴリ・季節・話題・予算・大人向け・子ども向け・ランキング・値下がり・予約・新着などはページはそのままで noindex,follow・サイトマップに入れない。検索に出す一覧も、商品が12件より少ない日が7日続いたら同じく外す（indexable()）
+
+## 更新（update.yml）
+
+2026-11-16 に CLAUDE.md の「しくみ」から移したもの（中身はそのまま）。
+
+- update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。12:07 と予備の13:43 は Cloudflare の Worker oshi-cron〔workers/cron/。GitHub の予定の実行はお昼に飛ばされるため。docs/shikumi.md の「お昼の更新」〕が workflow_dispatch で動かし、19:07・予備の20:43・毎月1日は schedule。予備の回は前の150分に成功か動いている回があれば休む。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）
+- そのほかの workflow：pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）、merge-ok.yml（マージの印。下の「マージの印（merge-ok.yml）」）
+
+## マージの印（merge-ok.yml）
+
+2026-11-16 に CLAUDE.md から移したもの（中身はそのまま）。
+
+- しょーくんの「マージして」のあと、司令塔が PR にラベル merge-ok を付ける → merge-ok.yml（scripts/merge-ok.mjs）が点検（プルリクエストの確認・資料を変える PR は読みものの資料の点検）の合格を待って squash でマージし（本文は「マージの印（merge-ok）で #番号 をマージ」）、更新（update.yml）を main で1回動かす。結果は見張りが見る。merge-ok の無い PR はさわらない
+- 本文の「#数字 のあとにマージ」の PR が開いているあいだは待つ。点検の失敗・main とのぶつかりは、PR にコメントして merge-blocked（司令塔が見る）
+- 試すのは Actions の「マージの印」→ Run workflow（dry_run が true ならマージしない。pr に番号を入れると、その PR だけ）。点検の workflow の name を変えたら merge-ok.yml の workflows: も（scripts/merge-ok-test.mjs が見る）
