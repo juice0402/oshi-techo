@@ -1,32 +1,30 @@
 # 推しグッズ入荷手帳（推し手帳）
 
-楽天市場の商品検索APIで推しグッズの新着を集め（キャラ・アニメ・ゲーム・アイドルの4つのコーナー。作品は config/）、静的サイトにして Cloudflare Pages（プロジェクト oshi-techo）へ Direct Upload で公開する。このリポジトリ（juice0402/oshi-techo）は公開。楽天の記録は非公開の juice0402/oshi-techo-data（data/ と、更新のくわしい出力 notes/update.log）に置く（2026-10-28 に引っ越し。前の非公開リポジトリを改名したもので、10/28 までの issue・PR もそこ）。ドメインは nyuka-techo.com（名前に楽天・キャラ名を入れない決まり）。持ち主はコードを書かず、スマホで作業する。説明はやさしい日本語で短く。
+コードを直すときは docs/MAP.md → 検索 → その範囲だけ読む → 変わる所だけ直す（claude/code-rules.md）
+
+楽天市場の商品検索APIで推しグッズの新着を集め（キャラ・アニメ・ゲーム・アイドルの4つのコーナー。作品は config/）、静的サイトにして Cloudflare Pages（プロジェクト oshi-techo）へ Direct Upload で公開する。このリポジトリ（juice0402/oshi-techo）は公開。楽天の記録は非公開の juice0402/oshi-techo-data（data/ と、更新のくわしい出力 notes/update.log）に置く。ドメインは nyuka-techo.com（名前に楽天・キャラ名を入れない決まり）。持ち主はコードを書かず、スマホで作業する。説明はやさしい日本語で短く。終わった経緯は docs/claude-old.md（ふだんは読まない）。
 
 ## 読むもの
 
+- docs/MAP.md：フォルダとファイルの地図・大きいファイルの行の目安・自動で作るファイル
 - docs/shikumi.md：機能ごとのくわしい説明。その機能をさわるときに、その節だけ読む
 - docs/yomimono-neta.md：読みもののネタの山と書き方（予約タスク「読みもの書き」が上から1本ずつ書く）。docs/sodateru.md：育てる山（夜の作業が上から1つずつ取る）
 - claude.ai プロジェクト「ネット副業」の資料：claude/oshi-techo-spec.md（設計・PRごとの記録・決めた経緯）、claude/site-principles.md（見た目と文章の原則。見た目・文章を変えるとき）、claude/oshi-techo-keywords.md（Googleの検索候補。ページの名前や新しいページはこれに合わせる）
 
 ## しくみ（npmの部品は使わず、Node 22 だけで動く）
 
-- config/：characters.json（キャラのコーナーの作品・推しキャラ・公式）、corners/（アニメ・ゲーム・アイドルのコーナーと、その作品。docs/shikumi.md の「コーナー」）、settings.json（全体）、seasons.json（季節の特集）、topics.json（作品ならではの話題）
-- scripts/fetch.mjs：楽天から集めて data/（非公開の記録。更新のときに oshi-techo-data から持ってきて戻す）を更新。fetch-ranking.mjs（ランキング）・fetch-books.mjs（楽天ブックスの発売日）・fetch-yomimono.mjs（読みものの棚）は失敗しても公開を止めない
-- scripts/build.mjs：data/ から dist/（公開するページ）を作る。SITE_MODE=production 以外は noindex
-- scripts/test.mjs：除外ルールとページの決まり（広告表示・クレジット・バナー・絵文字なし・使わない言葉・使わない形・リンク切れ・サイトマップ・タイトルと説明文の重なり・本番の検索設定）を確かめる
+- 作り：config/（作品・設定）→ scripts/fetch.mjs など（楽天から集めて data/）→ scripts/build.mjs（dist/ を作る。SITE_MODE=production 以外は noindex）→ scripts/test.mjs（決まりの点検）。ファイルごとの役目は docs/MAP.md
+- fetch-ranking.mjs・fetch-books.mjs・fetch-yomimono.mjs は失敗しても公開を止めない
 - scripts/lib/ の text・view・rakuten-core・search・filter・classify は Cloudflare の関数でも使うので、node: の部品や process.env を使わない
-- functions/：search/（探す。その場で楽天に聞く）、koushiki/（公式の YouTube の新しい動画）、_middleware.js（oshi-techo.pages.dev と www、なくしたページを 301）
-- そのほか scripts/：pages-secrets.mjs（楽天・YouTube のキーを Cloudflare の秘密の設定へ）、check-search.mjs（公開後に探すを試す）、indexnow.mjs、cleanup-deployments.mjs（本番以外で3日より古いデプロイを消す）
-- src/：見た目（base.css・themes/・deco/）、楽天のクレジットとバナー、icons/・og/・brand/、my.js（わたしの推し・しおり）
-- .github/workflows/：update.yml（1日2回、日本時間12:07・19:07と、毎月1日の0:07〔入荷ビンゴの新しい月をすぐ出す。28〜31日に起きて1日のときだけ動く〕。12:07 と予備の13:43 は Cloudflare の Worker oshi-cron〔workers/cron/。GitHub の予定の実行はお昼に飛ばされるため。docs/shikumi.md の「お昼の更新」〕が workflow_dispatch で動かし、19:07・予備の20:43・毎月1日は schedule。予備の回は前の150分に成功か動いている回があれば休む。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ）、pr.yml（見本データでテストだけ。楽天から取らず、プレビューも出さない）、og.yml（SNSの画像を写す。手で動かす）、check-sources.yml（読みものの資料の点検）、mihari.yml（見張り。更新・資料の点検が失敗したら issue〔ラベル mihari〕、次の成功で閉じる。docs/shikumi.md の「見張り」）、merge-ok.yml（マージの印。下の節）
+- .github/workflows/update.yml：1日2回（12:07・19:07）と毎月1日の0:07の更新。お昼の回は Worker oshi-cron が動かす。oshi-techo-data から記録を持ってきて、集める・作る・テスト・本番に公開・記録を戻す。出力は scripts/quiet.sh で非公開のメモにだけ書き、公開のログは「済」「失敗」だけ。くわしくは docs/shikumi.md の「更新（update.yml）」と「お昼の更新（Worker oshi-cron・2026-11-11）」
+- pr.yml は見本データでテストだけ（楽天から取らず、プレビューも出さない）。ほかの workflow（og・check-sources・mihari・merge-ok）は docs/MAP.md と docs/shikumi.md の「見張り（2026-11-02）」「マージの印（merge-ok.yml）」
 
 ## ページ（くわしくは docs/shikumi.md）
 
-- 作品ごと：新着・値下がり・再入荷・予約受付中・カテゴリ・推しキャラ（6件以上）・季節の特集・ご当地・選び方（人気ランキング・大人向け・子ども向け）・予算で選ぶ・話題・発売日カレンダー。作品のトップの下のほうに入荷メモ（このサイトの記録からの事実。docs/shikumi.md の「入荷メモ」）
-- 全体：トップ（横にすべらせる棚）・探す・公式（/koushiki/）・誕生日・推し活カレンダー・季節とご当地のまとめ・推し活の読みもの（/yomimono/。調べて書いた記事に図・計算の道具・楽天の棚。docs/shikumi.md の「読みもの」）・作品ごとの買い方メモ（/<作品>/kaikata/。公式のお店と新作・予約・くじ・再販。楽天の商品と広告を出さない。docs/shikumi.md の「買い方メモ」）
-- 推しキャラのページに入荷ビンゴ（今月その推しの種類を初めて見つけた日の3×3。記録は scripts/bingo.mjs が data/bingo.json に。docs/shikumi.md の「入荷ビンゴ」）と /bingo/（わたしの推しのカードと前の月までの記録）と /bingo/<年>-<月>/（終わった月のまとめ。data/bingo-summary.json）
+- 作品ごと・全体のページの一覧は docs/shikumi.md の「ページの一覧」。入荷ビンゴは同じく「入荷ビンゴ（2026-10-30）」
+- 買い方メモ（/<作品>/kaikata/）には楽天の商品と広告を出さない
 - ブラウザの中だけの機能（わたしの推し・推し×種類のしおり・並べかえ・しぼりこみ・入荷ビンゴ）は URL を増やさず、サイトや楽天に何も送らない
-- 商品の一覧で検索に出すのは、コーナーのトップ・ご当地・福袋・発売日カレンダーだけ（2026-11-10 しょーくん A「しっかりしぼる」。build.mjs の SEARCH_LISTS）。推しキャラ・カテゴリ・季節・話題・予算・大人向け・子ども向け・ランキング・値下がり・予約・新着などはページはそのままで noindex,follow・サイトマップに入れない。検索に出す一覧も、商品が12件より少ない日が7日続いたら同じく外す（indexable()）
+- 商品の一覧で検索に出すのは、コーナーのトップ・ご当地・福袋・発売日カレンダーだけ（build.mjs の SEARCH_LISTS）。ほかの一覧はページはそのままで noindex,follow・サイトマップに入れない。検索に出す一覧も、商品が12件より少ない日が7日続いたら同じく外す（indexable()）。くわしくは docs/shikumi.md の「商品が少ないページ」
 - キャラや推しキャラを足すときは characters.json（docs/shikumi.md の「推しキャラ」「キャラを足すとき」）。SNS の画像（src/og.png）は作品名7つ＋「などのグッズ」なので、外した作品が入っていたときだけ作り直す
 
 ## 守ること
@@ -58,9 +56,10 @@ YouTube（/koushiki/）
 
 - ブランチ → プルリクエスト → 見本データのテスト → しょーくんに伝えてから main へ反映 → update.yml を手で動かして本番（merge-ok でマージしたときは GitHub が動かす）（本当のデータのテストはここ。失敗したら公開しない）→ oshi-techo-data の notes/update.log で結果を確かめる → claude/oshi-techo-spec.md に追記
 - 本当のデータで試すときは、oshi-techo-data の data/ をこのリポジトリの data/ に写して使う（.gitignore で入らない）。コミットや issue に商品名を書かない
+- テストは pr.yml と同じ（見本データの env をつけて node scripts/build.mjs > /dev/null && node scripts/test.mjs。docs/MAP.md の「ビルド・テスト・公開」）
 
 ## マージの印（merge-ok.yml）
 
-- しょーくんの「マージして」のあと、司令塔が PR にラベル merge-ok を付ける → merge-ok.yml（scripts/merge-ok.mjs）が点検（プルリクエストの確認・資料を変える PR は読みものの資料の点検）の合格を待って squash でマージし（本文は「マージの印（merge-ok）で #番号 をマージ」）、更新（update.yml）を main で1回動かす。結果は見張りが見る。merge-ok の無い PR はさわらない
+- しょーくんの「マージして」のあと、司令塔が PR にラベル merge-ok を付ける → merge-ok.yml（scripts/merge-ok.mjs）が点検の合格を待って squash でマージし、更新（update.yml）を main で1回動かす。merge-ok の無い PR はさわらない
 - 本文の「#数字 のあとにマージ」の PR が開いているあいだは待つ。点検の失敗・main とのぶつかりは、PR にコメントして merge-blocked（司令塔が見る）
-- 試すのは Actions の「マージの印」→ Run workflow（dry_run が true ならマージしない。pr に番号を入れると、その PR だけ）。点検の workflow の name を変えたら merge-ok.yml の workflows: も（scripts/merge-ok-test.mjs が見る）
+- 点検の workflow の name を変えたら merge-ok.yml の workflows: も（scripts/merge-ok-test.mjs が見る）。くわしくは docs/shikumi.md の「マージの印（merge-ok.yml）」
