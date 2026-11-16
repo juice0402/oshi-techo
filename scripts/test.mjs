@@ -867,6 +867,21 @@ if (process.env.DATA_LATEST) {
     );
     ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(gjs) && (gjs.match(/setItem\(/g) ?? []).length === 2 && gjs.includes("S.setItem(KEY, a.join(','))") && gjs.includes("S.setItem('ot-t', '1')") && /if \(\/\^\[a-z\]\+\$\/\.test\(p\)\) got\[p\] = 1/.test(gjs) && gjs.includes("b.getAttribute('data-p')"), 'ご当地の一覧のチェック：どこにも送らず、残すのは県の id だけ（商品の番号・名前・URL を残さない）');
     ok(readFileSync('dist/privacy/index.html', 'utf8').includes('ご当地グッズの一覧の「持ってる」のチェックも同じ'), 'ご当地の一覧のチェック：プライバシーポリシーに1文');
+    // ご当地の一覧の「都道府県ごとの見つけた記録」（#107）：見本の記録（test/fixture-gotouchi-seen.json）にだけある長崎も文字で出る
+    const kr = (h) => h.match(/<section id="kiroku"><h2>都道府県ごとの見つけた記録<\/h2><table class="kk-book">(.*?)<\/table><p class="asof">(.*?)<\/p><\/section>/)?.slice(1) ?? [];
+    const [snT, snAsof] = kr(sn);
+    const krNames = (t) => [...(t ?? '').matchAll(/<tr><th scope="row">(?:<a href="#p-[a-z]+">)?([^<]+)/g)].map((m) => m[1]);
+    const prefOrder = AREAS.flatMap((a) => a.prefs);
+    ok(
+      !!snT && krNames(snT).includes('長崎') && krNames(snT).includes('北海道') && snT.includes('<tr><th scope="row">長崎</th><td class="kd">2026年<wbr>8月10日</td><td class="kd">2026年<wbr>9月20日</td></tr>') && snT.includes('<a href="#p-hokkaido">北海道</a></th><td class="kd">2026年<wbr>9月1日</td>') &&
+        krNames(snT).every((n, i, a) => i === 0 || prefOrder.indexOf(a[i - 1]) < prefOrder.indexOf(n)) && /^\d+\/\d+までに、このサイトが楽天市場で見つけたご当地スヌーピーの記録から$/.test(snAsof) && snT.includes('<th scope="col">初めて見つけた日</th><th scope="col">最後に見た日</th>'),
+      'ご当地の記録の表：/snoopy/gotouchi/ に北から南の順で出て、記録にだけある県（長崎）は文字だけ。日付は「2026年11月11日」の形',
+    );
+    const gpages = [sn, sg2, ch2, readFileSync('dist/sanrio/gotouchi/index.html', 'utf8')];
+    ok(gpages.every((h) => { const [t] = kr(h); return !t || !/\d+件/.test(t); }), 'ご当地の記録の表：件数（数字＋件）を出さない');
+    ok(gpages.every((h) => { const [t] = kr(h); if (!t) return true; const hrefs = [...t.matchAll(/href="([^"]*)"/g)].map((m) => m[1]); return hrefs.length > 0 && hrefs.every((x) => /^#p-[a-z]+$/.test(x) && h.includes(`<section class="gp" id="${x.slice(1)}">`)); }), 'ご当地の記録の表：リンクはこのページの中の #p- だけ（いま商品のある県の見出しへ）');
+    ok(gpages.every((h) => !h.includes('id="kiroku"') || (h.indexOf('id="kiroku"') > h.lastIndexOf('<section class="gp"') && h.indexOf('id="kiroku"') > (h.indexOf('id="sonohoka"')) && !/id="kiroku"[\s\S]*class="gpk"/.test(h))) && !readFileSync('dist/gotouchi/index.html', 'utf8').includes('id="kiroku"'), 'ご当地の記録の表：都道府県の節と「地名が商品名にないもの」のあと。「持ってる」は付けない。ご当地のまとめには置かない');
+    ok(/const MIN_KIROKU = 3;/.test(readFileSync('scripts/build.mjs', 'utf8')) && /if \(ids\.length < MIN_KIROKU\) return '';/.test(readFileSync('scripts/build.mjs', 'utf8')), 'ご当地の記録の表：記録のある県が3つより少ないときは出さない');
   }
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
   // 誕生日
