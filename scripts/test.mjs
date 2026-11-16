@@ -716,6 +716,11 @@ if (process.env.DATA_LATEST) {
     );
     ok(sr.includes('<title>サンリオの福袋2027一覧｜楽天市場で買えるハッピーバッグ｜推しグッズ入荷手帳</title>') && sr.includes('<h1 class="tape">サンリオの福袋2027</h1>'), '福袋：予約受付中のものがない日の名前');
     ok(/<title>福袋2027一覧｜[^<]*などのキャラクターの福袋・ハッピーバッグ｜推しグッズ入荷手帳<\/title>/.test(hub) && hub.includes('<h1 class="tape">福袋2027</h1>') && ldOf(hub).some((x) => x['@type'] === 'CollectionPage' && x.name === '福袋2027'), '福袋：/fukubukuro/ の名前・見出し・構造化データ');
+    {
+      const secs = [...hub.matchAll(/<section id="([a-z0-9-]+)" data-mywork><h2>([^<]+)<\/h2>/g)];
+      const links = [...hub.matchAll(/<a href="\/([a-z0-9-]+)\/fukubukuro\/">[^<]*をもっと見る<\/a>/g)].map((m) => m[1]);
+      ok(secs.length >= 2 && secs.map((m) => m[1]).join() === links.join() && hub.includes("querySelectorAll('section[data-mywork]')"), `福袋：/fukubukuro/ の作品ごとの section に作品の id と data-mywork（わたしの推しの作品を上へ動かす印。HTML の順はそのまま・${secs.length}作品）`);
+    }
     ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
     const hw11 = rd('chiikawa/hachiware/index.html');
     const fr11 = (h) => h.match(/<img class="bg-frame" src="\/art\/bingo-([a-z0-9-]+)-[0-9a-f]{8}\.webp"/)?.[1];

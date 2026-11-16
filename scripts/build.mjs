@@ -1761,7 +1761,8 @@ for (const { s, works } of seasonPages) {
       works
         .map(
           (w, i) =>
-            `<section><h2>${esc(w.c.name)}</h2>${s.gift ? filterGrid(w.items, { show: settings.topItems, pool: 24, eager: i === 0 }) : grid(w.items.slice(0, settings.topItems), i === 0)}<p class="more"><a href="/${w.c.slug}/${s.slug}/">${esc(w.c.name)}の${esc(label)}をもっと見る</a></p></section>`,
+            // id と data-mywork：わたしの推しの作品を src/my.js がブラウザの中で上へ動かす（HTML の順はそのまま）
+            `<section id="${w.c.slug}" data-mywork><h2>${esc(w.c.name)}</h2>${s.gift ? filterGrid(w.items, { show: settings.topItems, pool: 24, eager: i === 0 }) : grid(w.items.slice(0, settings.topItems), i === 0)}<p class="more"><a href="/${w.c.slug}/${s.slug}/">${esc(w.c.name)}の${esc(label)}をもっと見る</a></p></section>`,
         )
         .join('') +
       (s.gift ? FILTER_END : '') +
