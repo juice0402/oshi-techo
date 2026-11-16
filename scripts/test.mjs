@@ -722,6 +722,17 @@ if (process.env.DATA_LATEST) {
       ok(secs.length >= 2 && secs.map((m) => m[1]).join() === links.join() && hub.includes("querySelectorAll('section[data-mywork]')"), `福袋：/fukubukuro/ の作品ごとの section に作品の id と data-mywork（わたしの推しの作品を上へ動かす印。HTML の順はそのまま・${secs.length}作品）`);
     }
     ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
+    // 福袋のメモ（作品の福袋のページの下。入荷メモと同じ形。件数・あおる言葉・外へのリンクを出さない）
+    {
+      const fm = ck.match(/<section class="memo"><h2>福袋のメモ<\/h2>[\s\S]*?<\/section>/)?.[0] ?? '';
+      const lis = [...fm.matchAll(/<li>([\s\S]*?)<\/li>/g)].map((m) => m[1]);
+      ok(fm && lis.length >= 2 && lis.length <= 5 && lis.every((t) => t.endsWith('。')) && fm.includes('<p class="asof">11月5日までに、このサイトが楽天市場で見つけた商品の記録から</p>') && ck.indexOf('kaikata/#yotei') < ck.indexOf(fm) && ck.indexOf(fm) < ck.indexOf('時点の価格') && ck.indexOf(fm) < ck.indexOf('<nav class="tsugi2"'), '福袋のメモ：ちいかわの福袋のページの下（買い方メモへの行のあと・つぎに見るより上）に2〜5行');
+      ok(fm.includes('<a href="/chiikawa/yoyaku/">予約</a>の締切がいちばん近いのは12月10日') && fm.includes('受付中のものの発売・お届けは、12月'), '福袋のメモ：予約の締切と発売・お届けの月（予約はその作品の予約のページへ）');
+      ok(fm && !/\d+\s*件/.test(fm), '福袋のメモに件数（数字＋件）が出ていない');
+      ok(fm && [...fm.matchAll(/href="([^"]*)"/g)].every((m) => /^\/(?!\/)/.test(m[1])), '福袋のメモのリンクがこのサイトの中だけ');
+      ok(fm && !/定価|[%％]\s*オフ|最安値|残りわずか|今だけ|お早めに/.test(fm), '福袋のメモに定価・%オフ・最安値・残りわずか・今だけ・お早めにがない');
+      ok(!sr.includes('福袋のメモ') && !hub.includes('福袋のメモ'), '福袋のメモ：2行より少ない作品と /fukubukuro/ には出さない');
+    }
     const hw11 = rd('chiikawa/hachiware/index.html');
     const fr11 = (h) => h.match(/<img class="bg-frame" src="\/art\/bingo-([a-z0-9-]+)-[0-9a-f]{8}\.webp"/)?.[1];
     ok(fr11(hw11) === 'frame-11' && fr11(rd('sanrio/hellokitty/index.html')) === (existsSync('src/art/bingo/frame-birthday.webp') ? 'frame-birthday' : 'frame-11') && rd('bingo/index.html').includes('"now":"2026-11"'), '入荷ビンゴ：月をかえると額が切りかわり、誕生日の月の推し（ハローキティ 11/1）は誕生日の額');

@@ -347,6 +347,8 @@ const newest = (list) => (list.length ? jstDate(new Date(list.map((i) => i.first
 // そのページにしかない数（新着・予約・件数・日付）を入れて、全角80〜120字くらい。値段はピッタリではなく「◯円台から」の幅にする（検索結果に古い値段が残るため）
 const mdOfYmd = (ymd) => `${Number(ymd.slice(5, 7))}/${Number(ymd.slice(8, 10))}`;
 const TODAY_MD = mdOfYmd(today);
+// 日付は「11月20日」。今年でない日は「2027年1月15日」（発売のメモ・福袋のメモ）
+const jpDate = (ymd) => `${ymd.slice(0, 4) !== today.slice(0, 4) ? `${Number(ymd.slice(0, 4))}年` : ''}${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
 const priceBand = (y) => (y < 100 ? '100円未満' : y < 1000 ? `${Math.floor(y / 100) * 100}円台` : y < 10000 ? `${(Math.floor(y / 1000) * 1000).toLocaleString('ja-JP')}円台` : `${Math.floor(y / 10000)}万円台`);
 // 値段の中心（安いほうから4分の1〜4分の3の幅）。1つだけ安い・高いものに引っぱられないように
 const priceMid = (list) => {
@@ -1690,6 +1692,43 @@ for (const ym of bingoPast) bingoSummaryPage(ym);
 const seoFill = (t, v) => t.replace(/\{(work|year|works)\}/g, (_, k) => v[k] ?? '');
 // その作品の買い方メモに、まだ終わっていないこの季節の予定（events の tag）があるか
 const kaikataHas = (slug, tag) => hasKaikata(slug) && (readJson(`src/kaikata/${slug}.json`).events ?? []).some((e) => e.tag === tag && e.until >= today);
+// ---- 福袋のメモ（作品の福袋のページの下。入荷メモと同じ形。そのページの商品から作る事実だけ・件数は出さない） ----
+// seo のある季節（いまは福袋だけ）で出す。2行より少ないときは出さない
+function fukuMemoLines(c, items, s) {
+  const lines = [];
+  // 予約のページがあるときだけ「予約」をリンクに（予約のページは季節のページより先に作る）
+  const resvWord = pages.some((p) => p.path === `/${c.slug}/yoyaku/`) ? `<a href="/${c.slug}/yoyaku/">予約</a>` : '予約';
+  // ① この特集で初めて見つけた日（特集のはじまりより前に見つけたものがあるときは出さない）
+  const firsts = items.filter((i) => i.first).map((i) => jstDate(new Date(Date.parse(i.first)))).sort();
+  if (firsts.length && firsts[0] >= s.win.start) lines.push(`この特集で${esc(c.name)}の${esc(s.label)}を初めて見つけたのは${jpDate(firsts[0])}`);
+  // ② 予約受付中のものの、発売・お届けの月（多いもの2つまで・近い順）
+  const resv = items.filter((i) => i.resv);
+  const byMonth = {};
+  for (const i of resv) if (i.resv.release) byMonth[i.resv.release.slice(0, 7)] = (byMonth[i.resv.release.slice(0, 7)] ?? 0) + 1;
+  const months = Object.entries(byMonth)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 2)
+    .map(([m]) => m)
+    .sort();
+  if (months.length) {
+    const ml = months.map((m) => `${m.slice(0, 4) !== today.slice(0, 4) ? `${Number(m.slice(0, 4))}年` : ''}${Number(m.slice(5, 7))}月`);
+    lines.push(`${resvWord}受付中のものの発売・お届けは、${joinTo(ml)}${months.length > 1 || byMonth[months[0]] >= 2 ? 'が多め' : ''}`);
+  }
+  // ③ 予約の締切がいちばん近い日（商品名に書いてあるもの・今日より後）
+  const dl = resv.filter((i) => i.resv.deadline && i.resv.deadline > today).sort((a, b) => a.resv.deadline.localeCompare(b.resv.deadline))[0];
+  if (dl) lines.push(`${resvWord}の締切がいちばん近いのは${jpDate(dl.resv.deadline)}${CAT_SHORT[dl.cat] ? `（${esc(CAT_SHORT[dl.cat])}）` : ''}`);
+  // ④ 値段の幅（12件以上のときだけ）
+  if (items.length >= MEMO_PRICE_MIN && priceMid(items)) lines.push(`値段は${priceMid(items)}`);
+  // ⑤ この7日に新しく見つけたもの
+  if (weekNew(items)) lines.push('この7日にも新しく見つけた');
+  return lines.slice(0, MEMO_MAX);
+}
+function fukuMemoSection(c, items, s) {
+  if (!s.seo) return '';
+  const lines = fukuMemoLines(c, items, s);
+  if (lines.length < 2) return '';
+  return `<section class="memo"><h2>${esc(s.label)}のメモ</h2><ul>${lines.map((t) => `<li>${t}。</li>`).join('')}</ul><p class="asof">${jpDate(today)}までに、このサイトが楽天市場で見つけた商品の記録から</p></section>`;
+}
 function seasonWorkPage(s, w, others) {
   const label = s.label;
   {
@@ -1728,6 +1767,7 @@ function seasonWorkPage(s, w, others) {
           ? filterBar(w.items.slice(0, settings.listItems), ['s', 'g']) + sortBar(w.items.slice(0, settings.listItems)) + filterGrid(w.items, { show: settings.listItems, eager: true, sort: true }) + FILTER_END + SORT_END
           : sortGrid(w.items.slice(0, settings.listItems))) +
         (seo?.kaikataLink && kaikataHas(w.c.slug, s.slug) ? `<p class="more"><a href="/${w.c.slug}/kaikata/#yotei">${esc(seoFill(seo.kaikataLink, v))}</a></p>` : '') +
+        fukuMemoSection(w.c, w.items, s) +
         priceAt() +
         (others.length ? `<p class="more">${others.map((x) => `<a href="/${x.c.slug}/${s.slug}/">${esc(x.c.name)}の${esc(label)}</a>`).join('／')}</p>` : ''),
       lastmod: newest(w.items),
@@ -2361,8 +2401,7 @@ if (calEntries.length) {
 }
 
 // ---- 発売のメモ（発売日カレンダーのいちばん下。入荷メモと同じ形。楽天ブックスの発売日から作る事実だけ・件数は出さない） ----
-// 日付は「11月20日」。今年でない日は「2027年1月15日」
-const jpDate = (ymd) => `${ymd.slice(0, 4) !== today.slice(0, 4) ? `${Number(ymd.slice(0, 4))}年` : ''}${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
+// 日付は「11月20日」。今年でない日は「2027年1月15日」（jpDate。福袋のメモでも使うので、説明文の節に置いた）
 // 多い種類（楽天ブックスの kind の言葉のまま。説明文の kinds と同じ数え方）
 const topKinds = (list, n = 2) => {
   const m = {};
