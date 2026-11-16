@@ -36,7 +36,7 @@ if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
 // 1回に満たす量 ＝ スマホの容量 ×（100 − 始めるときの残り）÷ 100。送れる量は表示の容量の60〜70%（業界の団体の資料）
 var one=P*(100-r)/100,lo=fl(B*0.6/one),hi=fl(B*0.7/one);
 // Wh ＝ 定格容量（mAh）× 定格電圧（V）÷ 1,000（国土交通省の資料の式）
-var wh=Math.round(B*V/100)/10,ans='スマホの電池を'+r+'%から100%まで、約'+lo+'〜'+hi+'回充電できるめやすです。';
+var wh=Math.round(B*V/100)/10,ans='スマホの電池を'+r+'%から100%まで、'+(hi<0.1?'0.1回分にも足りないめやすです。':hi<1?'1回分には足りず、約'+lo+'〜'+hi+'回分のめやすです。':'約'+lo+'〜'+hi+'回充電できるめやすです。');
 ans+=V+'Vで出すと'+wh.toFixed(1)+'Whで、';
 ans+=wh<=100?'飛行機では100Wh以下の区分です。':wh<=160?'飛行機では100Wh超〜160Wh以下の区分です。':'160Whをこえるので飛行機に持ちこめません。';
 f.querySelector('.fit-ans').textContent=ans;
