@@ -1298,6 +1298,43 @@ const cornerYomi = (k) => {
   const list = yomiArticles.filter((a) => a.corner === k.slug);
   return list.length ? `<section class="yomi"><h2>${esc(k.name)}の読みもの</h2>${yomiList(list)}<p class="more"><a href="/yomimono/">読みものをすべて見る</a></p></section>` : '';
 };
+// コーナーの入荷メモ（本文のいちばん下）：作品のトップの入荷メモと同じ形で、そのコーナーの作品から作る事実を5行まで。件数は出さない
+// 作品の順は数の多い順、同じなら config のコーナーの作品の順（ws の順）。予約の締切はコーナーでは出さない
+function cornerMemoLines(k, ws) {
+  const top = (pairs, n) => pairs.map((p, idx) => [...p, idx]).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1] || a[2] - b[2]).slice(0, n).map(([c]) => c);
+  const workLink = (c, href = `/${c.slug}/`) => `<a href="${href}">${esc(c.name)}</a>`;
+  const L = new Map(ws.map((c) => [c.slug, listsFor(c.slug)]));
+  const recent = (c) => L.get(c.slug).news.filter((i) => nowMs - Date.parse(i.first) <= RECENT);
+  const lines = [];
+  // この7日の新着が多い作品（2件以上の作品だけ。作品が2つ以上のコーナー）
+  if (ws.length > 1) {
+    const many = top(ws.map((c) => [c, recent(c).length >= 2 ? recent(c).length : 0]), 2);
+    if (many.length) lines.push(`この7日の新着が多いのは、${joinTo(many.map((c) => workLink(c)))}`);
+  }
+  // この7日の新着に多い種類（コーナーにはカテゴリのページがないので、リンクにしない）
+  const wkNew = catSlugs(ws.flatMap(recent), 2);
+  if (wkNew.length) lines.push(`この7日の新着は、${joinTo(wkNew.map((s) => esc(CAT_SHORT[s])))}が多め`);
+  // 予約受付中のものがある作品（予約のページがあればそこへ）
+  const resv = top(ws.map((c) => [c, yoyakuFor(c.slug).total]), 3);
+  if (resv.length) lines.push(`予約受付中のものがあるのは、${joinTo(resv.map((c) => (yoyakuFor(c.slug).total >= MIN_PAGE ? workLink(c, `/${c.slug}/yoyaku/`) : esc(c.name))))}`);
+  // 楽天ブックスで次に日にちが決まっている発売（「頃」は使わない）
+  const next = ws
+    .flatMap((c) => calendarFor(c.slug).upcoming.filter((b) => b.date.exact && !b.date.approx).slice(0, 1).map((b) => [c, b]))
+    .sort((a, b) => a[1].date.ymd.localeCompare(b[1].date.ymd))[0];
+  if (next) {
+    const [c, b] = next;
+    lines.push(`楽天ブックスで次に発売日が来るのは${mdOfYmd(b.date.ymd)}の${hasCalendar(c) ? workLink(c, `/${c.slug}/hatsubai/`) : esc(c.name)}`);
+  }
+  // この7日に値下がりか再入荷を見つけた作品
+  const moved = top(ws.map((c) => [c, L.get(c.slug).nesage.length + L.get(c.slug).sainyuka.length]), 2);
+  if (moved.length) lines.push(`この7日に値下がりか再入荷を見つけたのは、${joinTo(moved.map((c) => workLink(c)))}`);
+  return lines.slice(0, MEMO_MAX);
+}
+function cornerMemoSection(k, ws) {
+  const lines = cornerMemoLines(k, ws);
+  if (lines.length < 2) return '';
+  return `<section class="memo"><h2>入荷メモ</h2><ul>${lines.map((t) => `<li>${t}。</li>`).join('')}</ul><p class="asof">${TODAY_MD}までに、このサイトが楽天市場で見つけた商品の記録から</p></section>`;
+}
 for (const k of liveCorners) {
   const ws = worksIn(k.slug);
   const news = cornerNews(k.slug);
@@ -1330,7 +1367,7 @@ for (const k of liveCorners) {
     description: desc,
     h1: `${k.title}の新着`,
     mainClass: 'top shelf',
-    body: shelves + rankSection(`楽天のランキングに入っている${k.title}`, rankedFor('').filter((r) => set.has(r.c)), 8) + cornerYomi(k) + oshiFolded(ws),
+    body: shelves + rankSection(`楽天のランキングに入っている${k.title}`, rankedFor('').filter((r) => set.has(r.c)), 8) + cornerYomi(k) + oshiFolded(ws) + cornerMemoSection(k, ws),
     lastmod: newest(news),
     count: news.length,
   });
