@@ -237,14 +237,25 @@ const feedCheck = (xml) => {
   ok(hm.every(([, m]) => { const n = (m[1].match(/<li>/g) ?? []).length; return n >= 2 && n <= 5 && m[1].includes('class="asof"'); }), '発売のメモは2〜5行・出どころの1行がある');
   ok(hm.every(([, m]) => !/もうすぐ|お早めに|締切|今だけ/.test(m[1])), '発売のメモにあおる言葉がない');
 }
-// コーナーの入荷メモ（/anime/・/game/・/idol/ の本文のいちばん下。#117）：件数を出さない・2〜5行・出どころの1行・リンクはこのサイトの中だけ
+// コーナーの入荷メモ（/anime/・/game/・/idol/ の本文のいちばん下。#117）：件数・あおる言葉を出さない・2〜5行・出どころの1行・リンクはこのサイトの中だけ
+// 見本データでは少なくとも1つのコーナーに出る（いま作った dist が本当のデータでも、見本データで別に作って確かめる）
 {
-  const cm = ['anime', 'game', 'idol']
-    .filter((k) => existsSync(`dist/${k}/index.html`))
-    .map((k) => [k, readFileSync(`dist/${k}/index.html`, 'utf8').match(/<section class="memo"><h2>入荷メモ<\/h2>([\s\S]*?)<\/section>/)])
-    .filter(([, m]) => m);
-  if (existsSync('dist/anime/index.html') && existsSync('test/fixture-latest.json') && process.env.DATA_LATEST) ok(cm.some(([k]) => k === 'anime'), 'コーナーの入荷メモ：見本データでは、アニメのコーナーのトップに出る');
+  const memosIn = (dir) =>
+    ['anime', 'game', 'idol']
+      .filter((k) => existsSync(join(dir, k, 'index.html')))
+      .map((k) => [k, readFileSync(join(dir, k, 'index.html'), 'utf8').match(/<section class="memo"><h2>入荷メモ<\/h2>([\s\S]*?)<\/section>/)])
+      .filter(([, m]) => m);
+  const out = mkdtempSync(join(tmpdir(), 'oshi-corner-memo-'));
+  const fx = { DATA_LATEST: 'test/fixture-latest.json', DATA_META: 'test/fixture-meta.json', DATA_BOOKS: 'test/fixture-books.json', DATA_RANKING: 'test/fixture-ranking.json' };
+  const r = spawnSync(process.execPath, ['scripts/build.mjs'], { env: { ...process.env, ...fx, OUT_DIR: out }, encoding: 'utf8' });
+  ok(r.status === 0, 'コーナーの入荷メモ：見本データでページを作れる');
+  const fxMemos = memosIn(out);
+  ok(fxMemos.length >= 1, `コーナーの入荷メモ：見本データでは、コーナーのトップの少なくとも1つに出る（${fxMemos.map(([k]) => k).join('・') || 'なし'}）`);
+  ok(!/<section class="memo"><h2>入荷メモ<\/h2>/.test(existsSync(join(out, 'index.html')) ? readFileSync(join(out, 'index.html'), 'utf8') : ''), 'サイトのトップ（キャラのコーナー）には入荷メモを出さない（見本データ）');
+  rmSync(out, { recursive: true, force: true });
+  const cm = [...memosIn('dist'), ...fxMemos];
   ok(cm.every(([, m]) => !/\d+\s*件/.test(m[1].replace(/<[^>]+>/g, ''))), 'コーナーの入荷メモに件数（数字＋件）が出ていない');
+  ok(cm.every(([, m]) => !/人気|注目|おすすめ/.test(m[1].replace(/<[^>]+>/g, ''))), 'コーナーの入荷メモに「人気」「注目」「おすすめ」が出ていない');
   ok(cm.every(([, m]) => [...m[1].matchAll(/href="([^"]*)"/g)].every(([, h]) => h.startsWith('/') && !h.startsWith('//'))), 'コーナーの入荷メモのリンクがこのサイトの中だけ');
   ok(cm.every(([, m]) => { const n = (m[1].match(/<li>/g) ?? []).length; return n >= 2 && n <= 5 && m[1].includes('class="asof"'); }), 'コーナーの入荷メモは2〜5行・出どころの1行がある');
   ok(!/<section class="memo"><h2>入荷メモ<\/h2>/.test(readFileSync('dist/index.html', 'utf8')), 'サイトのトップ（キャラのコーナー）には入荷メモを出さない');
