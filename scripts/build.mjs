@@ -1942,6 +1942,8 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     toc = `<nav class="gtoc" aria-label="都道府県">${areas
       .map((a) => (fold ? `<details open><summary>${esc(a.name)}</summary>${prefLinks(a)}</details>` : `<div class="gtr"><p class="oc">${esc(a.name)}</p>${prefLinks(a)}</div>`))
       .join('')}${restLink}</nav>`;
+    // 「持ってない県だけ」（src/gotouchi.js が「持ってる」の県がこのページにあるときだけ出す。押したかどうかは残さない）
+    toc += '<div class="flt gmo" hidden><ul class="chips"><li><button type="button" aria-pressed="false">持ってない県だけ</button></li></ul></div><p class="asof gmo-all" hidden>この一覧の県は、どれも「持ってる」にしてあります</p>';
   } else {
     const chips = [...areas.map((a) => [a.slug, a.name]), ...(rest.length ? [['sonohoka', SONOHOKA]] : [])];
     if (chips.length > 1) toc = `<ul class="chips">${chips.map(([id, name]) => `<li><a href="#${id}">${esc(name)}</a></li>`).join('')}</ul>`;
