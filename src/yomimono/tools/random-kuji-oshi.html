@@ -1,0 +1,38 @@
+<div class="fit" id="rnd">
+<p class="fit-mm"><label>全部の種類<input type="number" name="n" inputmode="numeric" min="2" max="60" step="1" value="12">種</label></p>
+<p class="fit-mm"><label>推しが出る種類<input type="number" name="m" inputmode="numeric" min="1" max="60" step="1" value="1">種</label></p>
+<p class="fit-mm"><label>買う個数<input type="number" name="k" inputmode="numeric" min="1" max="100" step="1" value="5">個</label></p>
+<p class="fit-mm"><label>1個の値段<input type="number" name="y" inputmode="numeric" min="1" max="20000" step="1" value="550">円</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 40" role="img" aria-label="買う個数ごとに、推しが1つは出る見こみを棒の高さで並べた。いま入れた個数の棒の色を変えた"></svg><figcaption>1個から順に、推しが1つは出る見こみ（いま入れた個数の棒だけ色を変えた）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('rnd');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+// 入れた数字が範囲の外・空・整数でないときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t,u){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi&&x===Math.floor(x))return x;if(!bad)bad=t+'は'+lo+'〜'+hi+u+'の整数を入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+// 見こみは多めに見ないよう、0.1%より下を切り捨てる（ごく小さな数を足して計算の誤差をよける）
+function pc(x){return (Math.floor(x*1000+1e-9)/10).toFixed(1);}
+// 推しが1つは出る見こみ ＝ 1 −（1 − 推しの種類 ÷ 全部の種類）の個数乗。どの種類も同じ数だけ入っていて、1個ずつ別に引くとしたときのめやす
+function p(n,m,k){return 1-Math.pow(1-m/n,k);}
+// その見こみに届く個数（いちばん少ない個数）
+function need(n,m,g){if(m>=n)return 1;return Math.ceil(Math.log(1-g)/Math.log(1-m/n)-1e-9);}
+function run(){bad='';
+var n=num('n',2,60,'全部の種類','種'),m=num('m',1,60,'推しが出る種類','種'),k=num('k',1,100,'買う個数','個'),y=num('y',1,20000,'1個の値段','円'),svg=f.querySelector('.fit-a');
+if(!bad&&m>n)bad='推しが出る種類は、全部の種類の'+n+'種までにしてください。';
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+var a=p(n,m,k),h=need(n,m,0.5),t=need(n,m,0.9);
+var yen='代金は'+(k*y).toLocaleString('ja-JP')+'円です。';
+var ans=m>=n?'全部の種類が推しなので、どれを引いても推しです。'+k+'個の'+yen:k+'個買うと、推しが1つは出る見こみは約'+pc(a)+'%で、'+yen+'50%に届くのは'+h+'個、90%に届くのは'+t+'個からのめやすです。必ず出る個数はありません。';
+f.querySelector('.fit-ans').textContent=ans;
+// 棒の絵：1個から、入れた個数と90%に届く個数の大きいほうまで（60本まで）
+clear(svg);var N=Math.min(60,Math.max(k,t)),w=100/N;svg.setAttribute('viewBox','-1 -1 102 42');
+el(svg,'rect',{x:0,y:0,width:100,height:40,'class':'fit-w'});
+for(var i=1;i<=N;i++){var v=p(n,m,i)*40;el(svg,'rect',{x:(i-1)*w,y:40-v,width:w,height:v,'class':'fit-c '+(i===k?'fit-p':'fit-s')});}}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>
