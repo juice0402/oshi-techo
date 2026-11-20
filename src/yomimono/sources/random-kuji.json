@@ -1,0 +1,35 @@
+{
+  "checked": "2026-11-20",
+  "items": [
+    {
+      "name": "一番くじ倶楽部（一番くじって何？）",
+      "url": "https://1kuji.com/guide",
+      "used": "ハズレなしのキャラクターくじで必ずいずれかの商品が手に入る、最後の1個を引くとラストワン賞、コンビニエンスストアや書店・ホビーショップ・オンラインストアなどで販売、ダブルチャンスキャンペーンは無料会員登録が必要でくじ券のキャンペーンナンバーを入力かLINEで応募、一番くじONLINEは購入後のボタンから応募"
+    },
+    {
+      "name": "一番くじ倶楽部（一番くじ 学園アイドルマスター Part2）",
+      "url": "https://1kuji.com/products/gkmas02",
+      "used": "2025年6月20日発売、1回850円（税10%込）、A賞〜H賞とラストワン賞、G賞・H賞は全12種で選べない、くじの残り数は店舗で確認、ダブルチャンスの期間は発売日〜2025年9月末日"
+    },
+    {
+      "name": "消費者庁（景品規制の質問と答え：懸賞）",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/premium/lotteries",
+      "used": "一般懸賞の最高額は取引の価額5,000円未満でその20倍、5,000円以上で10万円、総額は売上予定総額の2%以内（Q86）。ダブルチャンスは2回の懸賞の総額を合わせて2%以内（Q94）"
+    },
+    {
+      "name": "消費者庁（景品規制の質問と答え：カード合わせ）",
+      "url": "https://www.caa.go.jp/policies/policy/representation/fair_labeling/faq/card",
+      "used": "異なる種類の符票の特定の組合せを提示させる方法の懸賞（カード合わせ）は最高額や総額にかかわらず全面禁止（Q5・Q6）、同じ絵柄を集める方式はカード合わせに当たらない（Q26）"
+    },
+    {
+      "name": "hololive production OFFICIAL SHOP（受注生産のライブグッズの例）",
+      "url": "https://shop.hololivepro.com/products/sakuramiko_2ndlive_bloomingparade_madetoorder",
+      "used": "受注受付期間 2026年9月15日20時〜10月13日18時、発送予定は2027年1月中旬まで、受注期間終了後に発送、お支払い確定後はキャンセル不可、既定の販売数量に達し次第予告なく終了の場合あり、発送時期の異なる商品を同一決済で注文すると一番遅い商品に合わせて発送"
+    },
+    {
+      "name": "hololive production OFFICIAL SHOP（受注生産の誕生日記念グッズの例）",
+      "url": "https://shop.hololivepro.com/products/tokinosora_birthday_2026",
+      "used": "受注受付期間 2026年5月15日〜6月15日、発送予定は2026年12月中旬まで、お支払い確定後はキャンセル不可"
+    }
+  ]
+}
