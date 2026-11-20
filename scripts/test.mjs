@@ -905,6 +905,12 @@ if (process.env.DATA_LATEST) {
       'ご当地の一覧：県の見出しごとに「持ってる」のチェック（作品ごとの名前で残す。スヌーピーは読みものの道具と同じ。ご当地のまとめには置かない）',
     );
     ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(gjs) && (gjs.match(/setItem\(/g) ?? []).length === 2 && gjs.includes("S.setItem(KEY, a.join(','))") && gjs.includes("S.setItem('ot-t', '1')") && /if \(\/\^\[a-z\]\+\$\/\.test\(p\)\) got\[p\] = 1/.test(gjs) && gjs.includes("b.getAttribute('data-p')"), 'ご当地の一覧のチェック：どこにも送らず、残すのは県の id だけ（商品の番号・名前・URL を残さない）');
+    // 「持ってない県だけ」（#119）：県が3つ以上の一覧の目次のすぐ下に hidden で1つ。かくすだけで、新しく残すものはない。ご当地のまとめには置かない
+    const GMO = '</nav><div class="flt gmo" hidden><ul class="chips"><li><button type="button" aria-pressed="false">持ってない県だけ</button></li></ul></div><p class="asof gmo-all" hidden>この一覧の県は、どれも「持ってる」にしてあります</p>';
+    ok(
+      [sn, sg2, ch2].every((h) => (h.match(/class="flt gmo"/g) ?? []).length === (h.includes('<nav class="gtoc"') ? 1 : 0) && (!h.includes('class="flt gmo"') || h.includes(GMO))) && sn.includes(GMO) && !readFileSync('dist/gotouchi/index.html', 'utf8').includes('gmo') && gjs.includes("document.querySelector('.gmo')") && !/only[^\n]*setItem|setItem[^\n]*only/.test(gjs),
+      'ご当地の一覧：「持ってない県だけ」は目次のすぐ下に hidden で1つ。押したかどうかは残さない。ご当地のまとめには置かない',
+    );
     ok(readFileSync('dist/privacy/index.html', 'utf8').includes('ご当地グッズの一覧の「持ってる」のチェックも同じ'), 'ご当地の一覧のチェック：プライバシーポリシーに1文');
     // ご当地の一覧の「都道府県ごとの見つけた記録」（#107）：見本の記録（test/fixture-gotouchi-seen.json）にだけある長崎も文字で出る
     const kr = (h) => h.match(/<section id="kiroku"><h2>都道府県ごとの見つけた記録<\/h2><table class="kk-book">(.*?)<\/table><p class="asof">(.*?)<\/p><\/section>/)?.slice(1) ?? [];

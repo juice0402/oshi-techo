@@ -21,12 +21,47 @@
     if (v) v.split(',').forEach(function (p) { if (/^[a-z]+$/.test(p)) got[p] = 1; });
   } catch (e) {}
   var bs = [].slice.call(document.querySelectorAll('.gpk[data-p]'));
+  // 「持ってない県だけ」：「持ってる」の県がこのページに1つ以上あるときだけ出す。押すとその県の節と目次のリンクをかくす（押したかどうかは残さない）
+  var gm = document.querySelector('.gmo'),
+    gb = gm && gm.querySelector('button'),
+    ga = document.querySelector('.gmo-all'),
+    only = false;
+  var narrow = function () {
+    if (!gb) return;
+    var secs = [].slice.call(document.querySelectorAll('section.gp[id^="p-"]')),
+      left = 0;
+    var has = secs.some(function (s) { return got[s.id.slice(2)]; });
+    gm.hidden = !has;
+    if (!has) only = false;
+    gb.setAttribute('aria-pressed', String(only));
+    secs.forEach(function (s) {
+      s.hidden = only && !!got[s.id.slice(2)];
+      if (!s.hidden) left++;
+    });
+    secs.forEach(function (s) {
+      var a = s.parentNode;
+      a.hidden = !a.querySelector('section.gp:not([hidden])');
+    });
+    [].forEach.call(document.querySelectorAll('.gtoc a[href^="#p-"]'), function (a) {
+      a.parentNode.hidden = only && !!got[a.getAttribute('href').slice(3)];
+    });
+    [].forEach.call(document.querySelectorAll('.gtoc > *'), function (r) {
+      if (r.querySelector('a[href^="#p-"]')) r.hidden = !r.querySelector('li:not([hidden]) a[href^="#p-"]');
+    });
+    if (ga) ga.hidden = !(only && !left);
+  };
+  if (gb)
+    gb.addEventListener('click', function () {
+      only = !only;
+      narrow();
+    });
   var draw = function () {
     bs.forEach(function (b) { b.setAttribute('aria-pressed', String(!!got[b.getAttribute('data-p')])); });
     [].forEach.call(document.querySelectorAll('.gtoc a[href^="#p-"]'), function (a) {
       if (got[a.getAttribute('href').slice(3)]) a.setAttribute('data-got', '');
       else a.removeAttribute('data-got');
     });
+    narrow();
   };
   var save = function () {
     var a = [];
