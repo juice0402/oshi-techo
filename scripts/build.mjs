@@ -697,6 +697,42 @@ function gotouchiKiroku(key, here, part) {
   });
   return `<section id="kiroku"><h2>都道府県ごとの見つけた記録</h2><table class="kk-book"><thead><tr><th scope="col">都道府県</th><th scope="col">初めて見つけた日</th><th scope="col">最後に見た日</th></tr></thead><tbody>${rows.join('')}</tbody></table><p class="asof">${TODAY_MD}までに、このサイトが楽天市場で見つけたご当地${esc(part)}の記録から</p></section>`;
 }
+// /gotouchi/ のまとめの「新しく見つけた県」：記録の初めて見つけた日 f が30日以内の「作品・県」を新しい順に5行まで。
+// 記録のいちばん早い f から14日以内は出さない（記録を始めたころにまとめて見つけた分）。キティの記録と同じ県・同じ日のサンリオは、キティの行だけ。
+// 県の節がいまの一覧にあるときだけ /<作品>/gotouchi/#p-<id> へのリンク、ない県は文字だけ
+const NEW_PREF_DAYS = 30;
+const NEW_PREF_SKIP = 14;
+const NEW_PREF_MAX = 5;
+const mdJp = (ymd) => `${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
+const prefFull = (p) => (p === '北海道' ? p : p === '東京' ? '東京都' : p === '京都' || p === '大阪' ? `${p}府` : `${p}県`);
+function newPrefLines() {
+  const here = (list) => new Set(list.filter((i) => i.region).map((i) => prefId(i.region.pref).slice(2)));
+  const pages = new Map([
+    ...gotouchiWorks.map((w) => [w.c.slug, { path: `/${w.c.slug}/gotouchi/`, here: here(w.items) }]),
+    ...gotouchiSubs.map((x) => [`${x.w.c.slug}/${x.sub.slug}`, { path: subPath(x), here: here(x.items) }]),
+  ]);
+  const names = new Map(allWorks.flatMap((c) => [[c.slug, c.name], ...(c.gotouchiSub ?? []).filter((s) => s.slug).map((s) => [`${c.slug}/${s.slug}`, s.name])]));
+  const all = Object.entries(gotouchiSeen).flatMap(([k, prefs]) => Object.entries(prefs).map(([p, d]) => ({ k, p, f: d.f })));
+  if (!all.length) return [];
+  const start = all.reduce((m, x) => (x.f < m ? x.f : m), all[0].f);
+  const skipTo = jstDate(new Date(Date.parse(`${start}T00:00:00+09:00`) + NEW_PREF_SKIP * DAY));
+  const from = jstDate(new Date(nowMs - NEW_PREF_DAYS * DAY));
+  const subSame = new Set(all.filter((x) => x.k.includes('/')).map((x) => `${x.k.split('/')[0]}|${x.p}|${x.f}`));
+  return all
+    .filter((x) => names.has(x.k) && x.f > skipTo && x.f >= from && x.f <= today && !subSame.has(`${x.k}|${x.p}|${x.f}`))
+    .sort((a, b) => b.f.localeCompare(a.f) || PREF_IDS.indexOf(a.p) - PREF_IDS.indexOf(b.p) || a.k.localeCompare(b.k))
+    .slice(0, NEW_PREF_MAX)
+    .map((x) => {
+      const pg = pages.get(x.k);
+      const pref = esc(prefFull(PREF_NAME[x.p]));
+      return `${mdJp(x.f)}、ご当地${esc(names.get(x.k))}で${pg?.here.has(x.p) ? `<a href="${pg.path}#p-${x.p}">${pref}</a>` : pref}`;
+    });
+}
+function newPrefSection() {
+  const lines = newPrefLines();
+  if (lines.length < 2) return '';
+  return `<section class="memo"><h2>新しく見つけた県</h2><ul>${lines.map((t) => `<li>${t}。</li>`).join('')}</ul><p class="asof">${TODAY_MD}までに、このサイトが楽天市場で見つけたご当地グッズの記録から</p></section>`;
+}
 // 多い地名（ページの名前に使う）
 const topPlaces = (items, n = 3) => {
   const count = {};
@@ -2108,7 +2144,9 @@ if (gotouchiWorks.length) {
           (w, i) =>
             `<section><h2>ご当地${esc(w.c.name)}</h2>${grid(w.newest.slice(0, settings.topItems), i === 0)}<p class="more"><a href="/${w.c.slug}/gotouchi/">ご当地${esc(w.c.name)}一覧</a></p></section>`,
         )
-        .join('') + priceAt(),
+        .join('') +
+      newPrefSection() +
+      priceAt(),
     lastmod: newest(all),
   });
 }

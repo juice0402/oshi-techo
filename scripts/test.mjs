@@ -926,6 +926,27 @@ if (process.env.DATA_LATEST) {
     ok(gpages.every((h) => { const [t] = kr(h); return !t || !/\d+件/.test(t); }), 'ご当地の記録の表：件数（数字＋件）を出さない');
     ok(gpages.every((h) => { const [t] = kr(h); if (!t) return true; const hrefs = [...t.matchAll(/href="([^"]*)"/g)].map((m) => m[1]); return hrefs.length > 0 && hrefs.every((x) => /^#p-[a-z]+$/.test(x) && h.includes(`<section class="gp" id="${x.slice(1)}">`)); }), 'ご当地の記録の表：リンクはこのページの中の #p- だけ（いま商品のある県の見出しへ）');
     ok(gpages.every((h) => !h.includes('id="kiroku"') || (h.indexOf('id="kiroku"') > h.lastIndexOf('<section class="gp"') && h.indexOf('id="kiroku"') > (h.indexOf('id="sonohoka"')) && !/id="kiroku"[\s\S]*class="gpk"/.test(h))) && !readFileSync('dist/gotouchi/index.html', 'utf8').includes('id="kiroku"'), 'ご当地の記録の表：都道府県の節と「地名が商品名にないもの」のあと。「持ってる」は付けない。ご当地のまとめには置かない');
+    // ご当地のまとめの「新しく見つけた県」（#124）：見本の記録にだけある鹿児島（スヌーピー）は文字だけで出る
+    const gtAll = readFileSync('dist/gotouchi/index.html', 'utf8');
+    const npM = gtAll.match(/<section class="memo"><h2>新しく見つけた県<\/h2><ul>(.*?)<\/ul><p class="asof">(.*?)<\/p><\/section>/);
+    const npLis = [...(npM?.[1] ?? '').matchAll(/<li>(.*?)<\/li>/g)].map((m) => m[1]);
+    const npDates = npLis.map((t) => t.match(/^(\d+)月(\d+)日、/)).map((m) => (m ? Number(m[1]) * 100 + Number(m[2]) : -1));
+    ok(
+      !!npM && npLis.length >= 2 && npLis.length <= 5 && npLis.includes('10月17日、ご当地スヌーピーで鹿児島県。') && npLis.includes('10月17日、ご当地スヌーピーで<a href="/snoopy/gotouchi/#p-yamanashi">山梨県</a>。') &&
+        npLis.every((t) => /^\d+月\d+日、ご当地[^、。<]+で(<a href="[^"]+">)?[^<。]+[都道府県](<\/a>)?。$/.test(t)) && npDates.every((d, i, a) => d > 0 && (i === 0 || a[i - 1] >= d)) &&
+        /^\d+\/\d+までに、このサイトが楽天市場で見つけたご当地グッズの記録から$/.test(npM[2]) && !/限定|今だけ|お早めに/.test(npM[0]),
+      'ご当地のまとめ：「新しく見つけた県」が新しい順に5行まで出て、記録にだけある県（鹿児島）は文字だけ',
+    );
+    ok(!!npM && !/\d+件/.test(npM[0]), 'ご当地のまとめの「新しく見つけた県」：件数（数字＋件）を出さない');
+    ok(
+      !!npM && [...npM[0].matchAll(/href="([^"]*)"/g)].map((m) => m[1]).every((x) => {
+        const m = x.match(/^(\/[a-z0-9-]+\/gotouchi\/(?:[a-z0-9-]+\/)?)#(p-[a-z]+)$/);
+        return m && existsSync(`dist${m[1]}index.html`) && readFileSync(`dist${m[1]}index.html`, 'utf8').includes(`<section class="gp" id="${m[2]}">`);
+      }),
+      'ご当地のまとめの「新しく見つけた県」：リンクはこのサイトのご当地の一覧の #p- だけ（いまある県の節へ）',
+    );
+    ok(!!npM && gtAll.indexOf(npM[0]) > gtAll.lastIndexOf('一覧</a></p></section>') && gtAll.indexOf(npM[0]) < gtAll.indexOf('時点の価格</p>') && gpages.every((h) => !h.includes('新しく見つけた県')), 'ご当地のまとめの「新しく見つけた県」：作品ごとの節のあと・時点の価格の行より上。作品ごとの一覧には置かない');
+    ok(/const NEW_PREF_SKIP = 14;/.test(readFileSync('scripts/build.mjs', 'utf8')) && /if \(lines\.length < 2\) return '';\n  return `<section class="memo"><h2>新しく見つけた県/.test(readFileSync('scripts/build.mjs', 'utf8')), 'ご当地のまとめの「新しく見つけた県」：記録の始めから14日は出さない・2行より少ないときは出さない');
     ok(/const MIN_KIROKU = 3;/.test(readFileSync('scripts/build.mjs', 'utf8')) && /if \(ids\.length < MIN_KIROKU\) return '';/.test(readFileSync('scripts/build.mjs', 'utf8')), 'ご当地の記録の表：記録のある県が3つより少ないときは出さない');
   }
   ok(topHtml.includes('<section class="dks s-gotouchi">') && topHtml.includes('<a href="/gotouchi/">ご当地グッズ</a>') && readFileSync('dist/chiikawa/index.html', 'utf8').includes('<li><a href="/chiikawa/gotouchi/">ご当地ちいかわ一覧</a></li>'), 'ご当地：トップ・作品のページ・いちばん下に入口');
