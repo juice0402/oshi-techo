@@ -1164,7 +1164,7 @@ ok(broken.size === 0, `サイト内のリンク切れがない${broken.size ? `�
 
 // つぎに見る（行き止まりのページの終わりの道しるべ。docs/shikumi.md の「つぎに見る」）
 {
-  const WHY = ['このページに多い推しキャラ', '同じ作品のコラボ', '同じ作品のほかの推しキャラ', '発売前のもの', '読みもの', '同じテーマの読みもの', 'この記事に出てくる作品', '推し活カレンダー', 'コラボグッズ'];
+  const WHY = ['このページに多い推しキャラ', '同じ作品のコラボ', '同じ作品のほかの推しキャラ', '発売前のもの', '読みもの', '同じテーマの読みもの', 'この記事に出てくる作品', '推し活カレンダー', 'コラボグッズ', '誕生日の飾り', '推しキャラの誕生日'];
   const pathOf = (f) => `/${f.slice('dist/'.length).replace(/index\.html$/, '')}`;
   const navOf = (s) => s.match(/<nav class="tsugi2" aria-label="つぎに見る"><h2>つぎに見る<\/h2><ul>(.*?)<\/ul><\/nav>/)?.[1] ?? null;
   const bad = [];
@@ -1200,6 +1200,16 @@ ok(broken.size === 0, `サイト内のリンク切れがない${broken.size ? `�
   ok(has('chiikawa/hachiware/') && hw.indexOf('のグッズの新着へ</a></p>') < hw.indexOf('class="tsugi2"') && /<\/nav><\/div><div class="side" data-stick>/.test(hw) && navOf(hw).split('<li>').length - 1 <= 2, 'つぎに見る：推しキャラのページは本文（.flow）の最後（入荷ビンゴより上）に2行まで');
   const pg = readFileSync('dist/yomimono/pc-game/index.html', 'utf8');
   ok(pg.indexOf('この記事を書くときに調べた資料') < pg.indexOf('class="tsugi2"') && navOf(pg).includes('<span>同じテーマの読みもの</span>') && navOf(pg).includes('<span>この記事に出てくる作品</span><a href="/minecraft/">マインクラフトのグッズの新着</a>'), 'つぎに見る：読みものの記事は、調べた資料の行のあとに同じテーマの読みものと出てくる作品');
+  // 推しの誕生日と祭壇の飾り方（#128）：/tanjoubi/ ⇄ 記事の "tanjoubi": true
+  if (existsSync('dist/tanjoubi/index.html') && existsSync('dist/yomimono/saidan/index.html')) {
+    const tj = navOf(readFileSync('dist/tanjoubi/index.html', 'utf8')) ?? '';
+    const sd = navOf(readFileSync('dist/yomimono/saidan/index.html', 'utf8')) ?? '';
+    ok(tj.includes('<li><span>誕生日の飾り</span><a href="/yomimono/saidan/">') && sd.includes('<li><span>推しキャラの誕生日</span><a href="/tanjoubi/">推しキャラの誕生日カレンダー</a></li>'), 'つぎに見る：/tanjoubi/ と祭壇の飾り方の記事は、おたがいへの行がある');
+  }
+  // 見本データ（10月18日）ではハローキティの誕生日（11月1日）が30日以内：読みものの1本目は祭壇の飾り方
+  if (process.env.DATA_LATEST && existsSync('dist/sanrio/hellokitty/index.html')) {
+    ok(/<li><span>読みもの<\/span><a href="\/yomimono\/saidan\/">/.test(navOf(readFileSync('dist/sanrio/hellokitty/index.html', 'utf8')) ?? ''), 'つぎに見る：誕生日が30日以内の推しキャラのページは、読みものの1本目が祭壇の飾り方');
+  }
   const yomiNo = readdirSync('dist/yomimono', { withFileTypes: true }).filter((d) => d.isDirectory() && existsSync(`dist/yomimono/${d.name}/index.html`) && d.name !== 'img').map((d) => d.name).filter((d) => !has(`yomimono/${d}/`));
   ok(yomiNo.length === 0, `つぎに見る：読みものの記事はどれも最後に次の道がある${yomiNo.length ? `（${yomiNo.join('、')}）` : ''}`);
   const yomiCfg = readJson('config/yomimono.json');
