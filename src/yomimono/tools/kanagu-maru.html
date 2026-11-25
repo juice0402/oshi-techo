@@ -1,0 +1,45 @@
+<div class="fit" id="mrk">
+<p class="fit-mm"><label>丸カンの線の太さ<input type="number" name="d" inputmode="decimal" min="0.3" max="3" step="0.1" value="1">mm</label></p>
+<p class="fit-mm"><label>丸カンの外径<input type="number" name="o" inputmode="decimal" min="2" max="30" step="0.1" value="7">mm</label></p>
+<p class="fit-mm"><label>アクキーの穴の直径<input type="number" name="h" inputmode="decimal" min="1" max="10" step="0.1" value="3">mm</label></p>
+<p class="fit-mm"><label>アクキーの厚さ<input type="number" name="t" inputmode="decimal" min="0.5" max="10" step="0.1" value="3">mm</label></p>
+<p class="fit-mm"><label>いっしょに通す金具の線の太さ<input type="number" name="w" inputmode="decimal" min="0.3" max="5" step="0.1" value="1">mm</label></p>
+<div class="fit-out" aria-live="polite">
+<p class="fit-ans"></p>
+<div class="fit-figs fit-1"><figure><svg class="fit-a" viewBox="0 0 100 50" role="img" aria-label="丸カンの輪を上から見た円と、内側に入るアクキーの厚さと金具の太さを同じ縮尺で並べたところ"></svg><figcaption>外の輪が丸カン、輪の中の2つの四角がアクキーの厚さと金具の線の太さ（同じ縮尺）</figcaption></figure></div>
+</div>
+</div>
+<script>(function(){
+var f=document.getElementById('mrk');if(!f)return;
+var NS='http://www.w3.org/2000/svg';
+// 入れた数字が範囲の外・空・0.1mm きざみでないときは、勝手に別の数字で計算せず、直してほしいことを出す
+var bad='';
+function num(n,lo,hi,t){var x=parseFloat(f.querySelector('input[name="'+n+'"]').value);if(x>=lo&&x<=hi&&Math.abs(x*10-Math.round(x*10))<1e-9)return x;if(!bad)bad=t+'は'+lo+'〜'+hi+'mmの数字を0.1mmきざみで入れてください。';return 0;}
+function el(svg,t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);svg.appendChild(e);return e;}
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function r1(x){return (Math.round(x*10)/10).toFixed(1);}
+function run(){bad='';
+var d=num('d',0.3,3,'丸カンの線の太さ'),o=num('o',2,30,'丸カンの外径'),h=num('h',1,10,'アクキーの穴の直径'),t=num('t',0.5,10,'アクキーの厚さ'),w=num('w',0.3,5,'いっしょに通す金具の線の太さ'),svg=f.querySelector('.fit-a');
+if(!bad&&o<=d*2)bad='外径は、線の太さの2倍の'+r1(d*2)+'mmより大きくしてください。';
+if(bad){f.querySelector('.fit-ans').textContent=bad;clear(svg);return;}
+// 内径 ＝ 外径 − 線の太さ × 2（輪の両がわに線が1本ずつあるため）
+var inn=o-d*2,need=t+w,gap=inn-need,s=[];
+s.push('内径は約'+r1(inn)+'mmです。');
+// 穴を通るか：線が穴より細ければ通る
+if(d<h)s.push('線の太さ'+r1(d)+'mmは穴の'+r1(h)+'mmより細いので、穴を通ります。');
+else s.push('線の太さ'+r1(d)+'mmは穴の'+r1(h)+'mm以上なので、穴を通りません。細い丸カンにします。');
+// 輪の中に、アクキーの厚さと、いっしょに通す金具の線が並んで入るか
+if(gap>0)s.push('輪の中にアクキーの厚さと金具の線を並べると、約'+r1(gap)+'mmあまるめやすです。');
+else s.push('アクキーの厚さと金具の線を足すと'+r1(need)+'mmで、内径に'+r1(-gap)+'mm足りないめやすです。外径の大きい丸カンにします。');
+// ボールチェーンを丸カンなしで穴に通すなら、玉が穴より小さいこと（玉の直径は工具の会社の表の 2.3・3.2・4.5mm）
+var ok=[2.3,3.2,4.5].filter(function(b){return b<h;});
+s.push(ok.length?'丸カンなしでボールチェーンを通すなら、玉の直径'+ok.join('mm・')+'mmのものが穴より小さいです。':'玉の直径2.3mmのボールチェーンも穴より大きいので、丸カンかナスカンでつなぎます。');
+f.querySelector('.fit-ans').textContent=s.join('');
+// 絵：丸カンの輪（外径と内径の円）と、輪の中に並べたアクキーの厚さ・金具の線（同じ縮尺）
+clear(svg);var R=o/2,ri=inn/2,W=Math.max(o,need)+2,H=o+2;svg.setAttribute('viewBox',(-W/2)+' '+(-H/2)+' '+W+' '+H);
+el(svg,'circle',{cx:0,cy:0,r:(R+ri)/2,'class':'fit-w',style:'fill:none;stroke-width:'+(R-ri)});
+var x0=-need/2,hh=inn*0.6;
+el(svg,'rect',{x:x0,y:-hh/2,width:t,height:hh,'class':gap>0?'fit-l':'fit-p'});
+el(svg,'rect',{x:x0+t,y:-hh/2,width:w,height:hh,'class':gap>0?'fit-s':'fit-p'});}
+f.addEventListener('change',run);f.addEventListener('input',run);run();
+})();</script>

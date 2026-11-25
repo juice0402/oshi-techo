@@ -1,0 +1,45 @@
+{
+  "checked": "2026-11-23",
+  "items": [
+    {
+      "name": "貴和製作所（丸カン・Cカンの開け方と閉じ方）",
+      "url": "https://kiwaseisakujo.jp/en/pages/basic_kanagu1",
+      "used": "平ヤットコ1本と指の道具か、平ヤットコ2本で、前後にずらすように開き、閉じるときも前後にずらす。広げた状態で開くと金属疲労で折れる、左右に開きすぎるとゆがむ"
+    },
+    {
+      "name": "MISUMI（ステンレス溶接リング（丸カン）・新生発条工業）",
+      "url": "https://jp.misumi-ec.com/vona2/detail/221004961847/",
+      "used": "寸法を内径と線径で表記、溶接しているので継ぎ目がない"
+    },
+    {
+      "name": "MISUMI（ボールチェーン BALLC）",
+      "url": "https://jp.misumi-ec.com/vona2/detail/110300261220/",
+      "used": "ボール外径 2.3mm・3.2mm、コネクタまたはカップリング付属、D2.3と3.2のカップリングは形状が異なる"
+    },
+    {
+      "name": "MISUMI（ボールチェーン（ステンレス製）・トラスコ中山）",
+      "url": "https://jp.misumi-ec.com/vona2/detail/221005499787/",
+      "used": "玉径 2.3・3.2・4.5mm"
+    },
+    {
+      "name": "MISUMI（Eパーツパック コネクター ボールチェーン専用・ニッサチェイン）",
+      "url": "https://jp.misumi-ec.com/vona2/detail/221005492803/",
+      "used": "コネクターにボールチェーンの左右を入れて輪にする、型番ごとに適合チェーンの記号が決まっている"
+    },
+    {
+      "name": "ステッカーミュール（アクリルチャーム）",
+      "url": "https://www.stickermule.com/jp/products/acrylic-charms",
+      "used": "各チャームに2mmの穴"
+    },
+    {
+      "name": "アクリルキーホルダー 入稿データ作成の注意（2023年2月16日）",
+      "url": "https://www.hansokuhin.com/good_db/data/img/H161050_photoc.pdf",
+      "used": "ボールチェーンの穴は直径3mmで作成"
+    },
+    {
+      "name": "ファンクリ（アクリルキーホルダーの仕様）",
+      "url": "https://www.rakuten.ne.jp/gold/auc-fun-create/ac_key/webdeco.html",
+      "used": "5つの形の仕様で厚さ3mm、接続部品は回転付きナスカン"
+    }
+  ]
+}
