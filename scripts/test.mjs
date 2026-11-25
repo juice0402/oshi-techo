@@ -55,6 +55,21 @@ ok(judge({ ...base, name: 'ちいかわ パジャマ アダルトサイズ M' },
     ok(t(bsd, '文豪ストレイドッグス アクリルスタンド 太宰治') && t(bsd, '文豪ストレイドッグス CDケース 収納'), 'アクスタや CD ケースは載せる');
   }
 }
+// 2026-11-21（#121）本当のデータで見つけたまざりもの：前に【新品】などがついたソフト・3DS や Xbox のソフト・「〔著〕」の本・作品と関係ない同じ名前の物。グッズは残す
+{
+  const w = (s) => chars.find((c) => c.slug === s);
+  const [dq, kirby, mc, im, ens, hq] = ['dragonquest', 'kirby', 'minecraft', 'idolmaster', 'enstars', 'haikyu'].map(w);
+  if (dq && kirby && mc && im && ens && hq) {
+    const t = (c, name) => judge({ ...base, name }, c, settings).keep;
+    ok(!t(dq, '【新品】Nintendo Switch ドラゴンクエスト モンスターズ') && !t(dq, 'ドラゴンクエスト 1&2 Switch ゲームソフト') && !t(dq, '【3DS】ドラゴンクエスト') && !t(im, 'アイドルマスター - Xbox360'), 'ゲーム：前に【新品】がついたソフト・3DS・Xbox のソフトは載せない');
+    ok(t(dq, '【新品】Nintendo Switch ドラゴンクエスト スライム 収納ケース') && t(dq, 'ドラゴンクエスト スライム ソフトビニール フィギュア'), 'ゲーム：前に【新品】がついた Switch のケース・ソフビは載せる');
+    ok(!t(kirby, '星のカービィ ぼうけんのお話 （角川つばさ文庫） [ 作者 名前 ]') && !t(mc, 'マインクラフト ぼうけんの本 [ 作者 ]') && !t(ens, 'あんさんぶるスターズ！ 〔1〕 お話 作者/〔著〕'), 'ゲーム・アイドル：楽天ブックスの本（文庫・[ 作者 ]・〔著〕）は載せない');
+    ok(t(mc, 'レゴ マインクラフト クリーパー [ おもちゃ 玩具 プレゼント ]') && t(kirby, '星のカービィ ぬいぐるみ ワドルディ'), 'ゲーム：[ おもちゃ ] と書いたレゴやぬいぐるみは載せる');
+    const tr = w('touken-ranbu');
+    ok(judge({ ...base, name: 'ポケモン Switch2 ゲームソフト ケース 24枚収納' }, pokemon, settings).keep && (!tr || (t(tr, '刀剣乱舞 アクリルスタンド アニメ/漫画 グッズ') && !t(tr, '刀剣乱舞 お話 1 作者/漫画'))), 'ゲームソフトのケース・「アニメ/漫画」と並べたグッズは載せる（マンガの本は載せない）');
+    ok(!t(hq, 'マットレス ハイキューブ シングル') && t(hq, 'ハイキュー!! アクリルスタンド 日向翔陽'), 'ハイキュー：同じ字の「ハイキューブ」は載せない');
+  }
+}
 ok(!judge({ ...base, name: 'ポケモンカードゲーム 拡張パック BOX' }, pokemon, settings).keep, 'ポケカは載せない');
 ok(!judge({ ...base, name: 'ポケモン シングルカード ピカチュウ' }, pokemon, settings).keep, 'シングルカードは載せない');
 ok(judge({ ...base, name: 'ポケモンセンター ピカチュウ ぬいぐるみ' }, pokemon, settings).keep, 'ピカチュウのぬいぐるみは載せる');
@@ -221,9 +236,10 @@ const feedCheck = (xml) => {
   ok(memos.length > 0, `入荷メモがある（${memos.length}作品）`);
   ok(memos.every(([, m]) => !/\d+\s*件/.test(m[1].replace(/<[^>]+>/g, ''))), '入荷メモに件数を出していない');
   ok(memos.every(([, m]) => (m[1].match(/<li>/g) ?? []).length <= 5 && m[1].includes('class="asof"')), '入荷メモは5行まで・記録の出どころがある');
+  ok(memos.every(([, m]) => !/短め|頃/.test(m[1].replace(/<[^>]+>/g, ''))), '入荷メモで「短め」と言い切らない・「頃」の発売日を使わない（#121）');
   if (process.env.DATA_LATEST) {
     const ch = memos.find(([s]) => s === 'chiikawa')?.[1][1] ?? '';
-    ok(ch.includes('その前の3週間より多い') && ch.includes('売り切れるまでが短め（まんなかで3日ほど）'), '入荷メモ：記録がたまると、入荷の増え方と売り切れまでの日数が出る（見本）');
+    ok(ch.includes('その前の3週間より多いペース') && ch.includes('見つけてから売り切れを見るまでが、まんなかで3日ほど'), '入荷メモ：記録がたまると、入荷の増え方と売り切れまでの日数が出る（見本）');
   }
 }
 // 発売のメモ（発売日カレンダーのいちばん下。#100）：件数を出さない・5行まで・出どころの1行・リンクはこのサイトの中だけ
