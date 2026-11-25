@@ -1188,6 +1188,8 @@ const yomiOrder = yomiArticles
 const yomiFor = (pred, c, n = 2) => yomiOrder.filter((a) => (!a.corner || a.corner === c?.corner) && pred(a)).slice(0, n);
 const yomiHasWork = (a, c) => a.works?.includes(c.slug) || a.linkFrom?.work === c.slug;
 const yomiLinks = (list) => list.map((a) => ({ href: `/yomimono/${a.slug}/`, text: a.title }));
+// 誕生日の読みもの（記事の "tanjoubi": true。いまは祭壇の飾り方だけ）：/tanjoubi/ と、誕生日が BIRTHDAY_SOON 以内の推しキャラのページのつぎに見るへ
+const yomiTanjoubi = (c) => yomiFor((a) => a.tanjoubi === true, c);
 // 商品カードの名前（esc したもの）をもとの文字に（page() が一覧の商品の名前を拾うとき）
 function unesc(s) {
   return s.replace(/&(amp|lt|gt|quot|#39);/g, (_, k) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" })[k]);
@@ -1639,8 +1641,18 @@ for (const { c, o, label, items: list, ranked } of oshiPages) {
     extraJs: BINGO_JS,
     tsugi: [
       collabRow(c),
-      // その推しに当たる商品に多いカテゴリの記事 → なければ作品の記事
-      { why: '読みもの', links: yomiLinks([yomiByCats(catRank(list.map((i) => i.name)), c), yomiFor((a) => yomiHasWork(a, c), c)].find((l) => l.length) ?? []) },
+      // その推しに当たる商品に多いカテゴリの記事 → なければ作品の記事。誕生日が BIRTHDAY_SOON 以内なら誕生日の読みものをいちばん前に（重ねずに2本まで）
+      {
+        why: '読みもの',
+        links: yomiLinks(
+          [
+            ...new Set([
+              ...(bd && bd.days <= BIRTHDAY_SOON ? yomiTanjoubi(c) : []),
+              ...([yomiByCats(catRank(list.map((i) => i.name)), c), yomiFor((a) => yomiHasWork(a, c), c)].find((l) => l.length) ?? []),
+            ]),
+          ].slice(0, 2),
+        ),
+      },
     ],
   });
 }
@@ -2353,6 +2365,7 @@ if (birthdays.length) {
         )
         .join('')}</ul><p class="more"><a href="/calendar/oshi.ics">推しキャラの誕生日と予定を、スマホのカレンダーに入れる</a>／<a href="/calendar/">推し活カレンダー</a></p><p class="asof">誕生日は公式で使われている日です</p></section>`,
     decoParts: soon.length ? ['birthday'] : [],
+    tsugi: [{ why: '誕生日の飾り', links: yomiLinks(yomiTanjoubi(null).slice(0, 1)) }],
   });
 }
 
@@ -2628,6 +2641,8 @@ for (const a of yomiArticles) {
           .map((w) => allWorks.find((x) => x.slug === w))
           .map((w) => ({ href: `/${w.slug}/`, text: `${w.name}のグッズの新着` })),
       },
+      // "tanjoubi": true の記事だけ。/tanjoubi/ ができていないときは、まとめの所で外れる
+      { why: '推しキャラの誕生日', links: a.tanjoubi === true ? [{ href: '/tanjoubi/', text: '推しキャラの誕生日カレンダー' }] : [] },
     ],
     lastmod: a.updated || a.published,
     ogImage: `/yomimono/img/${a.hero}-og.jpg?v=${createHash('sha256').update(readFileSync(`src/yomimono/img/${a.hero}-og.jpg`)).digest('hex').slice(0, 8)}`,
