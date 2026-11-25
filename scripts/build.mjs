@@ -346,6 +346,8 @@ const newest = (list) => (list.length ? jstDate(new Date(list.map((i) => i.first
 // ---- 説明文（meta description）：そのページのデータから作る ----
 // そのページにしかない数（新着・予約・件数・日付）を入れて、全角80〜120字くらい。値段はピッタリではなく「◯円台から」の幅にする（検索結果に古い値段が残るため）
 const mdOfYmd = (ymd) => `${Number(ymd.slice(5, 7))}/${Number(ymd.slice(8, 10))}`;
+// 入荷メモの「次に発売日が来るのは」：作った日と同じ日なら「今日の11/21」（うしろに（発売日カレンダー）が続くので、かっこは使わない）
+const dayOfYmd = (ymd) => (ymd === today ? `今日の${mdOfYmd(ymd)}` : mdOfYmd(ymd));
 const TODAY_MD = mdOfYmd(today);
 // 日付は「11月20日」。今年でない日は「2027年1月15日」（発売のメモ・福袋のメモ）
 const jpDate = (ymd) => `${ymd.slice(0, 4) !== today.slice(0, 4) ? `${Number(ymd.slice(0, 4))}年` : ''}${Number(ymd.slice(5, 7))}月${Number(ymd.slice(8, 10))}日`;
@@ -1038,7 +1040,8 @@ function memoLines(c, L, Y) {
       .filter((k) => wk[k] >= 6 && before[k] && wk[k] >= ((before[k] * 7) / (MEMO_TREND_DAYS - 7)) * 1.5)
       .sort((a, b) => wk[b] - wk[a])
       .slice(0, 2);
-    if (up.length) lines.push(`${joinTo(up.map(catLink))}の入荷が、その前の3週間より多い`);
+    // 「その前の3週間」の合計より多いと読まれないように、1週間あたりでくらべたことが分かる「ペース」と書く
+    if (up.length) lines.push(`この7日は、${joinTo(up.map(catLink))}の入荷がその前の3週間より多いペース`);
   }
   // 見つけてから初めて売り切れを見るまでの日数（記録が3週間たまってから。記録を始めて2日より後に見つけたものだけ）
   if (span >= MEMO_SOLD_DAYS) {
@@ -1055,7 +1058,8 @@ function memoLines(c, L, Y) {
       .map(([k, a]) => [k, median0(a)])
       .filter(([, m]) => m <= 14)
       .sort((a, b) => a[1] - b[1])[0];
-    if (fast) lines.push(`${catLink(fast[0])}は、見つけてから売り切れるまでが短め（まんなかで${Math.max(1, Math.round(fast[1]))}日ほど）`);
+    // ほかの種類とほとんど同じ日数のこともあるので「短め」とは書かず、日数だけを書く。売り切れは「見た」日（あとで再入荷することもある）
+    if (fast) lines.push(`${catLink(fast[0])}は、見つけてから売り切れを見るまでが、まんなかで${Math.max(1, Math.round(fast[1]))}日ほど`);
   }
   // この7日の新着に多い種類
   const wkNew = catSlugs(L.news.filter((i) => nowMs - Date.parse(i.first) <= RECENT), 2);
@@ -1080,9 +1084,9 @@ function memoLines(c, L, Y) {
     const label = Y.total >= MIN_PAGE ? `<a href="${base}yoyaku/">予約</a>` : '予約';
     lines.push(`${label}の締切がいちばん近いのは${mdOfYmd(dl.resv.deadline)}${CAT_SHORT[dl.cat] ? `（${esc(CAT_SHORT[dl.cat])}）` : ''}`);
   }
-  // 発売日（楽天ブックス。日にちが決まっているもの）
-  const next = calendarFor(c.slug).upcoming.find((b) => b.date.exact);
-  if (next) lines.push(`楽天ブックスで次に発売日が来るのは${mdOfYmd(next.date.ymd)}${hasCalendar(c) ? `（<a href="${base}hatsubai/">発売日カレンダー</a>）` : ''}`);
+  // 発売日（楽天ブックス。日にちが決まっているもの。「頃」「予定」は使わない）
+  const next = calendarFor(c.slug).upcoming.find((b) => b.date.exact && !b.date.approx);
+  if (next) lines.push(`楽天ブックスで次に発売日が来るのは${dayOfYmd(next.date.ymd)}${hasCalendar(c) ? `（<a href="${base}hatsubai/">発売日カレンダー</a>）` : ''}`);
   return lines.slice(0, MEMO_MAX);
 }
 function memoSection(c, L, Y) {
@@ -1359,7 +1363,7 @@ function cornerMemoLines(k, ws) {
     .sort((a, b) => a[1].date.ymd.localeCompare(b[1].date.ymd))[0];
   if (next) {
     const [c, b] = next;
-    lines.push(`楽天ブックスで次に発売日が来るのは${mdOfYmd(b.date.ymd)}の${hasCalendar(c) ? workLink(c, `/${c.slug}/hatsubai/`) : esc(c.name)}`);
+    lines.push(`楽天ブックスで次に発売日が来るのは${dayOfYmd(b.date.ymd)}の${hasCalendar(c) ? workLink(c, `/${c.slug}/hatsubai/`) : esc(c.name)}`);
   }
   // この7日に値下がりか再入荷を見つけた作品
   const moved = top(ws.map((c) => [c, L.get(c.slug).nesage.length + L.get(c.slug).sainyuka.length]), 2);
