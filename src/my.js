@@ -193,6 +193,32 @@
     });
   }
 
+  // 発売日カレンダー（/<作品>/hatsubai/）の「わたしの推しだけ」：わたしの推しに当たるカード（data-o）が1つ以上ある端末だけに出す。
+  // 押すと当たらないカードと、カードが全部かくれた節をかくす。もう一度押すと元にもどる。並びの順・発売のメモ・つぎに見るはそのまま。押したかどうかは保存しない
+  var hbf = document.querySelector('.hbf');
+  if (hbf && my.length) {
+    var mine3 = my.map(function (x) { return x.p; });
+    var hbHit = function (li) { return (li.getAttribute('data-o') || '').split(' ').some(function (p) { return mine3.indexOf(p) >= 0; }); };
+    var hbSecs = [].slice.call(document.querySelectorAll('main section')).filter(function (s) { return s.querySelector('ul.grid > li'); });
+    if (hbSecs.some(function (s) { return [].some.call(s.querySelectorAll('ul.grid > li'), hbHit); })) {
+      var hb = hbf.querySelector('button');
+      hbf.hidden = false;
+      hb.addEventListener('click', function () {
+        var on = hb.getAttribute('aria-pressed') !== 'true';
+        hb.setAttribute('aria-pressed', String(on));
+        hbSecs.forEach(function (s) {
+          var c = 0;
+          [].forEach.call(s.querySelectorAll('ul.grid > li'), function (li) {
+            var ok = !on || hbHit(li);
+            li.hidden = !ok;
+            if (ok) c++;
+          });
+          s.hidden = !c;
+        });
+      });
+    }
+  }
+
   // トップの「わたしの推し」：推しキャラのページを読んで、最初の8件（種類をえらんでいればその種類）を棚に入れる
   var sec = document.getElementById('my');
   if (!sec || !my.length) return;

@@ -1302,6 +1302,12 @@ if (process.env.DATA_BOOKS) {
   ok(cal.includes('<h2>2026年10月</h2>') && cal.includes('<h2>2026年11月</h2>') && cal.includes('<h2>最近発売したもの</h2>'), '発売日カレンダー：月ごと・最近発売に分ける');
   ok(cal.includes('11/20発売・本') && cal.includes('楽天ブックスで見る'), '発売日カレンダー：発売日と楽天ブックスへのリンク');
   ok(cal.includes('<title>ちいかわの新作グッズ発売予定・発売日カレンダー（2026年10月・11月）｜'), '発売日カレンダー：名前に「新作」と年月');
+  const hbfDiv = '<div class="flt hbf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>';
+  const calCards = [...cal.matchAll(/<li [^>]*>/g)].map((m) => m[0]).filter((l) => l.includes('data-o='));
+  ok((cal.match(/class="flt hbf"/g) ?? []).length === 1 && cal.indexOf(hbfDiv) >= 0 && cal.indexOf(hbfDiv) < cal.indexOf('<h2>2026年10月</h2>'), '発売日カレンダー：「わたしの推しだけ」は最初の月の見出しの上に、隠したしぼりこみのチェック欄で');
+  ok(calCards.length > 0 && calCards.every((l) => /data-o="(\/chiikawa\/[a-z0-9-]+\/ ?)+"/.test(l)), '発売日カレンダー：推しキャラに当たるカードに、同じ作品の推しキャラのページの場所（data-o）');
+  const myJsHb = readFileSync('src/my.js', 'utf8');
+  ok(myJsHb.includes("document.querySelector('.hbf')") && !/setItem\([^)]*hb/.test(myJsHb), '発売日カレンダー：「わたしの推しだけ」は src/my.js が動かし、押したかどうかは保存しない');
   ok(readFileSync('dist/about/index.html', 'utf8').includes('<p class="fl">発売日カレンダー　<a href="/chiikawa/hatsubai/">ちいかわ</a>'), 'いちばん下に発売日カレンダーへのリンク');
   ok(readFileSync('dist/chiikawa/index.html', 'utf8').includes('<h2>もうすぐ発売</h2>'), 'キャラのページに「もうすぐ発売」');
   const { parseSalesDate, kindOf } = await import('./lib/books.mjs');
