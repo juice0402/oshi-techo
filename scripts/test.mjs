@@ -760,7 +760,8 @@ if (process.env.DATA_LATEST) {
       const links = [...hub.matchAll(/<a href="\/([a-z0-9-]+)\/fukubukuro\/">[^<]*をもっと見る<\/a>/g)].map((m) => m[1]);
       ok(secs.length >= 2 && secs.map((m) => m[1]).join() === links.join() && hub.includes("querySelectorAll('section[data-mywork]')"), `福袋：/fukubukuro/ の作品ごとの section に作品の id と data-mywork（わたしの推しの作品を上へ動かす印。HTML の順はそのまま・${secs.length}作品）`);
     }
-    ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && !sr.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
+    // サンリオも 2026-11 に公式の福袋の予定（2027年福袋の予約）が入ったので、2作品とも1行がある。/fukubukuro/ には出さない
+    ok(ck.includes('<p class="more"><a href="/chiikawa/kaikata/#yotei">公式の福袋の予定はちいかわの買い方メモに</a></p>') && sr.includes('<p class="more"><a href="/sanrio/kaikata/#yotei">公式の福袋の予定はサンリオの買い方メモに</a></p>') && !hub.includes('/kaikata/#yotei') && ck.indexOf('kaikata/#yotei') < ck.indexOf('時点の価格'), '福袋：公式の福袋の予定がある作品だけ、時点の価格の前に買い方メモへの1行');
     // 福袋のメモ（作品の福袋のページの下。入荷メモと同じ形。件数・あおる言葉・外へのリンクを出さない）
     {
       const fm = ck.match(/<section class="memo"><h2>福袋のメモ<\/h2>[\s\S]*?<\/section>/)?.[0] ?? '';

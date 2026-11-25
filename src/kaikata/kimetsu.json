@@ -1,6 +1,6 @@
 {
   "published": "2026-11-06",
-  "checked": "2026-11-06",
+  "checked": "2026-11-26",
   "shops": [
     {
       "kind": "通販",
@@ -103,6 +103,11 @@
       "from": "2026-11",
       "until": "2026-11-30",
       "text": "AMNIBUS で9月9日まで受け付けた再販のグッズが、11月上旬から順に送られる予定です"
+    },
+    {
+      "from": "2026-12-21",
+      "until": "2026-12-27",
+      "text": "一番くじ「鬼滅の刃 ～兄妹の鬼～」が発売の予定です"
     }
   ],
   "sources": [
@@ -185,6 +190,11 @@
       "name": "Kotaku（非公式のグッズで逮捕 2021年7月）",
       "url": "https://kotaku.com/demon-slayer-knockoffs-lead-to-arrests-in-japan-1847386073",
       "used": "非公式のグッズの逮捕と押収の数"
+    },
+    {
+      "name": "一番くじ倶楽部（2026年12月発売のくじ）",
+      "url": "https://1kuji.com/products?sale_month=12&sale_year=2026",
+      "used": "鬼滅の刃 ～兄妹の鬼～（12月21日）"
     }
   ]
 }
