@@ -2079,12 +2079,12 @@ function gotouchiListPage({ c, items, newestItems, path, h1, who, part, title, c
     lastmod: newest(w.items),
   });
 }
-// 作品のご当地の一覧から、読みもの（linkFrom の gotouchi）の同じ県の見出しへ。文の形は目次の上の1行に合わせる
+// 作品のご当地の一覧から、読みもの（linkFrom の gotouchi）の同じ県の見出しへ。文の形は目次の上の1行に合わせる（linkFrom.part があれば作品名の代わりに。ご当地キティは「キティ」）
 const yomiPrefLinks = (c) =>
   Object.fromEntries(
     yomiArticles
       .filter((a) => a.linkFrom?.work === c.slug && a.linkFrom.pages?.includes('gotouchi'))
-      .flatMap((a) => yomiPrefHeads(a.slug).map((h) => [h.id, `<p class="more"><a href="/yomimono/${a.slug}/#${h.id}">${esc(h.pref)}のご当地${esc(c.name)}はどこで売ってる？（読みもの）</a></p>`])),
+      .flatMap((a) => yomiPrefHeads(a.slug).map((h) => [h.id, `<p class="more"><a href="/yomimono/${a.slug}/#${h.id}">${esc(h.pref)}のご当地${esc(a.linkFrom.part ?? c.name)}はどこで売ってる？（読みもの）</a></p>`])),
   );
 const placesNote = (places) => (places.length ? `（${places.join('・')}など）` : '');
 for (const w of gotouchiWorks) {
@@ -2824,7 +2824,7 @@ page({
 <p>このサイトには会員登録がありません。名前やメールアドレスを受け取るのは、お問い合わせのフォームに書いてもらったときだけです。</p>
 <h2>端末に保存するもの</h2>
 <p>「わたしの推し」に選んだ推しキャラと、前にこのサイトを見た時刻を、見ている端末のブラウザの中だけに保存します。サイトや楽天には送りません。ブラウザのデータを消すと消えます。</p>
-<p>読みもの「ご当地スヌーピーの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。ご当地グッズの一覧の「持ってる」のチェックも同じで、保存するのは都道府県の名前（ローマ字）だけです。</p>
+<p>読みもの「ご当地スヌーピーの買える場所と集め方」と「ご当地キティの買える場所と集め方」の、集めた都道府県のチェックも、見ている端末のブラウザの中だけに保存します。ご当地グッズの一覧の「持ってる」のチェックも同じで、保存するのは都道府県の名前（ローマ字）だけです。</p>
 <p>推しキャラのページの「入荷ビンゴ」は、開けたマスの種類と、その月に初めて来た日を、見ている端末のブラウザの中だけに保存します。</p>
 <p>予約受付中のグッズの「予約した」は、その商品の番号と発売の時期と押した日だけを、見ている端末のブラウザの中（ot-yoyaku）に保存します。発売の月が過ぎて60日たつと消えます。発売の時期がわからないものは、押した日から60日で消えます。</p>
 ${settings.contact ? `<h2>お問い合わせ</h2>

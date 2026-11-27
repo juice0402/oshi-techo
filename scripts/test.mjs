@@ -279,7 +279,7 @@ const feedCheck = (xml) => {
 // 読みもの（/yomimono/）：図の中に字を入れない（字は HTML）・計算の道具はどこにも送らない・絵に大きさの指定・調べた資料へのリンク
 {
   const arts = readJson('config/yomimono.json', []);
-  const KEEP_LOCAL_TOOLS = new Set(['gotouchi-snoopy']);
+  const KEEP_LOCAL_TOOLS = new Map([['gotouchi-snoopy', 'ot-gotouchi-snoopy'], ['gotouchi-kitty', 'ot-gotouchi-kitty']]);
   for (const a of arts) {
     const p = `dist/yomimono/${a.slug}/index.html`;
     ok(existsSync(p), `${p} がある`);
@@ -288,8 +288,8 @@ const feedCheck = (xml) => {
     const svgs = [...s2.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
     ok(svgs.length >= 5 && svgs.every((x) => !/<text[\s>]/.test(x)), `${p}：図が5つ以上あり、図の中に字を入れていない（${svgs.length}こ）`);
     const tool = s2.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/, '').match(/<div class="fit"[\s\S]*?<\/script>/)?.[0] ?? '';
-    // 例外：ご当地スヌーピーの「集めた都道府県のチェック」は、集めた記録を残すための道具なので、その端末の localStorage（ot-gotouchi-snoopy）にだけ残す（#16 で決めた。わたしの推しと同じ「ブラウザの中だけの機能」。どこにも送らない）
-    if (KEEP_LOCAL_TOOLS.has(a.slug)) ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(tool) && tool.includes("KEY='ot-gotouchi-snoopy'") && (tool.match(/localStorage/g) ?? []).length === 1 && /try\{S=window\.localStorage;\}catch/.test(tool), `${p}：チェックの道具はどこにも送らず、この端末のブラウザの中だけに残す`);
+    // 例外：ご当地スヌーピーとご当地キティ（ot-gotouchi-kitty。ご当地キティ一覧の「持ってる」と同じ記録）の「集めた都道府県のチェック」は、集めた記録を残すための道具なので、その端末の localStorage（ot-gotouchi-snoopy）にだけ残す（#16 で決めた。わたしの推しと同じ「ブラウザの中だけの機能」。どこにも送らない）
+    if (KEEP_LOCAL_TOOLS.has(a.slug)) ok(!/fetch\(|XMLHttpRequest|sendBeacon/.test(tool) && tool.includes(`KEY='${KEEP_LOCAL_TOOLS.get(a.slug)}'`) && (tool.match(/localStorage/g) ?? []).length === 1 && /try\{S=window\.localStorage;\}catch/.test(tool), `${p}：チェックの道具はどこにも送らず、この端末のブラウザの中だけに残す`);
     else ok(!/fetch\(|XMLHttpRequest|sendBeacon|localStorage/.test(tool), `${p}：計算の道具はどこにも送らず、何も残さない`);
     ok(/<p class="yomi-hero"><img src="\/yomimono\/img\/[a-z0-9-]+\.webp" width="1200" height="600" alt="[^"]+"/.test(s2), `${p}：記事の絵に大きさと説明の指定がある`);
     if (a.sources) ok(s2.includes(`href="/yomimono/${a.slug}/shiryou/"`) && existsSync(`dist/yomimono/${a.slug}/shiryou/index.html`), `${p}：調べた資料のページがある`);
