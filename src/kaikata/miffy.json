@@ -1,6 +1,6 @@
 {
   "published": "2026-10-27",
-  "checked": "2026-10-27",
+  "checked": "2026-11-26",
   "shops": [
     {
       "kind": "お店",
@@ -73,22 +73,15 @@
   ],
   "events": [
     {
-      "from": "2026-09-19",
-      "to": "2026-11-08",
-      "until": "2026-11-08",
-      "text": "福井県立美術館で「誕生70周年記念 ミッフィー展」が開かれています"
-    },
-    {
-      "from": "2026-10-31",
-      "to": "2026-11-17",
-      "until": "2026-11-17",
-      "text": "キデイランド大阪梅田店で miffy style のポップアップが開かれます。限定品は通販も取り置きもありません"
-    },
-    {
       "from": "2026-11-06",
-      "to": "2026-11-24",
-      "until": "2026-11-24",
-      "text": "札幌アピアで miffy style のポップアップが開かれます。11月6日から8日までは先着の予約制です"
+      "to": "2026-12-08",
+      "until": "2026-12-08",
+      "text": "横浜赤レンガ倉庫の2号館で、「Flower Miffy Pop-Up Marche」が開かれています"
+    },
+    {
+      "from": "2026-12-05",
+      "until": "2026-12-11",
+      "text": "miffy style で、限定の干支ひつじのグッズが発売の予定です。通販の miffy style online では12月5日の10時からで、タンブラーは通販では売りません"
     }
   ],
   "sources": [
@@ -146,6 +139,16 @@
       "name": "ディック・ブルーナ・ジャパン（ショップ情報）",
       "url": "https://dickbruna.jp/shop/",
       "used": "日本の公式サイトとショップ"
+    },
+    {
+      "name": "超！アニメディア（2026年10月29日）",
+      "url": "https://cho-animedia.jp/article/2026/10/29/64286.html",
+      "used": "Flower Miffy Pop-Up Marche（横浜赤レンガ倉庫・11月6日〜12月8日）"
+    },
+    {
+      "name": "キデイランド（miffy style 限定 干支ひつじ）",
+      "url": "https://www.kiddyland.co.jp/event/miffy_hitsuji20261205/",
+      "used": "12月5日発売、miffy style online は10時から"
     }
   ]
 }

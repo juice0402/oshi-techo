@@ -1,6 +1,6 @@
 {
   "published": "2026-10-27",
-  "checked": "2026-10-27",
+  "checked": "2026-11-26",
   "shops": [
     {
       "kind": "お店",
@@ -65,6 +65,28 @@
       "from": "2026-11-07",
       "until": "2026-11-30",
       "text": "スヌーピータウンショップのクリスマスのシリーズが発売されます。通販と取り置きは11月9日から30日までです"
+    },
+    {
+      "from": "2026-12",
+      "until": "2026-12-31",
+      "text": "ローソンなどで「スヌーピー当りくじ」が発売の予定です。1回880円（税込）で、くわしいことは12月上旬に出ると公式サイトでは案内されています"
+    },
+    {
+      "from": "2026-12-03",
+      "to": "2026-12-21",
+      "until": "2026-12-21",
+      "text": "有楽町マルイで、スヌーピータウンショップの期間限定の「スヌーピークリスマス POP UP STORE」が開かれます"
+    },
+    {
+      "from": "2026-12-04",
+      "to": "2026-12-06",
+      "until": "2026-12-06",
+      "text": "スヌーピータウンショップ東京駅店が新しくなって開き、店だけの「TOKYO駅長WHITE」シリーズが発売の予定です。4日から6日は入店の列ができ、7日からも混むと入場を制限することがあります"
+    },
+    {
+      "from": "2026-12-05",
+      "until": "2026-12-07",
+      "text": "スヌーピータウンショップで、干支の「YEAR OF THE SHEEP」と「SAKURA Style」が発売の予定です（東京駅店は4日から）。おかいものSNOOPYでは12月7日の正午からです"
     }
   ],
   "sources": [
@@ -112,6 +134,26 @@
       "name": "おかいものSNOOPY（偽サイトの注意）",
       "url": "https://okaimono-snoopy.jp/blogs/informattion/snoopyinformation",
       "used": "偽のサイトとアドレスの確かめ"
+    },
+    {
+      "name": "サンリオ（スヌーピー当りくじの予告）",
+      "url": "https://www.sanrio.co.jp/news/goods/sn-atarikuji-yokoku-20260916/",
+      "used": "2026年12月発売、ローソンほか、1回880円"
+    },
+    {
+      "name": "スヌーピータウンショップ（ホーム）",
+      "url": "https://town.snoopy.co.jp/",
+      "used": "有楽町マルイのクリスマスのポップアップ（12月3日〜21日）"
+    },
+    {
+      "name": "スヌーピータウンショップ（東京駅店 リニューアルOPEN記念）",
+      "url": "https://town.snoopy.co.jp/item/original/tokyo_reopening_limited.html",
+      "used": "東京駅店のリニューアル（12月4日）と入店の案内"
+    },
+    {
+      "name": "スヌーピータウンショップ（YEAR OF THE SHEEP）",
+      "url": "https://town.snoopy.co.jp/item/original/sheep2027.html",
+      "used": "12月5日発売、東京駅店は4日、おかいものSNOOPYは7日正午"
     }
   ]
 }
