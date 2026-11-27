@@ -662,7 +662,7 @@ for (const f of html) {
   if (process.env.DATA_LATEST) {
     const hw = readFileSync('dist/chiikawa/hachiware/index.html', 'utf8');
     const sec = hw.match(/<section class="bingo"[\s\S]*?<\/section>/)?.[0] ?? '';
-    ok(/<div class="spread"><div class="flow"><ul class="grid" data-pool>[\s\S]*?のグッズの新着へ<\/a><\/p>(?:<nav class="tsugi2"[\s\S]*?<\/nav>)?<\/div><div class="side" data-stick><section class="bingo" data-k="chiikawa\/hachiware" data-m="2026-10"><h2>ハチワレの10月の入荷ビンゴ<\/h2><div class="bg-wrap">/.test(hw), '入荷ビンゴ：推しキャラのページのいちばん下（スマホ）・右の柱（パソコン）に、見出し（説明の行を重ねない）');
+    ok(/<div class="spread"><div class="flow"><ul class="grid" data-pool>[\s\S]*?のグッズの新着へ<\/a><\/p>(?:<nav class="tsugi2"[\s\S]*?<\/nav>)?<\/div><div class="side" data-stick><section class="bingo" id="bingo" data-k="chiikawa\/hachiware" data-m="2026-10"><h2>ハチワレの10月の入荷ビンゴ<\/h2><div class="bg-wrap">/.test(hw), '入荷ビンゴ：推しキャラのページのいちばん下（スマホ）・右の柱（パソコン）に、見出し（説明の行を重ねない）');
     ok((sec.match(/<li class="bg-c /g) ?? []).length === 9 && sec.indexOf('data-k="nui"') < sec.indexOf('st-mid') && sec.indexOf('st-mid') < sec.indexOf('data-k="pouch"') && /data-k="sticker"[^]*<\/ol>/.test(sec), '入荷ビンゴ：3×3 でまん中は「来た」');
     ok(sec.includes('<li class="bg-c st-on" data-k="nui"><span class="bg-a"><span class="bg-pic"><img src="/art/bingo-nui-') && sec.includes('<small class="bg-dt">10/3</small><small class="bg-nm">ぬいぐるみ</small>') && sec.includes('<li class="bg-c st-none" data-k="mug">') && sec.includes('<b class="bg-han">来た</b>'), '入荷ビンゴ：印のあるマスは日付と名前、ないマスは名前だけ（記録と、いま載っている商品から）');
     ok(sec.includes('<p class="bg-log"><span>10/2 アクスタ</span><span>10/3 ぬいぐるみ</span><span>10/9 タオル</span><span>10/12 キーホルダー</span>') && !/件/.test(sec), '入荷ビンゴ：見つけた日の記録は日付の順（件数は出さない）');
@@ -685,7 +685,11 @@ for (const f of html) {
     const pjs = readFileSync('src/bingo-page.js', 'utf8');
     ok(!/XMLHttpRequest|sendBeacon|document\.cookie|sessionStorage|setItem/.test(pjs) && (pjs.match(/fetch\(/g) ?? []).length === 1 && pjs.includes("fetch('/bingo/data.json')") && pjs.includes("getItem('ot-my')") && bp.includes('window.otBingo'), '入荷ビンゴ：/bingo/ はわたしの推し（ot-my）を読むだけで、同じサイトの記録のほかは読まず、どこにも送らない');
     ok(!/<a class="bg-a"/.test(sec), '入荷ビンゴ：しおりがないページでは、シールをリンクにしない');
-    ok(hw.includes("'oshi-bingo'") && hw.includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('oshi-bingo'), '入荷ビンゴ：CSS と動きは推しキャラのページだけに入れる');
+    ok(hw.includes("'oshi-bingo-t'") && hw.includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('.bg-card{') && !readFileSync('dist/chiikawa/index.html', 'utf8').includes('oshi-bingo-t'), '入荷ビンゴ：CSS と動きは推しキャラのページだけに入れる');
+    // トップの「わたしの推し」の袋の1行（#138）：飛び先の id="bingo" は推しキャラのページのカードだけ。my.js は oshi-bingo を読むだけ
+    const myjs = readFileSync('src/my.js', 'utf8');
+    ok((hw.match(/ id="bingo"/g) ?? []).length === 1 && bsecs.length > 0 && bsecs.every((t) => !t.includes(' id=')) && !readFileSync('src/bingo-page.js', 'utf8').includes("id = 'bingo'"), '入荷ビンゴ：id="bingo" は推しキャラのページのカードだけ（/bingo/ のカードには付けない）');
+    ok(myjs.includes("S.getItem('oshi-bingo')") && !/setItem\('oshi-bingo'|removeItem\('oshi-bingo'/.test(myjs) && myjs.includes("'#bingo'") && myjs.includes("'に、まだあけていない袋があります'") && myjs.includes("className = 'myh'"), 'わたしの推し：まだあけていない入荷ビンゴの袋の1行（oshi-bingo は読むだけ・#bingo へ・予約受付中と同じ .myh）');
   }
   ok(readFileSync('dist/privacy/index.html', 'utf8').includes('入荷ビンゴ'), '入荷ビンゴ：プライバシーポリシーに、端末に残すものを1行');
 }

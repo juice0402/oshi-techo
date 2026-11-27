@@ -1,5 +1,6 @@
 // わたしの推し・推し×種類のしおり・前に見てから（ブラウザの中だけで動く。build.mjs がページに入れる）
 // 保存するのは、見ている端末の localStorage の ot-my（推しキャラのページの場所・名前・えらんだ種類）、ot-cur・ot-prev（時刻）、ot-home（ホーム画面の案内をとじた印）、ot-yoyaku（「予約した」の商品の番号と発売の時期）だけ。
+// 入荷ビンゴの oshi-bingo（src/bingo.js が残す）は、トップの「わたしの推し」の袋の1行のために読むだけで、ここでは書かない。
 // 楽天のデータは保存しない。サイトや楽天には何も送らない。読みにいくのは、このサイトの推しキャラのページだけ。
 (function () {
   var S;
@@ -224,6 +225,7 @@
   if (!sec || !my.length) return;
   sec.hidden = false;
   var t = new Date(now + 324e5).toISOString().slice(0, 10);
+  var bags = [];
   my.forEach(function (o) {
     var box = document.createElement('div');
     box.className = 'myo';
@@ -284,7 +286,36 @@
         yp.appendChild(ya);
         box.appendChild(yp);
       }
+      // その推しの今月の入荷ビンゴに、まだあけていない袋（印のマスで、oshi-bingo の開けた種類にないもの）があれば1行。
+      // oshi-bingo は src/bingo.js が残すもので、ここでは読むだけ。月がちがう・記録がないときは印のマス全部が袋
+      var bs = d.querySelector('section.bingo#bingo');
+      var bh = bs && bs.querySelector('h2');
+      if (bh && !bs.hasAttribute('data-plain')) {
+        var bk = bs.getAttribute('data-k');
+        var bm = bs.getAttribute('data-m');
+        var bon = [].map.call(bs.querySelectorAll('li.st-on[data-k]'), function (li) { return li.getAttribute('data-k'); });
+        var bp = document.createElement('p');
+        var ba = document.createElement('a');
+        bp.className = 'myh';
+        bp.hidden = true;
+        ba.setAttribute('href', o.p + '#bingo');
+        ba.textContent = bh.textContent + 'に、まだあけていない袋があります';
+        bp.appendChild(ba);
+        box.appendChild(bp);
+        bags.push(function () {
+          var st = {};
+          try { st = JSON.parse(S.getItem('oshi-bingo') || '{}') || {}; } catch (e) {}
+          var me = st[bk];
+          var op = me && me.m === bm && Array.isArray(me.o) ? me.o : [];
+          bp.hidden = !bon.some(function (k) { return op.indexOf(k) < 0; });
+        });
+        bags[bags.length - 1]();
+      }
     }).catch(function () { box.remove(); });
+  });
+  // 入荷ビンゴのページで袋をあけてから「もどる」で来たとき（前の画面のまま出る）も、袋の1行を見なおす
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) bags.forEach(function (f) { f(); });
   });
   // ホーム画面に追加できることを、わたしの推しを選んだ人にだけ棚の下に1行。とじたら ot-home を覚えて、もう出さない
   if (!S.getItem('ot-home')) {
