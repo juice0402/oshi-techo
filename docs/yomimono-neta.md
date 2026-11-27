@@ -51,7 +51,7 @@
 - [x] モバイルバッテリーの選び方（PR #113・2026-11-16）
 - [x] ランダムグッズ・くじ・受注生産のちがい（PR #123・2026-11-20）
 - [x] アクキーの金具の付けかえ（丸カン・チェーン）（PR #130・2026-11-23）
-- [ ] ご当地キティの買える場所と集め方［gotouchi］— ご当地キティはどこで売ってる？に答える。都道府県ごとに、公式のお知らせで確かめた売り場だけ。道具：47都道府県のチェック（gotouchi-snoopy の道具と同じ形。localStorage の名前は別にして、プライバシーポリシーに1行）／資料：https://www.sanrio.co.jp/news/goods/kt-gotouchi-fukuoka-20260227/（サンリオ公式。福岡の限定の根付と売り場の例）・サンリオのニュースの「ご当地」を WebSearch で探す。作っている会社は公式の一次の資料がないので書かない。linkFrom は sanrio の gotouchi・kaikata・top
+- [x] ご当地キティの買える場所と集め方（PR #135・2026-11-27）
 - [ ] ご当地ちいかわの買える場所［gotouchi］— ご当地ちいかわはどこで売ってる？に答える。公式の売り場の案内が少ないので、ちいかわマーケットのご当地のシリーズ（東京のおみやげ・池袋・原宿・静岡など）を中心に、確かめられた所だけ。道具：チェック／資料：https://chiikawamarket.jp/（公式の通販。ご当地のシリーズ）・https://chiikawa-info.jp/p21/tenpo/（取扱い店舗。GitHub やこの作業場所から開けないことがある）。確かめられた売り場が5つより少なければ書かずに山の下へ。linkFrom は chiikawa の gotouchi・kaikata・top
 - [ ] ポスター・タペストリーを壁に穴をあけずに飾る［tsukuru］— 賃貸の部屋で推しのポスターを飾りたい人に。道具：壁の幅と高さ・ポスターの判（A・B判）・あいだから、何枚並ぶか／資料：https://www.mlit.go.jp/common/001016469.pdf（国土交通省の原状回復のガイドライン。画びょうの穴とポスターの跡・くぎ穴の扱い）・https://www.3mcompany.jp/3M/ja_JP/p/d/v100730077/（はがせるフックの耐荷重と付けられない壁）・https://www.ricoh.co.jp/-/Media/Ricoh/Sites/co_jp/pps/download/pdf/1664usersguide_03.pdf（A3〜B5 の寸法。A2・B2 などは JIS の表を WebSearch で探す）。棚：ポスターフレーム・タペストリー棒・はがせるフック。契約ごとに決まりがちがうので「契約書で確かめる」と書く
 - [ ] グッズの送り方（交換・お譲り）［atsumeru］— 推し仲間とグッズを交換したり、ゆずったりするときの送り方。道具：大きさ（長辺・3辺の合計・厚さ）と重さから、送れる方法と料金の候補／資料：https://www.post.japanpost.jp/service/send/domestic/list/（日本郵便のくらべの表。ゆうパケット・クリックポストの大きさと重さ）・https://clickpost.jp/（クリックポストの料金。2026年10月1日から240円）・https://www.post.japanpost.jp/service/send/domestic/delivery/e-shipping/yu-packetpost.html（ゆうパケットポスト）・https://www.post.japanpost.jp/service/send/domestic/mail/letter/（定形外の料金）。料金は確かめた月を書く。「転売」は使わない。棚：OPP袋・プチプチの封筒・梱包の箱
