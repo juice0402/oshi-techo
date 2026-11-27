@@ -2289,6 +2289,7 @@ for (const c of chars) {
 
 // ---- 全作品の予約帳 /yoyaku/（発売の月ごと。docs/shikumi.md の「予約帳」） ----
 // 上の「わたしの推しだけ」は、わたしの推しを登録している端末だけに出す（src/my.js がカードの data-o を見てしぼる。どこにも送らない）
+// 「予約したものだけ」は、端末の ot-yoyaku にある商品がこのページにあるときだけ出す（src/my.js がカードの data-y を見てしぼる。読むだけ）
 if (ykGroups.length) {
   const shown = ykGroups.flatMap((x) => x.items);
   const names = ykGroups.slice(0, 2).map((x) => x.name.replace(/発売$/, ''));
@@ -2309,7 +2310,7 @@ if (ykGroups.length) {
     h1: '推しグッズの予約帳',
     count: shown.length,
     body:
-      '<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>' +
+      '<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li><li hidden><button type="button" aria-pressed="false">予約したものだけ</button></li></ul></div>' +
       ykGroups.map((x, i) => `<section><h2>${esc(x.name)}</h2><ul class="grid">${x.items.map((e, j) => ykCard(e, i === 0 && j < 4)).join('')}</ul></section>`).join('') +
       '<p class="asof yk-none" hidden>わたしの推しの予約受付中のグッズは、いまはありません</p>' +
       '<p class="asof">発売の時期は、楽天ブックスの発売日と、楽天市場の商品名に書いてあるものです</p>' +
