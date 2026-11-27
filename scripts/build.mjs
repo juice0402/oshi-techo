@@ -576,7 +576,8 @@ const bingoMd = (d) => `${Number(d.slice(5, 7))}/${Number(d.slice(8, 10))}`;
 const bingoFrame = (o, m) => (o.birthday && Number(o.birthday.slice(0, 2)) === m && bingoImg('frame-birthday')) || bingoImg(`frame-${m}`) || bingoImg('frame-11');
 // 1枚のカード。/bingo/ のページの JS（src/bingo-page.js）も同じ形で作るので、形を変えたらそちらも合わせる
 // shiori：開いたシールをリンクにする種類（しおりのあるページだけ）。plain：袋にしない（/bingo/ のわたしの推しがいないとき）。more：カードの下の1行
-function bingoCardHtml({ key, label, frame, card, shiori = new Set(), plain = false, more = '' }) {
+// id：section の id（推しキャラのページだけ "bingo"。トップの「わたしの推し」の袋の1行の飛び先）
+function bingoCardHtml({ key, label, frame, card, shiori = new Set(), plain = false, more = '', id = '' }) {
   const m = Number(bingoMonth.slice(5, 7));
   const cells = CELLS.map((k) => {
     if (!k) return `<li class="bg-c st-mid"><span class="bg-st">${RING_SVG}<b class="bg-han">来た</b></span><small class="bg-dt bg-came"></small></li>`;
@@ -590,7 +591,7 @@ function bingoCardHtml({ key, label, frame, card, shiori = new Set(), plain = fa
     .sort((a, b) => card[a.k].localeCompare(card[b.k]) || KINDS.indexOf(a) - KINDS.indexOf(b))
     .map((x) => `<span>${bingoMd(card[x.k])} ${esc(x.name)}</span>`)
     .join('');
-  return `<section class="bingo" data-k="${esc(key)}" data-m="${bingoMonth}"${plain ? ' data-plain' : ''}><h2>${esc(label)}の${m}月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><img class="bg-frame" src="/${frame}" alt="" width="800" height="800" loading="lazy" decoding="async"><div class="bg-in"><ol class="bg-g">${cells}</ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg></div><b class="bg-bingo" hidden>ビンゴ</b></div><p class="bg-log">${log || '今月はまだ印がありません'}</p></div>${more}</section>`;
+  return `<section class="bingo"${id ? ` id="${id}"` : ''} data-k="${esc(key)}" data-m="${bingoMonth}"${plain ? ' data-plain' : ''}><h2>${esc(label)}の${m}月の入荷ビンゴ</h2><div class="bg-wrap"><div class="bg-card"><img class="bg-frame" src="/${frame}" alt="" width="800" height="800" loading="lazy" decoding="async"><div class="bg-in"><ol class="bg-g">${cells}</ol><svg class="bg-lines" viewBox="0 0 300 300" aria-hidden="true"></svg></div><b class="bg-bingo" hidden>ビンゴ</b></div><p class="bg-log">${log || '今月はまだ印がありません'}</p></div>${more}</section>`;
 }
 // 推しキャラのページのカード。list：そのページの商品（しおりのある種類だけ、開いたシールをしおりへのリンクにする）
 function bingoHtml(c, o, label, list) {
@@ -603,6 +604,7 @@ function bingoHtml(c, o, label, list) {
     card: bingo.months[bingoMonth]?.[key] ?? {},
     shiori: new Set(cats.length >= 2 ? cats : []),
     more: '<p class="more"><a href="/bingo/">前の月とわたしの推しのカード</a></p>',
+    id: 'bingo',
   });
 }
 const minify = (s) =>
