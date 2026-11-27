@@ -432,7 +432,8 @@ const releaseNote = (b) => {
 function bookCell(b, eager, { yk = null, op = '' } = {}) {
   return cardHtml(b, { tag: b.avail === 5 ? '予約' : '', note: releaseNote(b), eager, shop: b.maker, go: '楽天ブックスで見る', size: 120, yk, op });
 }
-const bookGrid = (list, eagerFirst = false) => `<ul class="grid">${list.map((b, i) => bookCell(b, eagerFirst && i < 4)).join('')}</ul>`;
+// op：カードの data-o に、当たる推しキャラのページの場所を入れる（発売日カレンダーの「わたしの推しだけ」。oshiHits は下で決まる）
+const bookGrid = (list, eagerFirst = false, op = false) => `<ul class="grid">${list.map((b, i) => bookCell(b, eagerFirst && i < 4, op ? { op: bookOp(b) } : {})).join('')}</ul>`;
 // 楽天ブックスで予約受付中のグッズ（おもちゃと、カレンダー・手帳）。これから発売のものだけ、発売日の順
 const isGoodsBook = (b) => b.kind === 'おもちゃ' || /カレンダー|手帳|ダイアリー/.test(b.name);
 const booksYoyaku = (slug) =>
@@ -472,6 +473,8 @@ const YK_MIN = 4; // これより少ない推しには棚を出さない
 const YK_PER_GROUP = 24; // /yoyaku/ の月ごとの件数
 const thisMonth = today.slice(0, 7);
 const oshiHits = oshiPages.map((p) => ({ c: p.c.slug, path: `/${p.c.slug}/${p.o.slug}/`, hit: oshiMatcher(p.o) }));
+// 予約帳の ykEntries と同じ当て方：同じ作品で、本の名前に推しキャラが当たるもの
+const bookOp = (b) => oshiHits.filter((h) => h.c === b.c && h.hit(b.name)).map((h) => h.path).join(' ');
 const ykEntries = [
   ...buyable
     .filter((i) => i.resv)
@@ -2540,12 +2543,14 @@ for (const c of calChars) {
   const cal = calendarFor(c.slug);
   const path = `/${c.slug}/hatsubai/`;
   const months = [...new Set(cal.upcoming.map(groupOf))];
+  // 「わたしの推しだけ」は /yoyaku/ と同じチェック欄。はじめは隠し、わたしの推しに当たるカードがある端末だけ src/my.js が出す（どこにも送らない）
   const body =
     booksAt() +
+    '<div class="flt hbf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>' +
     months
-      .map((m, i) => `<section><h2>${esc(m)}</h2>${bookGrid(cal.upcoming.filter((b) => groupOf(b) === m), i === 0)}</section>`)
+      .map((m, i) => `<section><h2>${esc(m)}</h2>${bookGrid(cal.upcoming.filter((b) => groupOf(b) === m), i === 0, true)}</section>`)
       .join('') +
-    (cal.recent.length ? `<section><h2>最近発売したもの</h2>${bookGrid(cal.recent.slice(0, settings.listItems), !months.length)}</section>` : '') +
+    (cal.recent.length ? `<section><h2>最近発売したもの</h2>${bookGrid(cal.recent.slice(0, settings.listItems), !months.length, true)}</section>` : '') +
     hatsubaiMemoSection(c, cal);
   page({
     path,
