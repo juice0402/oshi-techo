@@ -1093,13 +1093,16 @@ if (process.env.DATA_LATEST) {
     const lis = [...nov.matchAll(/<li [^>]*>/g)].map((m) => m[0]);
     const firstPlain = lis.findIndex((l) => !l.includes('data-o='));
     ok(lis.length && lis[0].includes('data-o="/jujutsu/gojo/"') && (firstPlain < 0 || lis.slice(firstPlain).every((l) => !l.includes('data-o='))), '予約帳：月の中では推しキャラに当たるものが先・カードに推しキャラのページの場所');
-    ok(ym.includes('<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li></ul></div>'), '予約帳：「わたしの推しだけ」はしぼりこみと同じチェック欄で、はじめは隠す（わたしの推しがいる端末だけ出す）');
+    ok(ym.includes('<div class="flt ykf" hidden><p class="oc">しぼりこむ</p><ul class="chips"><li><button type="button" aria-pressed="false">わたしの推しだけ</button></li><li hidden><button type="button" aria-pressed="false">予約したものだけ</button></li></ul></div>'), '予約帳：「わたしの推しだけ」「予約したものだけ」はしぼりこみと同じチェック欄で、はじめは隠す（わたしの推しがいる・予約したものがこのページにある端末だけ出す）');
+    const myJsYk = readFileSync('src/my.js', 'utf8');
+    const ykfJs = myJsYk.slice(myJsYk.indexOf("document.querySelector('.ykf')"), myJsYk.indexOf("document.querySelector('.hbf')"));
+    ok(ykfJs.includes("'えらんだ条件に合う予約受付中のグッズは、このページにはありません'") && ykfJs.includes('yHas(') && !ykfJs.includes('setItem') && !ykfJs.includes('fetch('), '予約帳：「予約したものだけ」は src/my.js が ot-yoyaku を読むだけでしぼり、押したかどうかは保存しない');
     const links = [...(shelf + ym).matchAll(/<a [^>]*href="([^"]+)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/') && !u.startsWith('https://hb.afl.rakuten.co.jp/'));
     ok(links.length === 0, `予約帳：棚と予約帳に楽天以外へのリンクがない${links.length ? `（${links.slice(0, 2).join('、')}）` : ''}`);
     ok(!/\d+\s*件/.test(textOf((shelf + ym).replace(/<span class="rv">[^<]*<\/span>/g, ''))), '予約帳：件数が出ていない（カードのレビューの数はのぞく）');
     const own = [...(shelf + ym).matchAll(/<(h2|p)[^>]*>([\s\S]*?)<\/\1>/g)].map((m) => textOf(m[2])).join(' ');
     ok(!/締切|残りわずか|今だけ|お早めに/.test(own), '予約帳：見出しと説明に「締切」「残りわずか」「今だけ」「お早めに」を書かない');
-    const cards = [...(shelf + ym).matchAll(/<li [^>]*>[\s\S]*?<\/li>/g)].map((m) => m[0]);
+    const cards = [...(shelf + ym).matchAll(/<li [^>]*>[\s\S]*?<\/li>/g)].map((m) => m[0]).filter((c) => !c.startsWith('<li hidden><button')); // しぼりこみのチップはのぞく
     ok(cards.length > 0 && cards.every((c) => /^<li [^>]*data-y="[^"]+" data-yd="(\d{4}-\d\d(-\d\d)?)?"/.test(c) && c.includes('</a><button type="button" class="ykb" aria-pressed="false" hidden>予約した</button></li>')), '予約帳：予約受付中のカードに「予約した」のチェック（リンクの外。動くときだけ出す）');
     const myJs = readFileSync('src/my.js', 'utf8');
     ok(myJs.includes("o.p + '#yoyaku'") && myJs.includes("'（予約したものあり）'") && myJs.includes("'（発売の順）'") && (myJs.match(/S\.setItem\('ot-yoyaku'/g) ?? []).length === 1 && (gojo.match(/ id="yoyaku"/g) ?? []).length === 1, 'トップのわたしの推し：予約の棚がある推しは棚の下に #yoyaku への1行（ot-yoyaku は読むだけ。id はページに1つ）');

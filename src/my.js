@@ -168,20 +168,33 @@
     });
   }
 
-  // /yoyaku/ の「わたしの推しだけ」：わたしの推しを登録している端末だけに出す。カードの data-o（推しキャラのページの場所）でしぼる
+  // /yoyaku/ のしぼりこみ。「わたしの推しだけ」はわたしの推しを登録している端末だけ（カードの data-o でしぼる）、
+  // 「予約したものだけ」は ot-yoyaku にある商品がこのページにある端末だけに出す（カードの data-y でしぼる。ot-yoyaku は読むだけ）。
+  // 両方押したときは両方に当たるものだけ残す。並びの順はそのまま（かくすだけ）。押したかどうかは保存しない
   var ykf = document.querySelector('.ykf');
-  if (ykf && my.length) {
-    var fb = ykf.querySelector('button');
+  var ykLis = ykf ? [].slice.call(document.querySelectorAll('main section li[data-y]')) : [];
+  var ykMy = ykf && my.length > 0;
+  var ykRs = ykLis.some(function (li) { return yHas(li.getAttribute('data-y')); });
+  if (ykMy || ykRs) {
+    var fbs = ykf.querySelectorAll('button');
+    var fb = fbs[0];
+    var rb = fbs[1];
     var mine2 = my.map(function (x) { return x.p; });
+    fb.parentNode.hidden = !ykMy;
+    if (rb) rb.parentNode.hidden = !ykRs;
     ykf.hidden = false;
-    fb.addEventListener('click', function () {
-      var on = fb.getAttribute('aria-pressed') !== 'true';
+    var ykOn = function (b) { return !!b && b.getAttribute('aria-pressed') === 'true'; };
+    var ykApply = function () {
+      var om = ykOn(fb);
+      var orz = ykOn(rb);
       var any = 0;
-      fb.setAttribute('aria-pressed', String(on));
       [].forEach.call(document.querySelectorAll('main section'), function (s) {
+        var lis = s.querySelectorAll('li[data-y]');
+        if (!lis.length) return;
         var c = 0;
-        [].forEach.call(s.querySelectorAll('li[data-y]'), function (li) {
-          var ok = !on || (li.getAttribute('data-o') || '').split(' ').some(function (p) { return mine2.indexOf(p) >= 0; });
+        [].forEach.call(lis, function (li) {
+          var ok = (!om || (li.getAttribute('data-o') || '').split(' ').some(function (p) { return mine2.indexOf(p) >= 0; })) &&
+            (!orz || yHas(li.getAttribute('data-y')));
           li.hidden = !ok;
           if (ok) c++;
         });
@@ -189,7 +202,17 @@
         any += c;
       });
       var e = document.querySelector('.yk-none');
-      if (e) e.hidden = !!any;
+      if (e) {
+        e.textContent = orz ? 'えらんだ条件に合う予約受付中のグッズは、このページにはありません' : 'わたしの推しの予約受付中のグッズは、いまはありません';
+        e.hidden = !!any;
+      }
+    };
+    [fb, rb].forEach(function (b) {
+      if (!b) return;
+      b.addEventListener('click', function () {
+        b.setAttribute('aria-pressed', String(!ykOn(b)));
+        ykApply();
+      });
     });
   }
 
