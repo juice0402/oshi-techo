@@ -363,3 +363,69 @@
 - 読むファイル：docs/shikumi.md の「ご当地」「入荷ビンゴ」（画像で保存の行）、src/gotouchi.js、src/bingo.js の draw() と共有の所（146〜165行あたり）、scripts/build.mjs の data-gk と .gmo の所（2010〜2050行あたり）、scripts/lib/region.mjs の AREAS
 - マージ：する
 - 足した：育てる山の補充（自動・2026-11-21）
+
+### [ ] ご当地の一覧の「都道府県ごとの見つけた記録」の表に、「持ってる」の県のペンの丸
+- やること：
+  1. scripts/build.mjs の gotouchiKiroku（「都道府県ごとの見つけた記録」の表）の各行の tr に、県の id（p- のないローマ字。ot-gotouchi-<作品> に残すのと同じ形）を data-p で入れる。ほかの HTML は変えない
+  2. src/gotouchi.js の draw() で、目次のペンの丸（.gtoc a[data-got]）と同じように、表の tr[data-p] のうち「持ってる」の県に data-got を付け、外したら消す。いまの一覧に商品がない県（記録の表にだけある県）も、ot-gotouchi-<作品> にあれば丸を付ける
+  3. src/themes/a-techo.css に、表の data-got の行の県の名前（th）に、目次と同じペンの丸（.gtoc a[data-got] と同じ var(--pen) の background）を付ける決まりを1つ足す。付けるのは background だけ（.gtoc a[data-got] の padding・margin は付けない。.kk-book th の width・nowrap・地の色の列の組みをくずさない）
+  4. scripts/test.mjs の「ご当地の記録の表」の点検（`<tr><th scope="row">…` の形を見ている所）を、tr に data-p が入った形に合わせる。docs/shikumi.md の「ご当地」の見つけた記録の表の行に1文足す
+- できあがりの条件：見本データで、ot-gotouchi-snoopy に県を2つ入れた端末で（Playwright で localStorage を入れて確かめる）/snoopy/gotouchi/ の見つけた記録の表のその2県にペンの丸が出て、県の「持ってる」を押して外すと表の丸も消える。「持ってる」が0・保存が使えない・JS が動かない端末では今と同じ見た目。dist の HTML の差は記録の表の tr の data-p だけで、title・説明文・h1・構造化データは変わっていない。test.mjs が通る（SITE_MODE=production でも）。スマホ 390px とパソコン 1280px で表が横にはみ出さない
+- 決まったこと：「持ってる」は端末の ot-gotouchi-<作品>（キティは ot-gotouchi-kitty）に県の id だけ・サイトや楽天に何も送らない・目次の県にペンの丸で数は出さない（docs/shikumi.md の「ご当地」の「持ってる」のチェック・#95、src/gotouchi.js のいちばん上）。見つけた記録の表は記録のある県が3つより少ないと出さない（同じ節・#107）。答えのページに「自分の数字が残る」形を足す（連絡板 C-026 案A・search-data-oshi.md で表示がいちばん多いのは /snoopy/gotouchi/）。12/1 までは1回1つの小さな足し（連絡板 C-028）
+- 迷ったら：丸を付けるのは表の県の名前だけ（日付の列には付けない）。「◯県持ってる」のような数や文は出さない。「持ってない県だけ」を押しても、記録の表の行はかくさない（表は記録なので全部見せる）。表の並び・列・文は変えない。新しい見た目は足さない（目次と同じペンの丸を使う）
+- 読むファイル：docs/shikumi.md の「ご当地」、scripts/build.mjs の gotouchiKiroku、src/gotouchi.js の draw()、src/themes/a-techo.css の .gtoc a[data-got] と .kk-book、scripts/test.mjs の記録の表の点検
+- 順番：「ご当地の一覧の「持ってる」県を、画像で保存」の項目のあと（同じ src/gotouchi.js をさわるため）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-28）
+
+### [ ] 推しの入荷ビンゴ（/bingo/）のわたしの推しのカードに、その推しの予約受付中への1行
+- やること：
+  1. scripts/build.mjs の /bingo/ の cfg.oshi（いまは [呼び方, 誕生日の月]）に、3つめとして、その推しキャラのページに予約受付中の棚が出るときだけ 1、出ないときは 0 を足す。棚が出るかは ykShelf と同じ条件（ykEntries のうち op にその推しキャラのページの場所があるものが YK_MIN 件以上）で数える。op の場所は「/作品/推し/」の形（前後にスラッシュ）で、cfg のキーは「作品/推し」なので、'/' + キー + '/' にしてから比べる（ykShelfShown は作る順に左右されるので使わない。「誕生日カレンダー…予約受付中への道」の項目が同じ条件の小さな関数をもう作っていれば、それを使う）
+  2. src/bingo-page.js の、カードの下の「<呼び方>のグッズの新着へ」のリンクのあと（同じ p.more の中、全角の空白で区切って）に、3つめが 1 の推しだけ「<呼び方>の予約受付中」を足し、/<作品>/<推し>/#yoyaku へリンクする
+  3. わたしの推しがいない端末に出る見本のカード（build.mjs の pick の bingoCardHtml の more）にも、同じ条件で同じリンクを足す
+  4. docs/shikumi.md の「入荷ビンゴ」の /bingo/ の行に1文足す
+- できあがりの条件：見本データで、予約受付中の棚がある推しを ot-my に入れた端末で（Playwright で localStorage を入れて確かめる）/bingo/ のその推しのカードの下に「予約受付中」のリンクが出て、押すと推しキャラのページの予約受付中の棚へ飛ぶ。棚がない推しには出ない。scripts/test.mjs に、/bingo/ の bgcfg の3つめが 1 の推しは、その推しキャラのページに id="yoyaku" があることを確かめる点検を足す。dist/bingo/data.json と bgcfg に商品の情報が入っていない（今の点検が通る）。test.mjs が通る（SITE_MODE=production でも）。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：買いに来る理由（予約・発売の時期・コラボ）を楽しさ（ビンゴ・わたしの推し）といっしょに渡す（claude/oshi-handoff.md の「大事な決めごと」・連絡板 C-025）。/bingo/ の bgcfg は絵の場所・種類の名前・推しの名前と誕生日の月だけで商品の情報は入れない（docs/shikumi.md の「入荷ビンゴ」）。推しキャラのページの予約受付中の棚は id="yoyaku"・YK_MIN 件より少ない推しには出さない（scripts/build.mjs の ykShelf、#80）
+- 迷ったら：予約の数・発売の日・締切は書かない。「急いで」「お早めに」「今だけ」のような、あおる言い方はしない。bgcfg に足すのは 0 と 1 だけ（件数を入れない）。前の月の記録の行・推しキャラのページの入荷ビンゴのカード（bingoHtml）には足さない。新しい見た目は足さない（今の p.more の文字のリンクと同じ形）
+- 読むファイル：docs/shikumi.md の「入荷ビンゴ」「予約帳」、scripts/build.mjs の /bingo/ の cfg と pick・ykEntries・ykShelf・YK_MIN、src/bingo-page.js の「のグッズの新着へ」の所、scripts/test.mjs の /bingo/ の点検
+- 順番：「誕生日カレンダー（/tanjoubi/）の誕生日が近い推しに、予約受付中への道」の項目のあと（同じ「棚が出るか」の数え方を使うため）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-28）
+
+### [ ] 誕生日カレンダー（/tanjoubi/）の「誕生日が近い順」で、わたしの推しにペンの丸
+- やること：
+  1. src/my.js で、/tanjoubi/ の「誕生日が近い順」（ul.bd）の各行のリンクの場所が、わたしの推し（ot-my の推しキャラのページの場所）と同じ行の li に data-my を付ける（ブラウザの中だけ・開いたときに一度だけ。ot-my は読むだけ）。build.mjs の HTML は変えない
+  2. src/themes/a-techo.css に、ul.bd の li[data-my] の名前のリンクに、ご当地の目次と同じペンの丸（.gtoc a[data-got] と同じ var(--pen) の background だけ。padding・margin は付けず、行の組みを変えない）を付ける決まりを1つ足す
+  3. src/my.js のいちばん上の、保存するものの説明のコメントはそのまま（新しく保存するものはない）。docs/shikumi.md の「推しキャラ」の誕生日の行に1文足す
+- できあがりの条件：見本データで、誕生日のある推しキャラを ot-my に入れた端末で（Playwright で localStorage を入れて確かめる）/tanjoubi/ の「誕生日が近い順」のその推しの名前にペンの丸が出る。ot-my が空・保存が使えない・JS が動かない端末と、わたしの推しに誕生日のある推しがいない端末では今と同じ見た目。行の並び・文は変わらない。dist の HTML は src/my.js と CSS のほかは変わらず、title・説明文・h1・構造化データも同じ。test.mjs が通る（SITE_MODE=production でも）。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：わたしの推しは端末の ot-my（3人まで）・ブラウザの中だけで、サイトや楽天に何も送らない（CLAUDE.md の「ページ」、docs/shikumi.md の「推しキャラ」）。季節のまとめでも、わたしの推しはブラウザの中で一度だけ動かし、ほかの HTML はそのまま（docs/shikumi.md の「季節のまとめのわたしの推し」・#109）。ペンの丸は「えらんだもの・持ってるもの」の印（ご当地の目次・ボタンのペンの丸。CLAUDE.md の「見た目と文章」）。12/1 までは1回1つの小さな足し（連絡板 C-028）
+- 迷ったら：並びは誕生日が近い順のまま（わたしの推しを上へ動かさない）。「わたしの推し」の字や数・「もうすぐ」のような文は足さない。上の誕生日が近い推しの棚（birthdaySection）・トップの誕生日の棚・推し活カレンダー（/calendar/）には足さない。ot-my の推しの誕生日がなくても何も出さない
+- 読むファイル：docs/shikumi.md の「推しキャラ」、scripts/build.mjs の /tanjoubi/ の page()（ul.bd・oshiHref）、src/my.js の ot-my の読み方と季節のまとめの data-mywork の所、src/themes/a-techo.css の .gtoc a[data-got] と .bd
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-28）
+
+### [ ] 入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/）の「印が多かった推しキャラ」で、わたしの推しにペンの丸
+- やること：
+  1. scripts/build.mjs の bingoSummaryPage の table() に section の id を渡せるようにし、「印が多かった推しキャラ」の section にだけ id="oshi" を付ける（渡さないときは今と同じ HTML）
+  2. src/my.js で、#oshi の表の各行のリンクの場所が、わたしの推し（ot-my の推しキャラのページの場所）と同じ行の tr に data-my を付ける（ブラウザの中だけ・開いたときに一度だけ。ot-my は読むだけ）
+  3. src/themes/a-techo.css に、#oshi の tr[data-my] の名前のリンクに、ご当地の目次と同じペンの丸（var(--pen) の background だけ。padding・margin は付けない）を付ける決まりを足す（前の項目で ul.bd に足した決まりがあれば、同じ決まりに選び方を足す）
+  4. docs/shikumi.md の「入荷ビンゴ」の先月のまとめの行に1文足す
+- できあがりの条件：見本データで（test/fixture-bingo-summary.json のまとめのページ）、上位の表にいる推しキャラを ot-my に入れた端末で（Playwright で localStorage を入れて確かめる）その行の名前にペンの丸が出る。ot-my が空・保存が使えない・JS が動かない端末と、わたしの推しが表にいない端末では今と同じ見た目。dist の HTML の差は、まとめのページの section の id="oshi" だけで、title・説明文・h1・構造化データ・noindex の付き方は変わっていない。test.mjs が通る（SITE_MODE=production でも）。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：先月のまとめは終わった月ごとに作り、印が多かった推しキャラの上位10人（推しキャラのページがあればリンク）を出す（docs/shikumi.md の「入荷ビンゴ」・issue #70）。わたしの推しは端末の ot-my だけ・何も送らない（CLAUDE.md の「ページ」）。ここにしかない記録・積み上がるもの（claude/site-principles.md の「楽しさで、わざわざ来てもらう」・連絡板 C-016）。12/1 までは1回1つの小さな足し（連絡板 C-028）
+- 迷ったら：丸を付けるのは「印が多かった推しキャラ」の表だけ（まとめの箇条・作品ごとの印・種類ごとの表には付けない）。わたしの推しが上位10人にいないときは何も出さない（「わたしの推しは◯マス」のような行は足さない）。順位・並び・文は変えない。新しい見た目は足さない
+- 読むファイル：docs/shikumi.md の「入荷ビンゴ」、scripts/build.mjs の bingoSummaryPage（table・oshiLink）、src/my.js の ot-my の読み方、src/themes/a-techo.css の .gtoc a[data-got] と .kk-book
+- 順番：前の項目のあと（同じ src/my.js と CSS のペンの丸をさわるため）。「入荷ビンゴの先月のまとめ（/bingo/<年>-<月>/）に、前と次の月のまとめへの「つぎに見る」」の項目のあと（同じ bingoSummaryPage をさわるため）
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-28）
+
+### [ ] コラボグッズの新着（/collab/）と推し活カレンダー（/calendar/）に「つぎに見る」
+- やること：
+  1. scripts/build.mjs の /collab/ の page() に tsugi を渡す：「推し活カレンダー」→ /calendar/（文字は /yoyaku/ と同じ「発売日と予約の締切のカレンダー」）、「発売前のもの」→ /yoyaku/（文字は「推しグッズの予約帳」。/yoyaku/ を作らない日は行を出さない）
+  2. /calendar/ の page() に tsugi を渡す：「コラボグッズ」→ /collab/（/yoyaku/ と同じ書き方）、「推しキャラの誕生日」→ /tanjoubi/（文字は「推しキャラの誕生日カレンダー」）、「発売前のもの」→ /yoyaku/（文字は「推しグッズの予約帳」）。作らない日のページは tsugiNav が外す今の作りのまま
+  3. 理由の文は scripts/test.mjs の WHY にある言葉だけを使う（WHY は変えない）。docs/shikumi.md の「つぎに見る」の節の、推しキャラのページ・読みものの記事・/yoyaku/ の道を書いた行の最後に1文足す
+- できあがりの条件：見本データで、/collab/ と /calendar/ の本文の最後に「つぎに見る」が出て、どの行も行き先のページがある（自分のページと作っていないページへのリンクがない）。build.mjs の出力の「つぎに見る」の行がこわれていない。test.mjs の「つぎに見る」の点検が通る（SITE_MODE=production でも）。title・説明文・h1・構造化データ・noindex の付き方・サイトマップは変わっていない。スマホ 390px とパソコン 1280px で横にはみ出さない
+- 決まったこと：行き止まりのページの終わりに文字の道しるべを4行まで・理由の文は決めたものだけ（test.mjs の WHY）・人気・おすすめ・今だけ・件数・JavaScript・わたしの推しの行は入れない・作品のトップ・コーナーのトップ・トップ・ご当地の一覧・買い方メモ・公式には足さない・検索の設定は変えない（docs/shikumi.md の「つぎに見る」、連絡板 C-027）。/yoyaku/ のつぎに見るは推し活カレンダーとコラボグッズ（docs/shikumi.md の「つぎに見る」の推しキャラのページの行・scripts/build.mjs の /yoyaku/ の page()）。サイトの中のつなぎは 12/1 までもしてよい（連絡板 C-028）
+- 迷ったら：「発売前のもの」はいまは作品ごとの予約受付中への理由の文だが、/yoyaku/ も発売前のものなので同じ文を使う（新しい理由の文は作らない）。1行に1つのリンク。/collab/ の作品ごとの節・「コラボグッズの新着」の文・時点の価格の行の位置は変えない（つぎに見るは tsugiNav の今の置き方のまま）。/calendar/ の日付の表の中身は変えない
+- 読むファイル：docs/shikumi.md の「つぎに見る」「推し活カレンダー」、scripts/build.mjs の tsugiNav・/yoyaku/ の page() の tsugi・/collab/ と /calendar/ の page()、scripts/test.mjs の WHY の所
+- マージ：する
+- 足した：育てる山の補充（自動・2026-11-28）
